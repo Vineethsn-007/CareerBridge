@@ -319,3 +319,14 @@ export interface TavusWebhookPayload {
 export interface EndInterviewRequest {
   reason?: string | null;
 }
+export interface IntegrityEvent {
+  event_type: "tab_switch" | "window_blur" | "fullscreen_exit" | "multiple_faces" | "no_face";
+  timestamp: string;
+  details?: Record<string, unknown>;
+}
+
+export interface IntegrityReportResponse {
+  status: string;
+  integrity_score: number;
+  total_events: number;
+}
