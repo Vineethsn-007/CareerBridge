@@ -142,11 +142,14 @@ button:disabled,
   backface-visibility: hidden;
 }
 
-/* Pointer-responsive ambient light container */
-.ambient-mouse-panel {
-  background-image: radial-gradient(
-    650px circle at var(--bg-x, 50%) var(--bg-y, 50%),
-    rgba(132, 179, 206, 0.14),
-    transparent 65%
-  );
+/* Cinematic Scroll Mask Utilities */
+.mask-clip-horizontal {
+  clip-path: inset(0% 100% 0% 0%);
+  will-change: clip-path;
 }
+
+.mask-clip-vertical {
+  clip-path: inset(100% 0% 0% 0%);
+  will-change: clip-path;
+}
+

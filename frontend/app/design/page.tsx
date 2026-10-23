@@ -5,7 +5,6 @@ import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { SpotlightCard } from "@/components/ui/SpotlightCard";
 import { Badge } from "@/components/ui/Badge";
 import { Chip } from "@/components/ui/Chip";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -272,15 +271,15 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-              <SpotlightCard className="p-6 space-y-3">
+              <Card variant="default" className="p-6 space-y-3">
                 <h3 className="text-sm font-bold text-deep-teal flex items-center gap-2">
-                  <span>Interactive Spotlight Card with</span>
+                  <span>Editorial Card with</span>
                   <GradientText>Gradient Text</GradientText>
                 </h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
-                  Move your mouse across this card to see the subtle powder-blue specular glow follow the pointer smoothly.
+                  Clean editorial card presentation with subtle borders and serene color hierarchy.
                 </p>
-              </SpotlightCard>
+              </Card>
 
               <SkeletonCard />
             </div>

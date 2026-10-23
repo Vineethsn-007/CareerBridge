@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import type { JobMatch } from "@/lib/types";
-import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Chip } from "@/components/ui/Chip";
 import { Button } from "@/components/ui/Button";
@@ -26,10 +26,9 @@ export function JobCard({ match, rank }: JobCardProps) {
   const { job, score, matched_skills, missing_skills, rationale } = match;
 
   return (
-    <SpotlightCard
-      data-cursor="card"
-      className="flex flex-col justify-between space-y-5 border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group bg-pure-white shadow-card"
-      spotlightColor="rgba(132, 179, 206, 0.2)"
+    <Card
+      variant="default"
+      className="flex flex-col justify-between space-y-5 border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group bg-pure-white shadow-card p-6"
     >
       <div className="space-y-4">
         {/* Top Header: Rank, Badges, Score */}
@@ -158,6 +157,6 @@ export function JobCard({ match, rank }: JobCardProps) {
           <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover/apply:translate-x-0.5 group-hover/apply:-translate-y-0.5" />
         </a>
       </div>
-    </SpotlightCard>
+    </Card>
   );
 }

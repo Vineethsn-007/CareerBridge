@@ -4,7 +4,6 @@ import "./globals.css";
 import { Navbar } from "@/components/shell/Navbar";
 import { Footer } from "@/components/shell/Footer";
 import { RouteTransition } from "@/components/shell/RouteTransition";
-import { CustomCursor } from "@/components/motion/CustomCursor";
 
 const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -56,7 +55,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fontSans.variable} ${fontSerif.variable}`}>
       <body className="bg-merino text-primary-text min-h-screen flex flex-col font-sans selection:bg-rock-blue/40 selection:text-deep-teal antialiased">
-        <CustomCursor />
         <Navbar />
         <main className="flex-1 flex flex-col">
           <RouteTransition>{children}</RouteTransition>
