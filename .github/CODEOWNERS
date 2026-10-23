@@ -11,13 +11,13 @@
 /backend/app/services/parser/          @Vineethsn-007
 
 # Jobs data + matching (Teammate B)
-/backend/app/data/                     @TEAMMATE_B
-/backend/app/services/jobs/            @TEAMMATE_B
-/backend/app/services/matching/        @TEAMMATE_B
+/backend/app/data/                     @hafeez-div
+/backend/app/services/jobs/            @hafeez-div
+/backend/app/services/matching/        @hafeez-div
 
 # Skill gap, prep plan, interview practice (Teammate C)
-/backend/app/services/skills/          @TEAMMATE_C
-/backend/app/services/interview/       @TEAMMATE_C
+/backend/app/services/skills/          @haashid
+/backend/app/services/interview/       @haashid
 
 # Frontend (Teammate D)
-/frontend/                             @TEAMMATE_D
+/frontend/                             @Rifan108
