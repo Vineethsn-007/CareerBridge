@@ -1,0 +1,27 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec)
+# Deploy: Render dashboard -> New -> Blueprint -> point at this repository.
+services:
+  - type: web
+    name: careerbridge-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    # Production settings are supplied through the Render dashboard (Environment
+    # tab). sync: false means Render asks for a value on first deploy instead of
+    # storing it in Git. CORS_ORIGINS must list the deployed frontend origin(s),
+    # comma-separated, e.g. https://careerbridge-frontend.vercel.app
+    envVars:
+      - key: CORS_ORIGINS
+        sync: false
+      - key: LLM_PROVIDER
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - key: LLM_TIMEOUT
+        sync: false
