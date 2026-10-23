@@ -1,0 +1,67 @@
+[
+  {
+    "id": "sample-001",
+    "title": "Junior Python Developer (SAMPLE)",
+    "company": "Sample Company A",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": ["Python", "SQL", "Git", "REST API", "Problem Solving"],
+    "description": "SAMPLE ENTRY. Build and maintain backend services in Python.",
+    "source_url": "https://example.com/jobs/sample-001",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "sample-002",
+    "title": "Frontend Intern (SAMPLE)",
+    "company": "Sample Company B",
+    "location": "Remote",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": ["JavaScript", "React", "HTML", "CSS", "Git"],
+    "description": "SAMPLE ENTRY. Work on a React web app with a small product team.",
+    "source_url": "https://example.com/jobs/sample-002",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "sample-003",
+    "title": "Data Analyst Trainee (SAMPLE)",
+    "company": "Sample Company C",
+    "location": "Mangalore",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": ["SQL", "Excel", "Power BI", "Data Analysis", "Communication"],
+    "description": "SAMPLE ENTRY. Prepare dashboards and reports for business teams.",
+    "source_url": "https://example.com/jobs/sample-003",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "sample-004",
+    "title": "ML Engineer Intern (SAMPLE)",
+    "company": "Sample Company D",
+    "location": "Hyderabad",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": ["Python", "Machine Learning", "PyTorch", "Pandas", "NumPy"],
+    "description": "SAMPLE ENTRY. Train and evaluate models on tabular and text data.",
+    "source_url": "https://example.com/jobs/sample-004",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "sample-005",
+    "title": "Full Stack Developer (SAMPLE)",
+    "company": "Sample Company E",
+    "location": "Pune",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": ["TypeScript", "React", "Node.js", "PostgreSQL", "Docker", "Git"],
+    "description": "SAMPLE ENTRY. Own features end to end across a React and Node.js stack.",
+    "source_url": "https://example.com/jobs/sample-005",
+    "verified": false,
+    "last_verified": null
+  }
+]

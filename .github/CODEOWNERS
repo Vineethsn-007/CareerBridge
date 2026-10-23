@@ -1,0 +1,23 @@
+# Later rules override earlier ones. Replace the TEAMMATE_* placeholders with real GitHub
+# usernames (an unknown username just shows a warning on GitHub; nothing breaks).
+# Owners are auto-requested as reviewers on PRs touching their paths.
+
+*                                      @Vineethsn-007
+
+# Platform, contract, parser (lead)
+/.github/                              @Vineethsn-007
+/backend/app/core/                     @Vineethsn-007
+/backend/app/schemas.py                @Vineethsn-007
+/backend/app/services/parser/          @Vineethsn-007
+
+# Jobs data + matching (Teammate B)
+/backend/app/data/                     @TEAMMATE_B
+/backend/app/services/jobs/            @TEAMMATE_B
+/backend/app/services/matching/        @TEAMMATE_B
+
+# Skill gap, prep plan, interview practice (Teammate C)
+/backend/app/services/skills/          @TEAMMATE_C
+/backend/app/services/interview/       @TEAMMATE_C
+
+# Frontend (Teammate D)
+/frontend/                             @TEAMMATE_D
