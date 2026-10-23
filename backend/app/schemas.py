@@ -189,3 +189,59 @@ class AnswerFeedback(BaseModel):
     strengths: list[str]
     improvements: list[str]
     sample_answer: str | None = None
+
+
+# ---------- Persona Q&A (additive, Task 3) ----------
+
+PersonaTopic = Literal[
+    "leadership", "teamwork", "ownership", "communication", "initiative", "learning agility"
+]
+
+
+class PersonaStartRequest(BaseModel):
+    resume: ParsedResume | None = None
+    resume_profile_id: int | None = None
+
+
+class PersonaQuestion(BaseModel):
+    index: int = Field(ge=1)
+    topic: PersonaTopic
+    question: str
+
+
+class PersonaStartResponse(BaseModel):
+    persona_id: int
+    resume_profile_id: int
+    total_questions: int
+    completed: bool = False
+    question: PersonaQuestion
+
+
+class PersonaAnswerRequest(BaseModel):
+    persona_id: int
+    question: PersonaQuestion
+    answer: str | None = None
+    skip: bool = False
+
+
+class PersonaStrength(BaseModel):
+    """A strength the candidate described in their own words, with a direct quote."""
+
+    strength: str
+    quote: str
+    topic: PersonaTopic
+
+
+class PersonaProfileResult(BaseModel):
+    persona_id: int
+    resume_profile_id: int
+    strengths: list[PersonaStrength] = Field(default_factory=list)
+    summary: str | None = None
+    confidence: Literal["high", "medium", "low"] = "low"
+    completed: bool = True
+
+
+class PersonaAnswerResponse(BaseModel):
+    completed: bool
+    question: PersonaQuestion | None = None
+    profile: PersonaProfileResult | None = None
