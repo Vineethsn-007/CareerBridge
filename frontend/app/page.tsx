@@ -269,76 +269,108 @@ export default function Home() {
       </section>
 
       {/* SECTION 4 — THE CHALLENGE */}
-      <section className="py-20 border-b border-border bg-merino">
+      <section className="py-20 lg:py-24 border-b border-border bg-merino">
         <Container size="xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Top Two-Column Composition: Left Editorial + Right Photograph */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* Left Column: Heading and Explanation */}
             <div className="lg:col-span-6 space-y-5">
               <Badge variant="priority-medium" size="sm">
                 The Real Challenge
               </Badge>
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-deep-teal leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-deep-teal leading-tight">
                 Career decisions shouldn&apos;t feel like guesswork.
               </h2>
-              <p className="text-base text-secondary-text leading-relaxed">
+              <p className="text-base sm:text-lg text-secondary-text leading-relaxed">
                 Students face many challenges when planning their careers.
                 CareerBridge brings everything together to help you make informed,
                 data-backed decisions.
               </p>
+              <p className="text-sm text-muted-text leading-relaxed pt-1">
+                From fragmented placement drives to conflicting online advice, navigating your first professional leap shouldn&apos;t be a solo trial-and-error experiment.
+              </p>
+            </div>
 
-              <div className="relative aspect-[1024/537] w-full rounded-2xl overflow-hidden border border-border shadow-card mt-6">
+            {/* Right Column: High-Quality Student Photograph */}
+            <div className="lg:col-span-6 relative">
+              {/* Soft blue visual accent behind image */}
+              <div className="absolute -inset-3 bg-rock-blue/20 rounded-3xl transform rotate-1 pointer-events-none" />
+
+              <div className="relative aspect-[1024/537] w-full rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white">
                 <Image
                   src="/images/collaborating-students.jpg"
                   alt="Indian engineering students working together on laptops during a hackathon"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 600px"
+                  priority
                 />
               </div>
-            </div>
 
-            {/* Right Column: 5 Concise Challenge Cards */}
-            <div className="lg:col-span-6 space-y-3.5">
+              {/* Authentic caption tag */}
+              <div className="absolute bottom-3 left-4 bg-deep-teal/85 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1 rounded-full flex items-center gap-1.5 shadow-subtle hidden sm:flex">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>Student Engineering Team • Live Hackathon Sprint</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Below: Five Concise Challenge Cards */}
+          <div className="mt-12 lg:mt-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {[
                 {
                   title: "Too many career options",
                   desc: "Endless job titles and conflicting advice make choosing a clear focus exhausting.",
                   num: "01",
+                  icon: Compass,
                 },
                 {
                   title: "Uncertainty about suitable jobs",
                   desc: "Hard to know whether your academic background truly matches market requirements.",
                   num: "02",
+                  icon: Target,
                 },
                 {
-                  title: "Confusion about which skills to learn",
+                  title: "Confusion on skills to learn",
                   desc: "Students waste months on outdated tutorials without knowing employer priorities.",
                   num: "03",
+                  icon: Layers,
                 },
                 {
                   title: "Resume not matching roles",
                   desc: "Generic resumes get filtered out by screening algorithms before a human ever looks.",
                   num: "04",
+                  icon: FileText,
                 },
                 {
                   title: "Limited interview practice",
                   desc: "Few students get realistic technical mock interviews with structured rubric feedback.",
                   num: "05",
+                  icon: MessageSquare,
                 },
-              ].map((c) => (
-                <div
-                  key={c.num}
-                  className="bg-pure-white border border-border rounded-lg p-4 shadow-subtle flex items-start gap-4 transition-all hover:border-rock-blue"
-                >
-                  <span className="text-xs font-serif font-bold text-rock-blue mt-0.5">
-                    {c.num}
-                  </span>
-                  <div className="space-y-0.5">
-                    <h4 className="text-sm font-bold text-deep-teal">{c.title}</h4>
-                    <p className="text-xs text-secondary-text leading-relaxed">{c.desc}</p>
+              ].map((c) => {
+                const Icon = c.icon;
+                return (
+                  <div
+                    key={c.num}
+                    className="bg-pure-white border border-border rounded-xl p-4 shadow-subtle flex flex-col justify-between gap-3 transition-all hover:border-rock-blue hover:shadow-card group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="w-8 h-8 rounded-lg bg-pale-blue/60 border border-border flex items-center justify-center text-venice-blue group-hover:bg-rock-blue/20 transition-colors">
+                        <Icon className="w-4 h-4 text-venice-blue" />
+                      </div>
+                      <span className="text-xs font-serif font-bold text-rock-blue">
+                        {c.num}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-deep-teal leading-snug">{c.title}</h4>
+                      <p className="text-xs text-secondary-text leading-relaxed">{c.desc}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </Container>
