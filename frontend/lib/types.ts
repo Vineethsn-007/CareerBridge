@@ -200,3 +200,60 @@ export interface AnswerFeedback {
   improvements: string[];
   sample_answer?: string | null;
 }
+
+// ---------- Persona Q&A (additive) ----------
+
+export type PersonaTopic =
+  | "leadership"
+  | "teamwork"
+  | "ownership"
+  | "communication"
+  | "initiative"
+  | "learning agility";
+
+export interface PersonaStartRequest {
+  resume?: ParsedResume | null;
+  resume_profile_id?: number | null;
+}
+
+export interface PersonaQuestion {
+  index: number;
+  topic: PersonaTopic;
+  question: string;
+}
+
+export interface PersonaStartResponse {
+  persona_id: number;
+  resume_profile_id: number;
+  total_questions: number;
+  completed: boolean;
+  question: PersonaQuestion;
+}
+
+export interface PersonaAnswerRequest {
+  persona_id: number;
+  question: PersonaQuestion;
+  answer?: string | null;
+  skip?: boolean;
+}
+
+export interface PersonaStrength {
+  strength: string;
+  quote: string;
+  topic: PersonaTopic;
+}
+
+export interface PersonaProfileResult {
+  persona_id: number;
+  resume_profile_id: number;
+  strengths: PersonaStrength[];
+  summary?: string | null;
+  confidence: "high" | "medium" | "low";
+  completed: boolean;
+}
+
+export interface PersonaAnswerResponse {
+  completed: boolean;
+  question?: PersonaQuestion | null;
+  profile?: PersonaProfileResult | null;
+}

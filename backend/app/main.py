@@ -1,3 +1,4 @@
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -5,13 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
 from app.core.config import settings
+from app.core.db import init_db
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI):
-    # Schema creation is safe to repeat; the scraper and jobs route rely on it.
-    from app.core.db import init_db
-
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    # Idempotent schema bootstrap (create_all + schema_version table);
+    # the scraper and jobs route rely on it.
     init_db()
     yield
 
