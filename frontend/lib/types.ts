@@ -257,3 +257,45 @@ export interface PersonaAnswerResponse {
   question?: PersonaQuestion | null;
   profile?: PersonaProfileResult | null;
 }
+
+// ---------- Interview Sessions & Plan ----------
+
+export interface PersonaInput {
+  summary?: string | null;
+  strengths?: string[];
+  confidence?: string | null;
+  answers?: Record<string, string>[];
+}
+
+export type QuestionType = "warmup" | "project" | "technical" | "behavioural" | "closing";
+export type QuestionDifficulty = "easy" | "medium" | "hard";
+
+export interface ClientQuestion {
+  id: string;
+  text: string;
+  type: QuestionType;
+  focus_skill_or_project?: string | null;
+  difficulty: QuestionDifficulty;
+  time_guide_seconds: number;
+}
+
+export interface InterviewSessionCreate {
+  resume: ParsedResume;
+  job_id: string;
+  persona?: PersonaInput | null;
+  num_questions?: number;
+  duration_minutes?: number | null;
+}
+
+export interface InterviewSessionResponse {
+  session_id: string;
+  job_id: string;
+  role_title: string;
+  company_name: string;
+  status: string;
+  num_questions: number;
+  duration_minutes: number;
+  questions: ClientQuestion[];
+  conversation_url?: string | null;
+  created_at: string;
+}

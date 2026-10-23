@@ -276,3 +276,61 @@ class PersonaAnswerResponse(BaseModel):
     completed: bool
     question: PersonaQuestion | None = None
     profile: PersonaProfileResult | None = None
+
+
+# ---------- Interview Sessions & Plan ----------
+
+
+class PersonaInput(BaseModel):
+    summary: str | None = None
+    strengths: list[str] = Field(default_factory=list)
+    confidence: str | None = None
+    answers: list[dict[str, str]] = Field(default_factory=list)
+
+
+class InterviewPlanQuestion(BaseModel):
+    id: str
+    text: str
+    type: Literal["warmup", "project", "technical", "behavioural", "closing"]
+    focus_skill_or_project: str | None = None
+    difficulty: Literal["easy", "medium", "hard"]
+    expected_key_points: list[str] = Field(default_factory=list)
+    follow_up: str | None = None
+    time_guide_seconds: int = 120
+
+
+class InterviewPlan(BaseModel):
+    job_id: str
+    role_title: str
+    company_name: str
+    questions: list[InterviewPlanQuestion]
+
+
+class ClientQuestion(BaseModel):
+    id: str
+    text: str
+    type: Literal["warmup", "project", "technical", "behavioural", "closing"]
+    focus_skill_or_project: str | None = None
+    difficulty: Literal["easy", "medium", "hard"]
+    time_guide_seconds: int = 120
+
+
+class InterviewSessionCreate(BaseModel):
+    resume: ParsedResume
+    job_id: str
+    persona: PersonaInput | None = None
+    num_questions: int = Field(default=5, ge=1, le=15)
+    duration_minutes: int | None = Field(default=15, ge=5, le=60)
+
+
+class InterviewSessionResponse(BaseModel):
+    session_id: str
+    job_id: str
+    role_title: str
+    company_name: str
+    status: str
+    num_questions: int
+    duration_minutes: int
+    questions: list[ClientQuestion]
+    conversation_url: str | None = None
+    created_at: str
