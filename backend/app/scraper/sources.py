@@ -12,9 +12,10 @@ feed saved fixtures and never touch the network.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
+from app.core.db import UTC
 from app.scraper.http import strip_html
 
 INDIA_MARKERS = (

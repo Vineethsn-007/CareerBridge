@@ -4,11 +4,15 @@ Generates technical, behavioural, and HR questions tailored to the resume and jo
 and evaluates candidate answers using a rubric-based scoring model with STAR guidance.
 """
 
+import datetime as dt
 import logging
 import secrets
 import uuid
+from typing import Any
 
-from app.core.db import SessionLocal, init_db
+import httpx
+
+from app.core.db import UTC, SessionLocal, init_db
 from app.core.llm import complete_json
 from app.schemas import (
     AnswerFeedback,
@@ -30,8 +34,18 @@ from app.services.interview.prompts import (
     INTERVIEW_QUESTIONS_PROMPT,
     INTERVIEW_QUESTIONS_SYSTEM,
 )
+from app.services.interview.tavus import (
+    create_tavus_conversation,
+    end_tavus_conversation,
+    fetch_tavus_conversation_verbose,
+)
 
 logger = logging.getLogger(__name__)
+
+
+def _utcnow() -> dt.datetime:
+    return dt.datetime.now(UTC)
+
 
 _BEHAVIOURAL_TEMPLATES = [
     "Tell me about a challenging technical roadblock in a project and how you solved it.",
@@ -689,13 +703,41 @@ def generate_interview_plan(
         )
 
 
-def create_interview_session(
+async def create_interview_session(
     resume: ParsedResume,
     job: Job,
     persona: PersonaInput | None = None,
     num_questions: int = 5,
     duration_minutes: int = 15,
+    consent_recording: bool = False,
+    consent_transcript: bool = True,
+    consent_integrity: bool = False,
+    tavus_client: httpx.AsyncClient | None = None,
 ) -> InterviewSessionResponse:
+    init_db()
+
+    # 1. Enforce single active session per candidate
+    if resume.email:
+        with SessionLocal() as db_session:
+            active_sessions = (
+                db_session.query(InterviewSessionModel)
+                .filter(
+                    InterviewSessionModel.candidate_email == resume.email,
+                    InterviewSessionModel.status.in_(["created", "live"]),
+                )
+                .all()
+            )
+            for old in active_sessions:
+                old.status = "ended"
+                old.ended_at = _utcnow()
+                if old.tavus_conversation_id:
+                    try:
+                        await end_tavus_conversation(old.tavus_conversation_id, client=tavus_client)
+                    except Exception as exc:
+                        logger.warning("Error ending prior Tavus conversation: %s", exc)
+            db_session.commit()
+
+    # 2. Pre-generate question plan
     plan = generate_interview_plan(
         resume=resume,
         job=job,
@@ -704,9 +746,23 @@ def create_interview_session(
         duration_minutes=duration_minutes,
     )
     session_id = f"sess_{uuid.uuid4().hex[:12]}"
-    webhook_token = secrets.token_urlsafe(24)
+    webhook_token = secrets.token_urlsafe(32)
 
-    init_db()
+    # 3. Create live video conversation with Tavus (or mock when unset)
+    candidate_display = resume.name or "there"
+    tavus_res = await create_tavus_conversation(
+        session_id=session_id,
+        plan=plan,
+        candidate_name=candidate_display,
+        webhook_token=webhook_token,
+        duration_minutes=duration_minutes,
+        consent_recording=consent_recording,
+        client=tavus_client,
+    )
+    tavus_conv_id = tavus_res.get("conversation_id")
+    tavus_conv_url = tavus_res.get("conversation_url")
+
+    # 4. Save session to DB
     with SessionLocal() as db_session:
         model = InterviewSessionModel(
             id=session_id,
@@ -718,7 +774,12 @@ def create_interview_session(
             status="created",
             num_questions=num_questions,
             duration_minutes=duration_minutes,
+            consent_recording=consent_recording,
+            consent_transcript=consent_transcript,
+            consent_integrity=consent_integrity,
             plan=plan.model_dump(),
+            tavus_conversation_id=tavus_conv_id,
+            tavus_conversation_url=tavus_conv_url,
             webhook_token=webhook_token,
         )
         db_session.add(model)
@@ -747,8 +808,12 @@ def create_interview_session(
         num_questions=num_questions,
         duration_minutes=duration_minutes,
         questions=client_questions,
-        conversation_url=None,
+        conversation_url=tavus_conv_url,
         created_at=created_at_str,
+        consent_recording=consent_recording,
+        consent_transcript=consent_transcript,
+        consent_integrity=consent_integrity,
+        has_report=False,
     )
 
 
@@ -782,4 +847,179 @@ def get_interview_session(session_id: str) -> InterviewSessionResponse | None:
             questions=client_questions,
             conversation_url=model.tavus_conversation_url,
             created_at=model.created_at.isoformat() if model.created_at else "",
+            consent_recording=model.consent_recording,
+            consent_transcript=model.consent_transcript,
+            consent_integrity=model.consent_integrity,
+            has_report=bool(model.report),
         )
+
+
+async def end_interview_session(
+    session_id: str,
+    reason: str | None = None,
+    tavus_client: httpx.AsyncClient | None = None,
+) -> InterviewSessionResponse:
+    """End an ongoing interview session and signal Tavus to terminate the call."""
+    init_db()
+    tavus_conv_id = None
+    with SessionLocal() as db_session:
+        model = db_session.get(InterviewSessionModel, session_id)
+        if model is None:
+            raise ValueError(f"Session '{session_id}' not found.")
+
+        if model.status not in ("ended", "processing", "report_ready", "failed"):
+            model.status = "ended"
+            model.ended_at = _utcnow()
+
+        tavus_conv_id = model.tavus_conversation_id
+        db_session.commit()
+
+    if tavus_conv_id:
+        try:
+            await end_tavus_conversation(tavus_conv_id, client=tavus_client)
+        except Exception as exc:
+            logger.warning("Error ending Tavus conversation '%s': %s", tavus_conv_id, exc)
+
+    res = get_interview_session(session_id)
+    if res is None:
+        raise ValueError(f"Session '{session_id}' not found.")
+    return res
+
+
+async def handle_tavus_webhook(
+    payload: dict[str, Any],
+    token: str | None = None,
+    session_id: str | None = None,
+) -> dict[str, Any]:
+    """Process incoming Tavus webhook callbacks with per-session token authentication."""
+    event_type = payload.get("event_type", "")
+    conversation_id = payload.get("conversation_id", "")
+    properties = payload.get("properties", {}) or {}
+
+    init_db()
+    with SessionLocal() as db_session:
+        model = None
+        if session_id:
+            model = db_session.get(InterviewSessionModel, session_id)
+        if model is None and conversation_id:
+            model = (
+                db_session.query(InterviewSessionModel)
+                .filter(InterviewSessionModel.tavus_conversation_id == conversation_id)
+                .first()
+            )
+
+        if model is None:
+            logger.warning(
+                "Webhook received for unknown session: conv=%s, session=%s",
+                conversation_id,
+                session_id,
+            )
+            return {"status": "ignored", "reason": "session_not_found"}
+
+        # Token authentication
+        if token and model.webhook_token:
+            if not secrets.compare_digest(token, model.webhook_token):
+                logger.warning("Invalid webhook token supplied for session '%s'", model.id)
+                raise PermissionError("Invalid webhook authentication token.")
+
+        # Idempotent event processing
+        if event_type in ("system.pal_joined", "system.replica_joined"):
+            if model.status == "created":
+                model.status = "live"
+                model.started_at = _utcnow()
+                db_session.commit()
+            return {"status": "processed", "event": event_type, "session_status": model.status}
+
+        elif event_type == "system.shutdown":
+            if model.status in ("created", "live"):
+                model.status = "ended"
+                model.ended_at = _utcnow()
+                db_session.commit()
+            return {"status": "processed", "event": event_type, "session_status": model.status}
+
+        elif event_type == "application.transcription_ready":
+            transcript = properties.get("transcript", [])
+            model.transcript = transcript
+            if model.status != "report_ready":
+                model.status = "processing"
+            db_session.commit()
+            return {"status": "processed", "event": event_type, "turns": len(transcript)}
+
+        elif event_type == "application.recording_ready":
+            rec_uri = properties.get("storage_uri") or properties.get("s3_key")
+            if rec_uri:
+                model.recording_url = str(rec_uri)
+                db_session.commit()
+            return {"status": "processed", "event": event_type}
+
+        elif event_type == "application.perception_analysis":
+            analysis = properties.get("analysis")
+            if analysis:
+                model.perception_analysis = {"analysis": analysis}
+                db_session.commit()
+            return {"status": "processed", "event": event_type}
+
+        return {"status": "ignored", "event": event_type}
+
+
+async def poll_and_sync_transcript(
+    session_id: str,
+    client: httpx.AsyncClient | None = None,
+) -> bool:
+    """Fallback: Poll Tavus verbose endpoint if transcript webhook is delayed."""
+    init_db()
+    with SessionLocal() as db_session:
+        model = db_session.get(InterviewSessionModel, session_id)
+        if model is None or not model.tavus_conversation_id:
+            return False
+
+        if model.transcript and len(model.transcript) > 0:
+            return True
+
+        verbose_data = await fetch_tavus_conversation_verbose(
+            model.tavus_conversation_id, client=client
+        )
+        if not verbose_data:
+            return False
+
+        events = verbose_data.get("events", [])
+        updated = False
+        for ev in events:
+            if ev.get("event_type") == "application.transcription_ready":
+                props = ev.get("properties", {})
+                transcript = props.get("transcript", [])
+                if transcript:
+                    model.transcript = transcript
+                    if model.status != "report_ready":
+                        model.status = "processing"
+                    updated = True
+
+            if ev.get("event_type") == "application.perception_analysis":
+                props = ev.get("properties", {})
+                if props.get("analysis"):
+                    model.perception_analysis = {"analysis": props.get("analysis")}
+                    updated = True
+
+        if updated:
+            db_session.commit()
+            return True
+
+    return False
+
+
+def record_integrity_events(session_id: str, events: list[dict[str, Any]]) -> dict[str, Any]:
+    """Store client-side integrity monitoring flags (if consented)."""
+    init_db()
+    with SessionLocal() as db_session:
+        model = db_session.get(InterviewSessionModel, session_id)
+        if model is None:
+            raise ValueError(f"Session '{session_id}' not found.")
+
+        if not model.consent_integrity:
+            return {"recorded": 0, "message": "Integrity monitoring not consented."}
+
+        current_log = list(model.integrity_log or [])
+        current_log.extend(events)
+        model.integrity_log = current_log
+        db_session.commit()
+        return {"recorded": len(events), "total": len(current_log)}

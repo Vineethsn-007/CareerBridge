@@ -4,7 +4,7 @@ Changing a model here means changing `frontend/lib/types.ts` in the same PR
 and telling the team in chat. Add fields freely; avoid renaming/removing them.
 """
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -321,6 +321,9 @@ class InterviewSessionCreate(BaseModel):
     persona: PersonaInput | None = None
     num_questions: int = Field(default=5, ge=1, le=15)
     duration_minutes: int | None = Field(default=15, ge=5, le=60)
+    consent_recording: bool = False
+    consent_transcript: bool = True
+    consent_integrity: bool = False
 
 
 class InterviewSessionResponse(BaseModel):
@@ -334,3 +337,20 @@ class InterviewSessionResponse(BaseModel):
     questions: list[ClientQuestion]
     conversation_url: str | None = None
     created_at: str
+    consent_recording: bool = False
+    consent_transcript: bool = True
+    consent_integrity: bool = False
+    has_report: bool = False
+
+
+class TavusWebhookPayload(BaseModel):
+    event_type: str
+    conversation_id: str
+    message_type: str | None = None
+    timestamp: str | None = None
+    webhook_url: str | None = None
+    properties: dict[str, Any] = Field(default_factory=dict)
+
+
+class EndInterviewRequest(BaseModel):
+    reason: str | None = None

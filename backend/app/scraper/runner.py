@@ -217,7 +217,9 @@ def _llm_missing() -> bool:
 
 
 def _iso_now() -> str:
-    from datetime import UTC, datetime
+    from datetime import datetime
+
+    from app.core.db import UTC
 
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
