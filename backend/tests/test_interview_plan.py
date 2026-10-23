@@ -1,5 +1,7 @@
 """Tests for pre-generated interview plan and interview sessions (Task 1)."""
 
+import asyncio
+
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
@@ -127,11 +129,13 @@ def test_create_interview_session_persists_rubric_but_hides_from_client():
     job = _sample_job()
     resume = _sample_resume()
 
-    res = interview_service.create_interview_session(
-        resume=resume,
-        job=job,
-        num_questions=5,
-        duration_minutes=15,
+    res = asyncio.run(
+        interview_service.create_interview_session(
+            resume=resume,
+            job=job,
+            num_questions=5,
+            duration_minutes=15,
+        )
     )
 
     assert res.session_id.startswith("sess_")

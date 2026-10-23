@@ -285,6 +285,9 @@ export interface InterviewSessionCreate {
   persona?: PersonaInput | null;
   num_questions?: number;
   duration_minutes?: number | null;
+  consent_recording?: boolean;
+  consent_transcript?: boolean;
+  consent_integrity?: boolean;
 }
 
 export interface InterviewSessionResponse {
@@ -298,4 +301,21 @@ export interface InterviewSessionResponse {
   questions: ClientQuestion[];
   conversation_url?: string | null;
   created_at: string;
+  consent_recording?: boolean;
+  consent_transcript?: boolean;
+  consent_integrity?: boolean;
+  has_report?: boolean;
+}
+
+export interface TavusWebhookPayload {
+  event_type: string;
+  conversation_id: string;
+  message_type?: string | null;
+  timestamp?: string | null;
+  webhook_url?: string | null;
+  properties?: Record<string, unknown>;
+}
+
+export interface EndInterviewRequest {
+  reason?: string | null;
 }
