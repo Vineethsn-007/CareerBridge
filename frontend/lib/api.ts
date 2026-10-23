@@ -8,6 +8,7 @@ import type {
   EndInterviewRequest,
   IntegrityEvent,
   IntegrityReportResponse,
+  InterviewReport,
   Job,
   JobMatch,
   MatchRequest,
@@ -85,5 +86,14 @@ export const api = {
   },
   logIntegrityEvents(sessionId: string, events: IntegrityEvent[]): Promise<IntegrityReportResponse> {
     return post<IntegrityReportResponse>(`/interview/sessions/${encodeURIComponent(sessionId)}/integrity`, { events });
+  },
+  getInterviewReport(sessionId: string): Promise<InterviewReport> {
+    return request<InterviewReport>(`/interview/sessions/${encodeURIComponent(sessionId)}/report`);
+  },
+  deleteInterviewData(sessionId: string): Promise<{ status: string; session_id: string }> {
+    return request<{ status: string; session_id: string }>(
+      `/interview/sessions/${encodeURIComponent(sessionId)}/data`,
+      { method: "DELETE" }
+    );
   },
 };

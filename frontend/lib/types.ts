@@ -330,3 +330,72 @@ export interface IntegrityReportResponse {
   integrity_score: number;
   total_events: number;
 }
+
+// ---------- Task 4: Interview Evaluation & Report ----------
+
+export interface QuestionEvaluation {
+  question_id: string;
+  question_text: string;
+  question_type: string;
+  focus_skill_or_project?: string | null;
+  difficulty: string;
+  score: number;
+  candidate_answer: string;
+  covered_points: string[];
+  missed_points: string[];
+  strengths: string[];
+  improvements: string[];
+  sample_answer: string;
+}
+
+export interface CommunicationMetrics {
+  words_per_minute: number;
+  filler_word_count: number;
+  filler_percentage: number;
+  filler_breakdown: Record<string, number>;
+  average_answer_duration_seconds: number;
+  average_answer_words: number;
+  long_pauses_count: number;
+  skipped_questions_count: number;
+  clarity_score: number;
+  conciseness_score: number;
+  confidence_score: number;
+  star_structure_score: number;
+}
+
+export interface IntegritySummary {
+  integrity_score: number;
+  total_events: number;
+  tab_switch_count: number;
+  fullscreen_exit_count: number;
+  face_missing_count: number;
+  multiple_faces_count: number;
+  flags: string[];
+}
+
+export interface ReportNextStep {
+  title: string;
+  skill: string;
+  action: string;
+  url?: string | null;
+  kind: string;
+}
+
+export interface InterviewReport {
+  session_id: string;
+  job_id: string;
+  role_title: string;
+  company_name: string;
+  candidate_name?: string | null;
+  overall_score: number;
+  readiness_level: string;
+  summary: string;
+  top_strengths: string[];
+  top_improvements: string[];
+  next_steps: ReportNextStep[];
+  question_evaluations: QuestionEvaluation[];
+  communication_metrics: CommunicationMetrics;
+  presentation_cues?: string[] | null;
+  integrity_summary?: IntegritySummary | null;
+  created_at: string;
+}

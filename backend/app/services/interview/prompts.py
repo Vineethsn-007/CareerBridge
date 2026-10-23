@@ -83,3 +83,31 @@ Target interview duration: {duration_minutes} minutes
 
 Generate a tailored InterviewPlan ordered from easy to hard.
 Output valid JSON only matching the schema."""
+
+
+DETAILED_QUESTION_EVALUATION_SYSTEM = (
+    "You are an expert interview coach and hiring manager evaluating a candidate's answer.\n"
+    "CRITICAL RULES:\n"
+    "1. Score the answer strictly from 0.0 to 10.0 based on coverage of expected key points.\n"
+    "2. For 'covered_points', list the expected key points the candidate addressed.\n"
+    "3. For 'missed_points', list expected key points that the candidate missed or omitted.\n"
+    "4. For 'strengths', identify 1-2 concrete strong aspects of their answer.\n"
+    "5. For 'improvements', identify 1-2 actionable tips. If behavioural, give explicit STAR "
+    "(Situation, Task, Action, Result) guidance.\n"
+    "6. For 'sample_answer', provide an exemplary model answer addressing all key points.\n"
+    "Output valid JSON only matching the schema: "
+    '{"score": <float 0-10>, "covered_points": ["<point>"], "missed_points": ["<point>"], '
+    '"strengths": ["<strength>"], "improvements": ["<improvement>"], "sample_answer": "<answer>"}'
+)
+
+DETAILED_QUESTION_EVALUATION_PROMPT = """Target Role: {job_title} at {job_company}
+Question ({question_type}, {difficulty}): {question_text}
+Focus Area: {focus_area}
+Expected Key Points (Rubric):
+{expected_key_points}
+
+Candidate Answer:
+\"\"\"{candidate_answer}\"\"\"
+
+Evaluate this candidate answer strictly against the expected key points rubric.
+Output valid JSON only."""

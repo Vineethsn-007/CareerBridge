@@ -940,10 +940,23 @@ async def handle_tavus_webhook(
         elif event_type == "application.transcription_ready":
             transcript = properties.get("transcript", [])
             model.transcript = transcript
-            if model.status != "report_ready":
-                model.status = "processing"
+            try:
+                from app.services.interview.evaluate import generate_interview_report
+
+                report = generate_interview_report(model)
+                model.report = report.model_dump()
+                model.status = "report_ready"
+            except Exception as exc:
+                logger.warning("Error generating report from transcription webhook: %s", exc)
+                if model.status != "report_ready":
+                    model.status = "processing"
             db_session.commit()
-            return {"status": "processed", "event": event_type, "turns": len(transcript)}
+            return {
+                "status": "processed",
+                "event": event_type,
+                "turns": len(transcript),
+                "has_report": bool(model.report),
+            }
 
         elif event_type == "application.recording_ready":
             rec_uri = properties.get("storage_uri") or properties.get("s3_key")
@@ -990,8 +1003,16 @@ async def poll_and_sync_transcript(
                 transcript = props.get("transcript", [])
                 if transcript:
                     model.transcript = transcript
-                    if model.status != "report_ready":
-                        model.status = "processing"
+                    try:
+                        from app.services.interview.evaluate import generate_interview_report
+
+                        report = generate_interview_report(model)
+                        model.report = report.model_dump()
+                        model.status = "report_ready"
+                    except Exception as exc:
+                        logger.warning("Error generating report during sync: %s", exc)
+                        if model.status != "report_ready":
+                            model.status = "processing"
                     updated = True
 
             if ev.get("event_type") == "application.perception_analysis":
@@ -1023,3 +1044,31 @@ def record_integrity_events(session_id: str, events: list[dict[str, Any]]) -> di
         model.integrity_log = current_log
         db_session.commit()
         return {"recorded": len(events), "total": len(current_log)}
+
+
+def get_or_generate_report(session_id: str) -> Any:
+    """Retrieves an existing InterviewReport, or generates it on-demand if not yet produced."""
+    from app.schemas import InterviewReport
+    from app.services.interview.evaluate import generate_interview_report
+
+    init_db()
+    with SessionLocal() as db_session:
+        model = db_session.get(InterviewSessionModel, session_id)
+        if model is None:
+            raise ValueError(f"Session '{session_id}' not found.")
+
+        if model.report:
+            return InterviewReport.model_validate(model.report)
+
+        report = generate_interview_report(model)
+        model.report = report.model_dump()
+        model.status = "report_ready"
+        db_session.commit()
+        return report
+
+
+def delete_session_data(session_id: str) -> dict[str, Any]:
+    """Permanently deletes candidate interview data for GDPR/privacy compliance."""
+    from app.services.interview.evaluate import delete_interview_session_data
+
+    return delete_interview_session_data(session_id)

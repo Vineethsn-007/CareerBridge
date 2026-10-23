@@ -9,6 +9,7 @@ from app.schemas import (
     EndInterviewRequest,
     EvaluateRequest,
     InterviewQuestion,
+    InterviewReport,
     InterviewRequest,
     InterviewSessionCreate,
     InterviewSessionResponse,
@@ -16,10 +17,12 @@ from app.schemas import (
 )
 from app.services.interview.service import (
     create_interview_session,
+    delete_session_data,
     end_interview_session,
     evaluate_answer,
     generate_questions,
     get_interview_session,
+    get_or_generate_report,
     handle_tavus_webhook,
     poll_and_sync_transcript,
     record_integrity_events,
@@ -63,6 +66,30 @@ async def get_session_by_id(session_id: str) -> InterviewSessionResponse:
         except Exception:
             pass
     return session
+
+
+@router.get("/sessions/{session_id}/report", response_model=InterviewReport)
+async def get_session_report(session_id: str) -> InterviewReport:
+    session = get_interview_session(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Interview session not found.")
+    if not session.has_report:
+        try:
+            await poll_and_sync_transcript(session_id)
+        except Exception:
+            pass
+    try:
+        return get_or_generate_report(session_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.delete("/sessions/{session_id}/data")
+def delete_candidate_data(session_id: str) -> dict[str, Any]:
+    try:
+        return delete_session_data(session_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 @router.post("/sessions/{session_id}/end", response_model=InterviewSessionResponse)
