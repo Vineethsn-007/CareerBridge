@@ -6,7 +6,7 @@ export interface MeterProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: string;
   showValue?: boolean;
   size?: "sm" | "md" | "lg";
-  variant?: "brand" | "saffron" | "success" | "warning";
+  variant?: "brand" | "saffron" | "success" | "warning" | "danger";
 }
 
 export function Meter({
@@ -31,6 +31,7 @@ export function Meter({
     saffron: "bg-rock-blue",
     success: "bg-[#18856B]",
     warning: "bg-[#B87926]",
+    danger: "bg-[#B54747]",
   };
 
   return (

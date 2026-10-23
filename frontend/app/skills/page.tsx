@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -117,7 +117,7 @@ function WeekCard({ week, isOpen, onToggle }: {
   );
 }
 
-export default function SkillsPage() {
+function SkillsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const jobId = searchParams.get("job");
@@ -184,7 +184,7 @@ export default function SkillsPage() {
   const noJob = !jobId;
 
   return (
-    <div className="min-h-screen bg-mesh py-10">
+    <div className="min-h-screen bg-merino py-10">
       <Container size="lg">
         <PageHeader
           title="Skill Gap Analysis"
@@ -364,3 +364,23 @@ export default function SkillsPage() {
     </div>
   );
 }
+
+export default function SkillsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-merino py-10">
+          <Container size="lg">
+            <div className="space-y-4">
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          </Container>
+        </div>
+      }
+    >
+      <SkillsPageContent />
+    </Suspense>
+  );
+}
+
