@@ -133,7 +133,7 @@ export default function Home() {
 
               {/* CTAs */}
               <div className="hero-actions flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-                <Link href="/resume">
+                <Link href="/resume" className="w-full sm:w-auto inline-flex">
                   <Button
                     size="lg"
                     variant="primary"
@@ -143,7 +143,7 @@ export default function Home() {
                     Build My Career Path
                   </Button>
                 </Link>
-                <Link href="#how-it-works">
+                <Link href="#how-it-works" className="w-full sm:w-auto inline-flex">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
                     Explore How It Works
                   </Button>
@@ -671,13 +671,13 @@ export default function Home() {
               and create a practical path toward your career goals.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link href="/resume">
-                <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
+              <Link href="/resume" className="w-full sm:w-auto inline-flex justify-center">
+                <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />} className="w-full sm:w-auto shadow-card">
                   Start Your Career Journey
                 </Button>
               </Link>
-              <Link href="/jobs">
-                <Button size="lg" variant="outline">
+              <Link href="/jobs" className="w-full sm:w-auto inline-flex justify-center">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
                   Explore the Platform
                 </Button>
               </Link>
