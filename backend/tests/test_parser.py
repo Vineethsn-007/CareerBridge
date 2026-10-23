@@ -44,8 +44,25 @@ def _sample_docx(with_table: bool = False) -> bytes:
 LLM_EXTRACTION = {
     "summary": "Data-curious student.",
     "education": [{"institution": "NIT Trichy", "degree": "B.Tech CSE", "year": "2027"}],
-    "experience": [{"title": "Data Intern", "company": "Acme", "duration": "3 months"}],
+    "experiences": [
+        {
+            "title": "Data Intern",
+            "company": "Acme",
+            "start_date": "2026-06-01",
+            "end_date": "2026-09-01",
+            "duration_months": 3,
+            "technologies": ["Python", "SQL"],
+            "impact": ["Built dashboards used by 40 students"],
+            "seniority": "intern",
+        }
+    ],
+    "skills": [
+        {"skill": "Python", "category": "work experience"},
+        {"skill": "SQL", "category": "project"},
+        {"skill": "Machine Learning", "category": "listed only"},
+    ],
     "projects": ["Chatbot for campus helpdesk"],
+    "total_experience_months": 3,
 }
 
 
@@ -53,8 +70,8 @@ def _mock_llm(monkeypatch, result):
     """Point parser_service's complete_json at a stub; returns the list of calls."""
     calls: list[tuple] = []
 
-    def fake_complete_json(prompt, system=None):
-        calls.append((prompt, system))
+    def fake_complete_json(prompt, system=None, schema_model=None):
+        calls.append((prompt, system, schema_model))
         if isinstance(result, Exception):
             raise result
         return result
@@ -132,7 +149,7 @@ def test_llm_extraction_enriches_baseline_result(monkeypatch):
 def test_llm_prompt_instructs_not_to_fabricate(monkeypatch):
     calls = _mock_llm(monkeypatch, LLM_EXTRACTION)
     parser_service.parse_resume("resume.docx", _sample_docx())
-    prompt, system = calls[0]
+    prompt, system, _schema_model = calls[0]
     assert "Never" in system or "never fabricate" in system.lower()
     assert "Use only information present" in system
     assert "Asha" in prompt
