@@ -11,6 +11,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { Magnetic } from "@/components/motion/Magnetic";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -78,9 +79,11 @@ export function Navbar() {
               </Button>
             </Link>
             <Link href="/resume" className="inline-flex">
-              <Button size="sm" variant="primary">
-                Get Started
-              </Button>
+              <Magnetic maxTranslation={4} radius={24}>
+                <Button size="sm" variant="primary">
+                  Get Started
+                </Button>
+              </Magnetic>
             </Link>
           </div>
 

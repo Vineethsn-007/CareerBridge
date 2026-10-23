@@ -5,13 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ScoreRing } from "@/components/ui/ScoreRing";
 import { Chip } from "@/components/ui/Chip";
+import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { TiltCard } from "@/components/motion/TiltCard";
+import { Magnetic } from "@/components/motion/Magnetic";
 import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/motion";
-import { prefersReducedMotion } from "@/lib/motion";
+import { gsap, prefersReducedMotion, isFinePointer } from "@/lib/motion";
 import {
   FileText,
   Briefcase,
@@ -92,6 +93,91 @@ export default function Home() {
           },
           "-=0.5"
         );
+
+      // Section 2: Pointer-based depth & 3D perspective parallax (fine pointers only)
+      if (!isFinePointer()) return;
+
+      const heroEl = heroRef.current;
+      const preview3d = heroEl.querySelector<HTMLElement>(".hero-preview-3d");
+      const bgAccent = heroEl.querySelector<HTMLElement>(".hero-bg-accent");
+      const imgWrap = heroEl.querySelector<HTMLElement>(".hero-image-wrap");
+      const card1 = heroEl.querySelector<HTMLElement>(".hero-float-card-1");
+      const card2 = heroEl.querySelector<HTMLElement>(".hero-float-card-2");
+      const card3 = heroEl.querySelector<HTMLElement>(".hero-float-card-3");
+
+      // High-performance GSAP quickTo setters (zero layout recalculations, pure transform)
+      const bgX = bgAccent ? gsap.quickTo(bgAccent, "x", { duration: 0.6, ease: "power2.out" }) : null;
+      const bgY = bgAccent ? gsap.quickTo(bgAccent, "y", { duration: 0.6, ease: "power2.out" }) : null;
+
+      const imgX = imgWrap ? gsap.quickTo(imgWrap, "x", { duration: 0.7, ease: "power2.out" }) : null;
+      const imgY = imgWrap ? gsap.quickTo(imgWrap, "y", { duration: 0.7, ease: "power2.out" }) : null;
+
+      const rotX = preview3d ? gsap.quickTo(preview3d, "rotateX", { duration: 0.6, ease: "power2.out" }) : null;
+      const rotY = preview3d ? gsap.quickTo(preview3d, "rotateY", { duration: 0.6, ease: "power2.out" }) : null;
+
+      const c1X = card1 ? gsap.quickTo(card1, "x", { duration: 0.75, ease: "power2.out" }) : null;
+      const c1Y = card1 ? gsap.quickTo(card1, "y", { duration: 0.75, ease: "power2.out" }) : null;
+
+      const c2X = card2 ? gsap.quickTo(card2, "x", { duration: 0.75, ease: "power2.out" }) : null;
+      const c2Y = card2 ? gsap.quickTo(card2, "y", { duration: 0.75, ease: "power2.out" }) : null;
+
+      const c3X = card3 ? gsap.quickTo(card3, "x", { duration: 0.75, ease: "power2.out" }) : null;
+      const c3Y = card3 ? gsap.quickTo(card3, "y", { duration: 0.75, ease: "power2.out" }) : null;
+
+      const onPointerMove = (e: PointerEvent) => {
+        const rect = heroEl.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+
+        // Coordinates normalized relative to the hero section: -1 to +1
+        const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+        const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+        // Background decoration: 4–8px (6px)
+        bgX?.(normX * 6);
+        bgY?.(normY * 6);
+
+        // Photograph layer: 5–10px (8px)
+        imgX?.(normX * 8);
+        imgY?.(normY * 8);
+
+        // Perspective 3D rotation: X ±2.5 deg, Y ±3.5 deg
+        rotX?.(-normY * 2.5);
+        rotY?.(normX * 3.5);
+
+        // Floating product previews with realistic opposing depths (8–14px)
+        c1X?.(normX * 12);
+        c1Y?.(normY * 10);
+
+        c2X?.(-normX * 13);
+        c2Y?.(-normY * 11);
+
+        c3X?.(normX * 9);
+        c3Y?.(normY * 8);
+      };
+
+      const onPointerLeave = () => {
+        // Coordinated return-to-rest behavior: smooth easing, no abrupt snaps
+        const targets = [bgAccent, imgWrap, preview3d, card1, card2, card3].filter(Boolean);
+        if (targets.length > 0) {
+          gsap.to(targets, {
+            x: 0,
+            y: 0,
+            rotateX: 0,
+            rotateY: 0,
+            duration: 0.85,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        }
+      };
+
+      heroEl.addEventListener("pointermove", onPointerMove, { passive: true });
+      heroEl.addEventListener("pointerleave", onPointerLeave, { passive: true });
+
+      return () => {
+        heroEl.removeEventListener("pointermove", onPointerMove);
+        heroEl.removeEventListener("pointerleave", onPointerLeave);
+      };
     },
     { scope: heroRef }
   );
@@ -131,18 +217,20 @@ export default function Home() {
                 personalized preparation plans with AI — all in one place.
               </p>
 
-              {/* CTAs */}
+              {/* CTAs with Realistic Magnetic Button */}
               <div className="hero-actions flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-                <Link href="/resume" className="w-full sm:w-auto inline-flex">
-                  <Button
-                    size="lg"
-                    variant="primary"
-                    rightIcon={<ArrowRight className="w-4 h-4" />}
-                    className="w-full sm:w-auto px-7 py-3.5 shadow-card"
-                  >
-                    Build My Career Path
-                  </Button>
-                </Link>
+                <Magnetic maxTranslation={7} radius={35} className="w-full sm:w-auto">
+                  <Link href="/resume" className="w-full sm:w-auto inline-flex">
+                    <Button
+                      size="lg"
+                      variant="primary"
+                      rightIcon={<ArrowRight className="w-4 h-4" />}
+                      className="w-full sm:w-auto px-7 py-3.5 shadow-card"
+                    >
+                      Build My Career Path
+                    </Button>
+                  </Link>
+                </Magnetic>
                 <Link href="#how-it-works" className="w-full sm:w-auto inline-flex">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
                     Explore How It Works
@@ -158,54 +246,69 @@ export default function Home() {
             </div>
 
             {/* Right Column: Editorial Visual & Product Cards */}
-            <div className="lg:col-span-5 relative">
-              {/* Soft blue visual accent behind image */}
-              <div className="absolute -inset-4 bg-rock-blue/20 rounded-2xl transform -rotate-1 pointer-events-none" />
+            <div className="lg:col-span-5 relative perspective-1000">
+              <div className="hero-preview-3d relative transform-style-3d">
+                {/* Soft blue visual accent behind image */}
+                <div className="hero-bg-accent absolute -inset-4 bg-rock-blue/20 rounded-2xl transform -rotate-1 pointer-events-none" />
 
-              <div className="hero-image-wrap relative rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white">
-                <div className="relative aspect-[1024/738] w-full">
-                  <Image
-                    src="/images/hero-student.jpg"
-                    alt="Indian engineering student working on code projects on his laptop"
-                    fill
-                    priority
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 520px"
-                  />
-                </div>
-              </div>
-
-              {/* Floating Product Preview 1 (Top-Right): Active Prep Plan */}
-              <div className="hero-float-card absolute -top-4 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
-                <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200/60 text-[#18856B] flex items-center justify-center font-bold text-xs shrink-0">
-                  4W
-                </div>
-                <div className="space-y-0.5 pr-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-xs font-bold text-deep-teal">Prep Plan Active</p>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#18856B] animate-pulse" />
+                <div
+                  className="hero-image-wrap relative rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white transition-shadow duration-300 hover:shadow-float-hover"
+                  data-cursor="explore"
+                  data-cursor-text="Explore"
+                >
+                  <div className="relative aspect-[1024/738] w-full">
+                    <Image
+                      src="/images/hero-student.jpg"
+                      alt="Indian engineering student working on code projects on his laptop"
+                      fill
+                      priority
+                      className="object-cover transition-transform duration-700 ease-out hover:scale-[1.02]"
+                      sizes="(max-width: 768px) 100vw, 520px"
+                    />
                   </div>
-                  <p className="text-[11px] text-secondary-text">Week 1: TypeScript & ORM</p>
                 </div>
-              </div>
 
-              {/* Floating Product Preview 2 (Bottom-Left): Match Score */}
-              <div className="hero-float-card absolute -bottom-5 -left-3 sm:-left-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
-                <ScoreRing score={88} size="sm" animate={true} />
-                <div className="space-y-0.5 pr-1">
-                  <p className="text-xs font-bold text-deep-teal">88% Match</p>
-                  <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru</p>
-                </div>
-              </div>
-
-              {/* Floating Product Preview 3 (Bottom-Right): Verified Candidate Profile */}
-              <div className="hero-float-card absolute -bottom-5 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-2.5 z-20">
-                <div className="space-y-0.5 text-left pr-0.5">
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs font-bold text-deep-teal">Muhammad Haashid</p>
-                    <Badge variant="verified" size="sm">Verified Match</Badge>
+                {/* Floating Product Preview 1 (Top-Right): Active Prep Plan */}
+                <div
+                  data-cursor="card"
+                  className="hero-float-card hero-float-card-1 absolute -top-4 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20 hover:shadow-float-hover transition-shadow duration-300 cursor-pointer"
+                >
+                  <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200/60 text-[#18856B] flex items-center justify-center font-bold text-xs shrink-0">
+                    4W
                   </div>
-                  <p className="text-[11px] text-secondary-text">Full Stack & Data Engineering</p>
+                  <div className="space-y-0.5 pr-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-deep-teal">Prep Plan Active</p>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#18856B] animate-pulse" />
+                    </div>
+                    <p className="text-[11px] text-secondary-text">Week 1: TypeScript & ORM</p>
+                  </div>
+                </div>
+
+                {/* Floating Product Preview 2 (Bottom-Left): Match Score */}
+                <div
+                  data-cursor="card"
+                  className="hero-float-card hero-float-card-2 absolute -bottom-5 -left-3 sm:-left-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20 hover:shadow-float-hover transition-shadow duration-300 cursor-pointer"
+                >
+                  <ScoreRing score={88} size="sm" animate={true} />
+                  <div className="space-y-0.5 pr-1">
+                    <p className="text-xs font-bold text-deep-teal">88% Match</p>
+                    <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru</p>
+                  </div>
+                </div>
+
+                {/* Floating Product Preview 3 (Bottom-Right): Verified Candidate Profile */}
+                <div
+                  data-cursor="card"
+                  className="hero-float-card hero-float-card-3 absolute -bottom-5 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-2.5 z-20 hover:shadow-float-hover transition-shadow duration-300 cursor-pointer"
+                >
+                  <div className="space-y-0.5 text-left pr-0.5">
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-bold text-deep-teal">Muhammad Haashid</p>
+                      <Badge variant="verified" size="sm">Verified Match</Badge>
+                    </div>
+                    <p className="text-[11px] text-secondary-text">Full Stack & Data Engineering</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -296,12 +399,16 @@ export default function Home() {
               {/* Soft blue visual accent behind image */}
               <div className="absolute -inset-3 bg-rock-blue/20 rounded-3xl transform rotate-1 pointer-events-none" />
 
-              <div className="relative aspect-[1024/537] w-full rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white">
+              <div
+                className="relative aspect-[1024/537] w-full rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white group"
+                data-cursor="explore"
+                data-cursor-text="Explore"
+              >
                 <Image
                   src="/images/collaborating-students.jpg"
                   alt="Indian engineering students working together on laptops during a hackathon"
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                   sizes="(max-width: 768px) 100vw, 600px"
                   priority
                 />
@@ -346,9 +453,11 @@ export default function Home() {
               ].map((c) => {
                 const Icon = c.icon;
                 return (
-                  <div
+                  <SpotlightCard
                     key={c.num}
-                    className="bg-pure-white border border-border rounded-xl p-4 shadow-subtle flex flex-col justify-between gap-3 transition-all hover:border-rock-blue hover:shadow-card group"
+                    data-cursor="card"
+                    className="p-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-card transition-all duration-300 flex flex-col justify-between gap-3 group"
+                    spotlightColor="rgba(132, 179, 206, 0.2)"
                   >
                     <div className="flex items-center justify-between">
                       <div className="w-8 h-8 rounded-lg bg-pale-blue/60 border border-border flex items-center justify-center text-venice-blue group-hover:bg-rock-blue/20 transition-colors">
@@ -362,7 +471,7 @@ export default function Home() {
                       <h4 className="text-sm font-bold text-deep-teal leading-snug">{c.title}</h4>
                       <p className="text-xs text-secondary-text leading-relaxed">{c.desc}</p>
                     </div>
-                  </div>
+                  </SpotlightCard>
                 );
               })}
             </div>
@@ -388,118 +497,142 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Card 1 */}
-            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+            <SpotlightCard
+              data-cursor="card"
+              className="p-6 space-y-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group"
+              spotlightColor="rgba(132, 179, 206, 0.2)"
+            >
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue group-hover:scale-105 transition-transform duration-300">
                 <FileText className="w-5 h-5 text-venice-blue" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-deep-teal">Resume Intelligence</h3>
+                <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">Resume Intelligence</h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
                   Extracts skills, projects, and coursework with editable controls to fix mistakes.
                 </p>
               </div>
               <div className="pt-2">
-                <Link href="/resume" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                <Link href="/resume" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link">
                   <span>Upload resume</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
-            </Card>
+            </SpotlightCard>
 
             {/* Card 2 */}
-            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+            <SpotlightCard
+              data-cursor="card"
+              className="p-6 space-y-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group"
+              spotlightColor="rgba(132, 179, 206, 0.2)"
+            >
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue group-hover:scale-105 transition-transform duration-300">
                 <Briefcase className="w-5 h-5 text-venice-blue" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-deep-teal">Job Matching</h3>
+                <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">Job Matching</h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
                   Calculates explainable match scores over real fresher roles verified against official portals.
                 </p>
               </div>
               <div className="pt-2">
-                <Link href="/jobs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                <Link href="/jobs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link">
                   <span>Browse matches</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
-            </Card>
+            </SpotlightCard>
 
             {/* Card 3 */}
-            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+            <SpotlightCard
+              data-cursor="card"
+              className="p-6 space-y-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group"
+              spotlightColor="rgba(132, 179, 206, 0.2)"
+            >
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue group-hover:scale-105 transition-transform duration-300">
                 <Target className="w-5 h-5 text-venice-blue" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-deep-teal">Skill Gap Analysis</h3>
+                <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">Skill Gap Analysis</h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
                   Categorizes missing skills into High, Medium, and Low priorities with clear explanations.
                 </p>
               </div>
               <div className="pt-2">
-                <Link href="/jobs/job-web-001" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                <Link href="/jobs/job-web-001" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link">
                   <span>View sample gap</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
-            </Card>
+            </SpotlightCard>
 
             {/* Card 4 */}
-            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+            <SpotlightCard
+              data-cursor="card"
+              className="p-6 space-y-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group"
+              spotlightColor="rgba(132, 179, 206, 0.2)"
+            >
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue group-hover:scale-105 transition-transform duration-300">
                 <Clock className="w-5 h-5 text-venice-blue" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-deep-teal">Guided Preparation Plans</h3>
+                <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">Guided Preparation Plans</h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
                   Custom weekly task schedules sized to your hours with verified free course links.
                 </p>
               </div>
               <div className="pt-2">
-                <Link href="/jobs/job-web-001" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                <Link href="/jobs/job-web-001" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link">
                   <span>Explore prep plan</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
-            </Card>
+            </SpotlightCard>
 
             {/* Card 5 */}
-            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+            <SpotlightCard
+              data-cursor="card"
+              className="p-6 space-y-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group"
+              spotlightColor="rgba(132, 179, 206, 0.2)"
+            >
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue group-hover:scale-105 transition-transform duration-300">
                 <MessageSquare className="w-5 h-5 text-venice-blue" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-deep-teal">Interview Practice</h3>
+                <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">Interview Practice</h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
                   AI mock questions evaluated on rubric criteria with STAR method answer drawers.
                 </p>
               </div>
               <div className="pt-2">
-                <Link href="/interview" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                <Link href="/interview" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link">
                   <span>Practice questions</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
-            </Card>
+            </SpotlightCard>
 
             {/* Card 6 */}
-            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+            <SpotlightCard
+              data-cursor="card"
+              className="p-6 space-y-4 bg-pure-white border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group"
+              spotlightColor="rgba(132, 179, 206, 0.2)"
+            >
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue group-hover:scale-105 transition-transform duration-300">
                 <Layers className="w-5 h-5 text-venice-blue" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-deep-teal">Career Discovery</h3>
+                <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">Career Discovery</h3>
                 <p className="text-xs text-secondary-text leading-relaxed">
                   Cross-disciplinary career roadmaps for Software, Data, Cloud, AI, and Product Design.
                 </p>
               </div>
               <div className="pt-2">
-                <Link href="#career-paths" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                <Link href="#career-paths" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link">
                   <span>Explore pathways</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                 </Link>
               </div>
-            </Card>
+            </SpotlightCard>
           </div>
         </Container>
       </section>
@@ -624,15 +757,19 @@ export default function Home() {
             ].map((p) => {
               const Icon = p.icon;
               return (
-                <div
+                <TiltCard
                   key={p.title}
-                  className="bg-pure-white border border-border rounded-lg p-6 shadow-subtle space-y-4 hover:border-rock-blue transition-all"
+                  maxTiltX={2.5}
+                  maxTiltY={3.5}
+                  lift={4}
+                  className="bg-pure-white border border-border rounded-lg p-6 shadow-subtle space-y-4 hover:border-rock-blue transition-all group"
+                  data-cursor="card"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-pale-blue text-venice-blue flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-pale-blue text-venice-blue flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300">
                       <Icon className="w-5 h-5 text-venice-blue" />
                     </div>
-                    <h3 className="text-base font-bold text-deep-teal">{p.title}</h3>
+                    <h3 className="text-base font-bold text-deep-teal group-hover:text-venice-blue transition-colors">{p.title}</h3>
                   </div>
                   <p className="text-xs text-secondary-text leading-relaxed">{p.desc}</p>
                   <div className="flex flex-wrap gap-1.5 pt-1">
@@ -643,13 +780,13 @@ export default function Home() {
                   <div className="pt-2 border-t border-border">
                     <Link
                       href="/jobs"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group/link"
                     >
                       <span>Explore verified roles</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/link:translate-x-1" />
                     </Link>
                   </div>
-                </div>
+                </TiltCard>
               );
             })}
           </div>
@@ -657,9 +794,12 @@ export default function Home() {
       </section>
 
       {/* SECTION 8 — FINAL CTA */}
-      <section className="py-20 bg-pale-blue border-b border-border">
+      <section className="py-20 bg-pale-blue border-b border-border relative overflow-hidden">
         <Container size="xl">
-          <div className="bg-pure-white border border-border rounded-2xl p-8 sm:p-12 shadow-float max-w-4xl mx-auto text-center space-y-6">
+          <SpotlightCard
+            className="bg-pure-white border border-border rounded-2xl p-8 sm:p-12 shadow-float max-w-4xl mx-auto text-center space-y-6"
+            spotlightColor="rgba(132, 179, 206, 0.22)"
+          >
             <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
               Ready to Accelerate?
             </span>
@@ -671,11 +811,13 @@ export default function Home() {
               and create a practical path toward your career goals.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link href="/resume" className="w-full sm:w-auto inline-flex justify-center">
-                <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />} className="w-full sm:w-auto shadow-card">
-                  Start Your Career Journey
-                </Button>
-              </Link>
+              <Magnetic maxTranslation={7} radius={35} className="w-full sm:w-auto">
+                <Link href="/resume" className="w-full sm:w-auto inline-flex justify-center">
+                  <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />} className="w-full sm:w-auto shadow-card">
+                    Start Your Career Journey
+                  </Button>
+                </Link>
+              </Magnetic>
               <Link href="/jobs" className="w-full sm:w-auto inline-flex justify-center">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto">
                   Explore the Platform
@@ -685,7 +827,7 @@ export default function Home() {
             <p className="text-xs text-muted-text">
               100% Free for students • No credit card required • Real backend data
             </p>
-          </div>
+          </SpotlightCard>
         </Container>
       </section>
     </div>

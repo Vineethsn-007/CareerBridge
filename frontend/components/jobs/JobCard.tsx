@@ -27,7 +27,8 @@ export function JobCard({ match, rank }: JobCardProps) {
 
   return (
     <SpotlightCard
-      className="flex flex-col justify-between space-y-5 border-border hover:border-rock-blue transition-all duration-300 group bg-pure-white shadow-card"
+      data-cursor="card"
+      className="flex flex-col justify-between space-y-5 border-border hover:border-rock-blue hover:-translate-y-1 hover:shadow-float transition-all duration-300 group bg-pure-white shadow-card"
       spotlightColor="rgba(132, 179, 206, 0.2)"
     >
       <div className="space-y-4">
@@ -151,10 +152,10 @@ export function JobCard({ match, rank }: JobCardProps) {
           href={job.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs text-venice-blue hover:text-deep-teal font-medium transition-colors"
+          className="group/apply inline-flex items-center gap-1.5 text-xs text-venice-blue hover:text-deep-teal font-medium transition-colors"
         >
           <span>Official Apply</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover/apply:translate-x-0.5 group-hover/apply:-translate-y-0.5" />
         </a>
       </div>
     </SpotlightCard>

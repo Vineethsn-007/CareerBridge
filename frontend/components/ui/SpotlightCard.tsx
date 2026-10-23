@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { prefersReducedMotion, isFinePointer } from "@/lib/motion";
 
 interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -12,42 +13,63 @@ interface SpotlightCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SpotlightCard({
   children,
   className,
-  spotlightColor = "rgba(132, 179, 206, 0.25)",
+  spotlightColor = "rgba(132, 179, 206, 0.2)",
   ...props
 }: SpotlightCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [opacity, setOpacity] = useState(0);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || prefersReducedMotion() || !isFinePointer()) return;
 
-  const handleMouseEnter = () => setOpacity(1);
-  const handleMouseLeave = () => setOpacity(0);
+    const handlePointerMove = (e: PointerEvent) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      card.style.setProperty("--spotlight-x", `${x}px`);
+      card.style.setProperty("--spotlight-y", `${y}px`);
+      card.style.setProperty("--spotlight-opacity", "1");
+    };
+
+    const handlePointerLeave = () => {
+      card.style.setProperty("--spotlight-opacity", "0");
+    };
+
+    card.addEventListener("pointermove", handlePointerMove, { passive: true });
+    card.addEventListener("pointerleave", handlePointerLeave);
+
+    return () => {
+      card.removeEventListener("pointermove", handlePointerMove);
+      card.removeEventListener("pointerleave", handlePointerLeave);
+    };
+  }, []);
 
   return (
     <div
       ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      data-cursor="card"
       className={cn(
-        "relative rounded-md border border-border bg-pure-white p-6 shadow-card overflow-hidden transition-all duration-300",
+        "relative rounded-md border border-border bg-pure-white p-6 shadow-card overflow-hidden transition-all duration-300 hover:border-rock-blue/70 hover:shadow-float group",
         className
       )}
+      style={{
+        ["--spotlight-x" as string]: "50%",
+        ["--spotlight-y" as string]: "50%",
+        ["--spotlight-opacity" as string]: "0",
+      }}
       {...props}
     >
+      {/* Soft Cursor-Responsive Spotlight */}
       <div
-        className="pointer-events-none absolute -inset-px transition-opacity duration-300"
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300 z-0"
         style={{
-          opacity,
-          background: `radial-gradient(500px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 45%)`,
+          opacity: "var(--spotlight-opacity, 0)",
+          background: `radial-gradient(450px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%), ${spotlightColor}, transparent 65%)`,
         }}
       />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 w-full h-full">{children}</div>
     </div>
   );
 }
