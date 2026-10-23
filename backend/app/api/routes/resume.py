@@ -16,5 +16,10 @@ async def parse(file: Annotated[UploadFile, File()]) -> ParsedResume:
         raise HTTPException(status_code=413, detail="File too large (max 5 MB).")
     try:
         return parse_resume(file.filename or "resume.txt", data)
+    except ValueError as exc:
+        # Clear, actionable parser errors (e.g. scanned PDF without a text layer).
+        raise HTTPException(
+            status_code=422, detail=str(exc) or "Could not read this resume."
+        ) from exc
     except Exception as exc:
         raise HTTPException(status_code=422, detail="Could not read this resume.") from exc

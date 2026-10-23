@@ -11,6 +11,42 @@ export interface Experience {
   company?: string | null;
   duration?: string | null;
   summary?: string | null;
+  // Additive (resume parsing agent):
+  start_date?: string | null;
+  end_date?: string | null;
+  duration_months?: number | null;
+  technologies?: string[];
+  impact?: string[];
+  seniority?: string | null;
+}
+
+export interface Certification {
+  name: string;
+  issuer?: string | null;
+  year?: string | null;
+}
+
+export type SkillEvidenceCategory = "work experience" | "project" | "listed only";
+
+export interface SkillEvidence {
+  skill: string;
+  category: SkillEvidenceCategory;
+  weighted_strength: number;
+  proficiency?: string | null;
+  years?: number | null;
+}
+
+export interface ResumeInsight {
+  text: string;
+  evidence?: string | null;
+}
+
+export interface ResumeInsights {
+  strengths: ResumeInsight[];
+  gaps: ResumeInsight[];
+  summary?: string | null;
+  target_roles: string[];
+  tips: string[];
 }
 
 export interface ParsedResume {
@@ -23,6 +59,12 @@ export interface ParsedResume {
   experience: Experience[];
   projects: string[];
   raw_text: string;
+  // Additive (resume parsing agent): always present in API payloads since the
+  // agent PR; optional here so hand-built demo objects stay valid.
+  skill_evidence?: SkillEvidence[];
+  certifications?: Certification[];
+  total_experience_months?: number | null;
+  insights?: ResumeInsights | null;
 }
 
 export type JobType = "full-time" | "internship" | "part-time" | "contract";
