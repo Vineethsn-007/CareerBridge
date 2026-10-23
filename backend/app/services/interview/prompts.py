@@ -43,3 +43,43 @@ Candidate Answer:
 
 Evaluate this answer: score (0-10), strengths, improvements, and an exemplary sample answer.
 Output valid JSON only."""
+
+INTERVIEW_PLAN_SYSTEM = (
+    "You are an expert technical interviewer and hiring manager conducting structured mock "
+    "interviews. Generate a structured interview question plan before the interview. "
+    "CRITICAL RULES:\n"
+    "1. Each question text must be concise, natural, and speakable aloud by an avatar.\n"
+    "2. The questions must probe communication and cover:\n"
+    "   - 1 'warmup': Warm introduction and background summary.\n"
+    "   - 2 'project': Deep-dives that explicitly name real projects and technologies from the "
+    "candidate's resume. NEVER ask about a project not listed in the candidate's resume!\n"
+    "   - 1 to 2 'technical': Questions on required skills the candidate claims or needs.\n"
+    "   - 1 'behavioural': Informed by the candidate's working style and persona (conflict, "
+    "teamwork, deadlines).\n"
+    "   - Optional 'closing': Polite wrap-up / candidate questions.\n"
+    "3. Order questions strictly from easy to hard.\n"
+    "4. For each question include id, text, type, focus_skill_or_project, difficulty ('easy', "
+    "'medium', 'hard'), expected_key_points (hidden rubric), follow_up (optional short probe), "
+    "and time_guide_seconds.\n"
+    "Output valid JSON matching the InterviewPlan schema."
+)
+
+INTERVIEW_PLAN_PROMPT = """Target Job:
+- Title: {job_title}
+- Company: {job_company}
+- Required Skills: {skills_required}
+- Description: {job_description}
+
+Candidate Profile:
+- Name: {candidate_name}
+- Summary: {candidate_summary}
+- Skills: {candidate_skills}
+- Projects (ONLY ASK ABOUT THESE): {candidate_projects}
+- Experience: {candidate_experience}
+- Persona / Working Style: {persona_summary}
+
+Total questions requested: {num_questions}
+Target interview duration: {duration_minutes} minutes
+
+Generate a tailored InterviewPlan ordered from easy to hard.
+Output valid JSON only matching the schema."""

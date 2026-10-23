@@ -59,8 +59,11 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=_NAMING_CONVENTION)
 
 
+UTC = getattr(dt, "UTC", dt.timezone.utc)  # noqa: UP017
+
+
 def _utcnow() -> dt.datetime:
-    return dt.datetime.now(dt.UTC)
+    return dt.datetime.now(UTC)
 
 
 class SchemaVersion(Base):
