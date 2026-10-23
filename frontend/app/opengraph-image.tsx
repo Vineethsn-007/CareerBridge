@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "CareerBridge | AI Career Acceleration for Indian Students";
+export const alt = "CareerBridge | Your Skills. Your Future. Your CareerBridge.";
 export const size = {
   width: 1200,
   height: 630,
@@ -12,7 +12,7 @@ export default function Image() {
     (
       <div
         style={{
-          background: "#0A0B14",
+          background: "#F5EEDD",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -24,7 +24,7 @@ export default function Image() {
       >
         <div
           style={{
-            background: "linear-gradient(135deg, #6366F1 0%, #22D3EE 100%)",
+            background: "#16587B",
             borderRadius: 20,
             padding: "12px 28px",
             color: "white",
@@ -37,24 +37,26 @@ export default function Image() {
         </div>
         <div
           style={{
-            fontSize: 52,
+            fontSize: 54,
             fontWeight: 800,
-            color: "#F4F5FB",
+            color: "#104763",
             textAlign: "center",
             lineHeight: 1.2,
             marginBottom: 16,
+            fontFamily: "serif",
           }}
         >
-          From Campus to Verified Tech Career
+          Your Skills. Your Future. Your CareerBridge.
         </div>
         <div
           style={{
             fontSize: 24,
-            color: "#9AA0BE",
+            color: "#496775",
             textAlign: "center",
+            maxWidth: 900,
           }}
         >
-          Verified Fresher Listings • Skill Gap Roadmaps • AI Mock Interviews
+          Verified Fresher Listings • AI Skill Gap Analysis • Mock Interview Simulator
         </div>
       </div>
     ),

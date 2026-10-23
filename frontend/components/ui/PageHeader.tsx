@@ -10,6 +10,7 @@ export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   backLabel?: string;
   action?: React.ReactNode;
   badge?: React.ReactNode;
+  isSerif?: boolean;
 }
 
 export function PageHeader({
@@ -19,13 +20,14 @@ export function PageHeader({
   backLabel = "Back",
   action,
   badge,
+  isSerif = true,
   className,
   ...props
 }: PageHeaderProps) {
   return (
     <div
       className={cn(
-        "flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-border/60 mb-8",
+        "flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-border mb-8",
         className
       )}
       {...props}
@@ -34,20 +36,25 @@ export function PageHeader({
         {backHref && (
           <Link
             href={backHref}
-            className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-accent transition-colors mb-1 font-medium"
+            className="inline-flex items-center gap-1 text-xs text-secondary-text hover:text-venice-blue transition-colors mb-1 font-medium"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>{backLabel}</span>
           </Link>
         )}
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+          <h1
+            className={cn(
+              "text-2xl sm:text-3xl tracking-tight text-deep-teal font-bold",
+              isSerif && "font-serif text-3xl sm:text-4xl"
+            )}
+          >
             {title}
           </h1>
           {badge}
         </div>
         {subtitle && (
-          <p className="text-sm text-text-muted max-w-2xl leading-relaxed">
+          <p className="text-sm text-secondary-text max-w-2xl leading-relaxed">
             {subtitle}
           </p>
         )}

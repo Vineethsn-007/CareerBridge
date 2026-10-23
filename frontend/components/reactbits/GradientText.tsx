@@ -10,7 +10,7 @@ interface GradientTextProps extends React.HTMLAttributes<HTMLSpanElement> {
 export function GradientText({
   children,
   className,
-  colors = ["#6366F1", "#22D3EE", "#FF9933", "#6366F1"],
+  colors = ["#16587B", "#84B3CE", "#104763", "#16587B"],
   showBorder = false,
   ...props
 }: GradientTextProps) {
@@ -22,8 +22,8 @@ export function GradientText({
   return (
     <span
       className={cn(
-        "relative inline-block text-transparent bg-clip-text animate-[gradient_8s_ease_infinite] font-semibold",
-        showBorder && "py-0.5 px-2 rounded border border-white/10",
+        "relative inline-block text-transparent bg-clip-text font-semibold",
+        showBorder && "py-0.5 px-2 rounded border border-border",
         className
       )}
       style={gradientStyle}

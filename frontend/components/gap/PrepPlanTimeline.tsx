@@ -39,7 +39,6 @@ export function PrepPlanTimeline({
 }: PrepPlanTimelineProps) {
   const { completedTasks, toggleTask, resetProgress } = usePlanProgressStore(plan.job_id);
 
-  // Compute total tasks and completed tasks
   let totalTasks = 0;
   let completedCount = 0;
 
@@ -58,17 +57,17 @@ export function PrepPlanTimeline({
   const getResourceIcon = (kind: string) => {
     switch (kind) {
       case "docs":
-        return <BookOpen className="w-3.5 h-3.5 text-accent" />;
+        return <BookOpen className="w-3.5 h-3.5 text-venice-blue" />;
       case "course":
-        return <Compass className="w-3.5 h-3.5 text-highlight" />;
+        return <Compass className="w-3.5 h-3.5 text-venice-blue" />;
       case "practice":
-        return <Code className="w-3.5 h-3.5 text-emerald-400" />;
+        return <Code className="w-3.5 h-3.5 text-[#18856B]" />;
       case "project":
-        return <FileCode className="w-3.5 h-3.5 text-primary" />;
+        return <FileCode className="w-3.5 h-3.5 text-venice-blue" />;
       case "video":
-        return <Video className="w-3.5 h-3.5 text-rose-400" />;
+        return <Video className="w-3.5 h-3.5 text-[#B54747]" />;
       default:
-        return <BookOpen className="w-3.5 h-3.5 text-text-muted" />;
+        return <BookOpen className="w-3.5 h-3.5 text-secondary-text" />;
     }
   };
 
@@ -79,8 +78,8 @@ export function PrepPlanTimeline({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Weeks Selector */}
           <div className="space-y-2">
-            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-accent" />
+            <span className="text-xs font-semibold text-secondary-text uppercase tracking-wider flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-venice-blue" />
               <span>Target Duration:</span>
             </span>
             <div className="flex items-center gap-2">
@@ -93,8 +92,8 @@ export function PrepPlanTimeline({
                   className={cn(
                     "px-3 py-1.5 text-xs rounded-DEFAULT border transition-all duration-150 select-none",
                     weeks === w
-                      ? "bg-brand-gradient text-white font-medium border-transparent shadow-glow"
-                      : "bg-surface-2 text-text-muted hover:text-text border-border"
+                      ? "bg-venice-blue text-white font-medium border-transparent shadow-subtle"
+                      : "bg-pale-blue text-secondary-text hover:text-primary-text border-border"
                   )}
                 >
                   {w} Weeks
@@ -105,8 +104,8 @@ export function PrepPlanTimeline({
 
           {/* Hours Per Week */}
           <div className="space-y-2">
-            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-highlight" />
+            <span className="text-xs font-semibold text-secondary-text uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-venice-blue" />
               <span>Weekly Commitment:</span>
             </span>
             <div className="flex items-center gap-2">
@@ -119,8 +118,8 @@ export function PrepPlanTimeline({
                   className={cn(
                     "px-3 py-1.5 text-xs rounded-DEFAULT border transition-all duration-150 select-none",
                     hoursPerWeek === h
-                      ? "bg-saffron-gradient text-bg font-semibold border-transparent shadow-glow-saffron"
-                      : "bg-surface-2 text-text-muted hover:text-text border-border"
+                      ? "bg-rock-blue text-dark-navy font-semibold border-transparent shadow-subtle"
+                      : "bg-pale-blue text-secondary-text hover:text-primary-text border-border"
                   )}
                 >
                   {h} hrs/wk
@@ -134,7 +133,7 @@ export function PrepPlanTimeline({
             <button
               type="button"
               onClick={resetProgress}
-              className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-text p-2 rounded hover:bg-white/5 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-secondary-text hover:text-primary-text p-2 rounded hover:bg-pale-blue transition-colors"
               title="Reset task checkmarks"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -144,10 +143,10 @@ export function PrepPlanTimeline({
         </div>
 
         {/* Overall Completion Progress */}
-        <div className="pt-4 mt-4 border-t border-border/40 space-y-1.5">
+        <div className="pt-4 mt-4 border-t border-border space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-muted font-medium">Preparation Checklist Progress</span>
-            <span className="text-text font-bold tabular-nums">
+            <span className="text-secondary-text font-medium">Preparation Checklist Progress</span>
+            <span className="text-primary-text font-bold tabular-nums">
               {completedCount} of {totalTasks} Tasks Completed ({completionPct}%)
             </span>
           </div>
@@ -160,16 +159,16 @@ export function PrepPlanTimeline({
         {plan.weeks.map((week) => (
           <Card key={week.week} variant="default" className="p-6 space-y-4">
             {/* Week Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
               <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-accent/15 border border-accent/30 text-accent font-bold text-xs flex items-center justify-center shrink-0">
+                <span className="w-8 h-8 rounded-full bg-pale-blue text-venice-blue font-bold text-xs flex items-center justify-center shrink-0">
                   W{week.week}
                 </span>
                 <div>
-                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <h4 className="text-sm font-bold text-deep-teal flex items-center gap-2">
                     <span>{week.focus}</span>
                   </h4>
-                  <p className="text-[11px] text-text-muted">
+                  <p className="text-[11px] text-secondary-text">
                     Week {week.week} Milestone
                   </p>
                 </div>
@@ -182,7 +181,7 @@ export function PrepPlanTimeline({
 
             {/* Tasks Checklist */}
             <div className="space-y-2.5">
-              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              <span className="text-xs font-semibold text-secondary-text uppercase tracking-wider">
                 Milestone Tasks:
               </span>
               <div className="space-y-2">
@@ -194,10 +193,10 @@ export function PrepPlanTimeline({
                       key={taskId}
                       onClick={() => toggleTask(taskId)}
                       className={cn(
-                        "p-3 rounded-DEFAULT border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none",
+                        "p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none",
                         isChecked
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                          : "bg-surface-2/60 border-border/80 hover:border-white/20 text-text"
+                          ? "bg-emerald-50 border-[#18856B]/30 text-[#18856B]"
+                          : "bg-pale-blue/30 border-border hover:border-rock-blue text-primary-text"
                       )}
                     >
                       <button
@@ -206,8 +205,8 @@ export function PrepPlanTimeline({
                         className={cn(
                           "w-4 h-4 rounded mt-0.5 flex items-center justify-center transition-colors shrink-0",
                           isChecked
-                            ? "bg-emerald-500 text-bg"
-                            : "border border-border bg-surface hover:border-accent"
+                            ? "bg-[#18856B] text-white"
+                            : "border border-border bg-pure-white hover:border-venice-blue"
                         )}
                       >
                         {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
@@ -229,18 +228,18 @@ export function PrepPlanTimeline({
             {/* Recommended Learning Resources */}
             {week.resources && week.resources.length > 0 && (
               <div className="pt-2 space-y-2">
-                <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                <span className="text-xs font-semibold text-secondary-text uppercase tracking-wider">
                   Curated Free Resources:
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {week.resources.map((res, rIdx) => (
                     <div
                       key={rIdx}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-DEFAULT bg-surface-2 border border-border text-xs text-text-muted hover:text-text transition-colors"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-pale-blue border border-border text-xs text-secondary-text hover:text-primary-text transition-colors"
                     >
                       {getResourceIcon(res.kind)}
-                      <span className="text-xs text-text font-medium">{res.title}</span>
-                      <span className="text-[10px] text-accent uppercase font-mono px-1 rounded bg-accent/10">
+                      <span className="text-xs text-primary-text font-medium">{res.title}</span>
+                      <span className="text-[10px] text-venice-blue uppercase font-mono px-1 rounded bg-light-blue">
                         {res.kind}
                       </span>
                       {res.url && (
@@ -248,7 +247,7 @@ export function PrepPlanTimeline({
                           href={res.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="hover:text-accent"
+                          className="hover:text-venice-blue"
                         >
                           <ExternalLink className="w-3 h-3" />
                         </a>

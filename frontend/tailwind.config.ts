@@ -11,6 +11,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Semantic variables
         bg: "var(--bg)",
         surface: "var(--surface)",
         "surface-2": "var(--surface-2)",
@@ -23,37 +24,38 @@ const config: Config = {
         success: "var(--success)",
         warning: "var(--warning)",
         danger: "var(--danger)",
+
+        // Exact Master Palette Tokens
+        merino: "#F5EEDD",
+        "rock-blue": "#84B3CE",
+        "venice-blue": "#16587B",
+        "deep-teal": "#104763",
+        "dark-navy": "#163A50",
+        "pale-blue": "#E6F0F5",
+        "light-blue": "#D5E6EF",
+        "pure-white": "#FFFFFF",
+        "muted-cream": "#FAF7EF",
+
+        "primary-text": "#173A4A",
+        "secondary-text": "#496775",
+        "muted-text": "#6E8792",
       },
       borderRadius: {
         DEFAULT: "12px",
-        sm: "12px",
-        md: "16px",
-        lg: "24px",
+        sm: "10px",
+        md: "14px",
+        lg: "18px",
+        xl: "24px",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-      },
-      backgroundImage: {
-        "brand-gradient": "linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)",
-        "brand-gradient-hover": "linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)",
-        "card-reflection": "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%)",
-        "saffron-gradient": "linear-gradient(135deg, #FF9933 0%, #FFB366 100%)",
+        sans: ["var(--font-sans)", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["var(--font-serif)", "Playfair Display", "Georgia", "serif"],
       },
       boxShadow: {
-        glow: "0 0 24px -4px rgba(99, 102, 241, 0.25)",
-        "glow-accent": "0 0 24px -4px rgba(34, 211, 238, 0.25)",
-        "glow-saffron": "0 0 24px -4px rgba(255, 153, 51, 0.35)",
-        card: "0 10px 30px -10px rgba(0, 0, 0, 0.5)",
-      },
-      animation: {
-        "pulse-subtle": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        shimmer: "shimmer 2s infinite linear",
-      },
-      keyframes: {
-        shimmer: {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
-        },
+        subtle: "0 2px 8px 0 rgba(23, 58, 74, 0.04)",
+        card: "0 4px 20px -2px rgba(23, 58, 74, 0.06)",
+        float: "0 12px 32px -4px rgba(23, 58, 74, 0.08)",
+        ring: "0 0 0 3px rgba(132, 179, 206, 0.35)",
       },
     },
   },
