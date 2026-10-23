@@ -12,6 +12,7 @@ const fontSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://careerbridge.in"),
   title: "CareerBridge | AI Career Acceleration for Indian Students",
   description:
     "Match with verified jobs, pinpoint skill gaps, and practice AI mock interviews tailored for freshers and students across India.",
@@ -23,6 +24,20 @@ export const metadata: Metadata = {
     "skill gap analysis",
     "resume parser",
   ],
+  openGraph: {
+    title: "CareerBridge | AI Career Acceleration for Indian Students",
+    description:
+      "Match with verified jobs, pinpoint skill gaps, and practice AI mock interviews tailored for freshers and students across India.",
+    siteName: "CareerBridge",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CareerBridge | AI Career Acceleration for Indian Students",
+    description:
+      "Match with verified jobs, pinpoint skill gaps, and practice AI mock interviews tailored for freshers and students across India.",
+  },
 };
 
 export default function RootLayout({
