@@ -22,8 +22,8 @@ import {
 
 // Preloaded sample resume for demo fallback
 const DEMO_RESUME: ParsedResume = {
-  name: "Aarav Sharma",
-  email: "aarav.sharma@gmail.com",
+  name: "Muhammad Haashid",
+  email: "muhammad.haashid@gmail.com",
   phone: "+91 9876543210",
   summary: "Final year Computer Science student seeking fresher Software Engineer roles.",
   skills: ["Python", "React", "TypeScript", "Next.js", "Node.js", "SQL", "Git", "REST API", "Problem Solving"],
@@ -46,7 +46,7 @@ const DEMO_RESUME: ParsedResume = {
     "Smart Campus Portal: Fullstack Next.js and FastAPI app for college events",
     "E-Commerce Microservices: Python FastAPI order processing system",
   ],
-  raw_text: "Aarav Sharma resume sample",
+  raw_text: "Muhammad Haashid resume sample",
 };
 
 interface JobDetailPageProps {

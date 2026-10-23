@@ -1,0 +1,300 @@
+{
+ "list": {
+  "offset": 0,
+  "limit": 2,
+  "totalFound": 78,
+  "content": [
+   {
+    "id": "744000155915888",
+    "name": "Dot Net + DevOps (Focused)",
+    "uuid": "3581625b-9cd8-4bc6-99fb-4c73d600fde0",
+    "jobAdId": "a63f9f6c-11d0-479e-94f2-2f82ce205154",
+    "defaultJobAd": true,
+    "refNumber": "REF7482O",
+    "company": {
+     "identifier": "T-SystemsICTIndiaPvtLtd1",
+     "name": "T-Systems ICT India Pvt. Ltd."
+    },
+    "releasedDate": "2026-10-16T06:09:58.396Z",
+    "location": {
+     "city": "Pune",
+     "region": "MH",
+     "country": "in",
+     "address": "Balewadi High Street",
+     "postalCode": "411045",
+     "remote": false,
+     "hybrid": true,
+     "fullLocation": "Pune, MH, India"
+    },
+    "industry": {
+     "id": "it_and_services",
+     "label": "Information Technology And Services"
+    },
+    "department": {},
+    "function": {
+     "id": "engineering",
+     "label": "Engineering"
+    },
+    "typeOfEmployment": {
+     "id": "permanent",
+     "label": "Full-time"
+    },
+    "experienceLevel": {
+     "id": "not_applicable",
+     "label": "Not Applicable"
+    },
+    "customField": [
+     {
+      "fieldId": "642550045c32ef73e80dcf17",
+      "fieldLabel": "Brands",
+      "valueId": "default",
+      "valueLabel": "T-Systems ICT India Pvt. Ltd."
+     },
+     {
+      "fieldId": "644cf33771f59f38f25d588b",
+      "fieldLabel": "Competency Level",
+      "valueId": "39394f68-5b73-40e7-a953-d2ec13f8c169",
+      "valueLabel": "Expert"
+     },
+     {
+      "fieldId": "COUNTRY",
+      "fieldLabel": "Country/Region",
+      "valueId": "in",
+      "valueLabel": "India"
+     },
+     {
+      "fieldId": "6444d6cb338dfc603c5d0789",
+      "fieldLabel": "Level",
+      "valueId": "66f47770-a423-4e6c-bfcd-fed8a0ebbdf2",
+      "valueLabel": "L 2.2"
+     },
+     {
+      "fieldId": "644cefa8b15967309ef2103f",
+      "fieldLabel": "Primary  Skills",
+      "valueLabel": ".NET core + Angular"
+     },
+     {
+      "fieldId": "646865c8de5f1e5149ba4c65",
+      "fieldLabel": "Job Description",
+      "valueLabel": "Software Developer   Expert \r\nExperience  6 to 9 years\r\nJob Overview  Fullstack   NET Core   Angular \r\n\r\nWe are looking for an experienced Software Developer who has strong technical foundation in  NET Core  Angular and Azure Cloud services \r\nKey Responsibilities \r\n \tAct as Expert Software Developer for the software development team and open to help managing product backlog sprint planning and stakeholder alignment \r\n \tCollaborate with architects and product owners globally to define technical and business priorities\r\n \tEnsure code quality reviews and adherence to best practices\r\n\r\nRequired Skills \r\n \t6 9 years of IT experience as Fullstack developer   NET   Angular \r\n \tStrong expertise in  NET Core  Angular  SQL Server  Azure services\r\n \tKnowledge of Azure networking concepts ADFS App Gateways Private Endpoints Subnets\r\n \tStrong problem solving coordination and communication skills\r\n\r\nNice to Have Skills \r\n \tExperience with CI CD pipelines Azure DevOps \r\n \tHands on Experience in microservice architecture\r\n \tFamiliarity with Docker Kubernetes\r\n \tExposure to CMS platforms e  g   Sitefinity"
+     },
+     {
+      "fieldId": "644cec203ef8b80fd372d768",
+      "fieldLabel": "TSIN ID",
+      "valueLabel": "TSIN023436"
+     }
+    ],
+    "visibility": "PUBLIC",
+    "ref": "https://api.smartrecruiters.com/v1/companies/T-SystemsICTIndiaPvtLtd1/postings/744000155915888",
+    "language": {
+     "code": "en",
+     "label": "English",
+     "labelNative": "English (US)"
+    }
+   },
+   {
+    "id": "744000155677234",
+    "name": "SAP SuccessFactor Consultant",
+    "uuid": "5787507e-4eaf-493b-a986-e6e5adbf91e4",
+    "jobAdId": "5d4f9c24-d72d-42a7-9b5d-04df0d1f8f54",
+    "defaultJobAd": true,
+    "refNumber": "REF6779H",
+    "company": {
+     "identifier": "T-SystemsICTIndiaPvtLtd1",
+     "name": "T-Systems ICT India Pvt. Ltd."
+    },
+    "releasedDate": "2026-10-15T07:14:20.425Z",
+    "location": {
+     "city": "Pune",
+     "region": "MH",
+     "country": "in",
+     "address": "Balewadi High Street",
+     "postalCode": "411045",
+     "remote": false,
+     "hybrid": false,
+     "fullLocation": "Pune, MH, India"
+    },
+    "industry": {
+     "id": "it_and_services",
+     "label": "Information Technology And Services"
+    },
+    "department": {},
+    "function": {
+     "id": "engineering",
+     "label": "Engineering"
+    },
+    "typeOfEmployment": {
+     "id": "permanent",
+     "label": "Full-time"
+    },
+    "experienceLevel": {
+     "id": "not_applicable",
+     "label": "Not Applicable"
+    },
+    "customField": [
+     {
+      "fieldId": "642550045c32ef73e80dcf17",
+      "fieldLabel": "Brands",
+      "valueId": "default",
+      "valueLabel": "T-Systems ICT India Pvt. Ltd."
+     },
+     {
+      "fieldId": "644cf33771f59f38f25d588b",
+      "fieldLabel": "Competency Level",
+      "valueId": "03f835d0-0aab-408f-905d-481b31e59d26",
+      "valueLabel": "Specialist"
+     },
+     {
+      "fieldId": "COUNTRY",
+      "fieldLabel": "Country/Region",
+      "valueId": "in",
+      "valueLabel": "India"
+     },
+     {
+      "fieldId": "6444d6cb338dfc603c5d0789",
+      "fieldLabel": "Level",
+      "valueId": "6739b0c2-b09e-4f4e-9d01-f0a5077c4d53",
+      "valueLabel": "L 1.2"
+     },
+     {
+      "fieldId": "644cefa8b15967309ef2103f",
+      "fieldLabel": "Primary  Skills",
+      "valueLabel": "SAP HCM"
+     },
+     {
+      "fieldId": "646865c8de5f1e5149ba4c65",
+      "fieldLabel": "Job Description",
+      "valueLabel": "Role   Integration Developer\r\n3 to 6 years of experience\r\nMust have skills\r\n  Strong integration experience with SAP Integration Suite  iFlow   including Groovy scripting  mapping  and error handling\r\n  In depth knowledge of SAP HCM   SuccessFactors data models and integration patterns\r\n  Proficient in ABAP OO  BAdIs  and InfotypeFramework for custom integration logic\r\n  Experience with secure data exchange  SSH  OAuth  x509  basic auth \r\n  Hands on experience with SAP SOA Manager and SuccessFactors migration and replication\r\n  Hands on experience with the SuccessFactors Integration Centre\r\nNice to have skills\r\n  Experience with Business Integration Builder  BIB  and this specific iFlow configuration\r\n  Familiarity with SAP HCM   SuccessFactors integration architecture \r\n  Knowledge of other SAP BTP modules like SAP Build\r\n  Understanding of master data customization in SAP HCM and SuccessFactors\r\n  Experience in other scripting language for transforming file based data  like python pandas \r\nResponsibilities\r\n  Implement and maintain migration and replication routines between SAP HCM and SuccessFactors within the Business Integration Builder  BIB  and Custom IFlow Integrations\r\n  Design and configure end to end integration interfaces  e g   recruiting  reporting \r\n  Configure replication settings  SAP Replication Systems  and whitelisting  within SuccessFactors\r\n  Perform end to end testing  data validation  and troubleshooting of integration flows and BIB configuration\r\nGeneral skills  \r\nCore Competency  deep knowledge of SAP HCM and SuccessFactors data models  including employee data  organizational structures  and HR lifecycle processes \r\nData Transformation  Experience with data migration  transformation  and validation from SAP HCM to SuccessFactors \r\nProcess Focus  support hybrid integration scenarios  master data synchronization  and automated data migration \r\nCollaboration  Close collaboration with HR domain experts  SAP consultants  and IT teams to define requirements  troubleshoot issues  and optimize processes \r\nQuality   Automation  A strong focus on data quality  automated validation  and continuous process improvement to ensure reliability"
+     },
+     {
+      "fieldId": "644cec203ef8b80fd372d768",
+      "fieldLabel": "TSIN ID",
+      "valueLabel": "TSIN022693"
+     }
+    ],
+    "visibility": "PUBLIC",
+    "ref": "https://api.smartrecruiters.com/v1/companies/T-SystemsICTIndiaPvtLtd1/postings/744000155677234",
+    "language": {
+     "code": "en",
+     "label": "English",
+     "labelNative": "English (US)"
+    }
+   }
+  ]
+ },
+ "detail": {
+  "id": "744000155915888",
+  "name": "Dot Net + DevOps (Focused)",
+  "uuid": "3581625b-9cd8-4bc6-99fb-4c73d600fde0",
+  "jobId": "dfd42d91-76f1-4b0b-a0ce-b45144f904d9",
+  "jobAdId": "a63f9f6c-11d0-479e-94f2-2f82ce205154",
+  "defaultJobAd": true,
+  "refNumber": "REF7482O",
+  "company": {
+   "name": "T-Systems ICT India Pvt. Ltd.",
+   "identifier": "T-SystemsICTIndiaPvtLtd1"
+  },
+  "location": {
+   "city": "Pune",
+   "region": "MH",
+   "country": "in",
+   "address": "Balewadi High Street",
+   "postalCode": "411045",
+   "remote": false,
+   "hybrid": true,
+   "fullLocation": "Pune, MH, India"
+  },
+  "customField": [
+   {
+    "fieldId": "644cefa8b15967309ef2103f",
+    "fieldLabel": "Primary  Skills",
+    "valueLabel": ".NET core + Angular"
+   },
+   {
+    "fieldId": "642550045c32ef73e80dcf17",
+    "fieldLabel": "Brands",
+    "valueId": "default",
+    "valueLabel": "T-Systems ICT India Pvt. Ltd."
+   },
+   {
+    "fieldId": "COUNTRY",
+    "fieldLabel": "Country/Region",
+    "valueId": "in",
+    "valueLabel": "India"
+   },
+   {
+    "fieldId": "646865c8de5f1e5149ba4c65",
+    "fieldLabel": "Job Description",
+    "valueLabel": "Software Developer   Expert \r\nExperience  6 to 9 years\r\nJob Overview  Fullstack   NET Core   Angular \r\n\r\nWe are looking for an experienced Software Developer who has strong technical foundation in  NET Core  Angular and Azure Cloud services \r\nKey Responsibilities \r\n \tAct as Expert Software Developer for the software development team and open to help managing product backlog sprint planning and stakeholder alignment \r\n \tCollaborate with architects and product owners globally to define technical and business priorities\r\n \tEnsure code quality reviews and adherence to best practices\r\n\r\nRequired Skills \r\n \t6 9 years of IT experience as Fullstack developer   NET   Angular \r\n \tStrong expertise in  NET Core  Angular  SQL Server  Azure services\r\n \tKnowledge of Azure networking concepts ADFS App Gateways Private Endpoints Subnets\r\n \tStrong problem solving coordination and communication skills\r\n\r\nNice to Have Skills \r\n \tExperience with CI CD pipelines Azure DevOps \r\n \tHands on Experience in microservice architecture\r\n \tFamiliarity with Docker Kubernetes\r\n \tExposure to CMS platforms e  g   Sitefinity"
+   },
+   {
+    "fieldId": "6444d6cb338dfc603c5d0789",
+    "fieldLabel": "Level",
+    "valueId": "66f47770-a423-4e6c-bfcd-fed8a0ebbdf2",
+    "valueLabel": "L 2.2"
+   },
+   {
+    "fieldId": "644cf33771f59f38f25d588b",
+    "fieldLabel": "Competency Level",
+    "valueId": "39394f68-5b73-40e7-a953-d2ec13f8c169",
+    "valueLabel": "Expert"
+   },
+   {
+    "fieldId": "644cec203ef8b80fd372d768",
+    "fieldLabel": "TSIN ID",
+    "valueLabel": "TSIN023436"
+   }
+  ],
+  "releasedDate": "2026-10-16T06:09:58.396Z",
+  "creator": {
+   "name": "",
+   "avatarUrl": ""
+  },
+  "postingUrl": "https://jobs.smartrecruiters.com/T-SystemsICTIndiaPvtLtd1/744000155915888-dot-net-devops-focused-",
+  "applyUrl": "https://jobs.smartrecruiters.com/T-SystemsICTIndiaPvtLtd1/744000155915888-dot-net-devops-focused-?oga=true",
+  "referralUrl": "https://jobs.smartrecruiters.com/external-referrals/company/T-SystemsICTIndiaPvtLtd1/publication/3581625b-9cd8-4bc6-99fb-4c73d600fde0?dcr_ci=T-SystemsICTIndiaPvtLtd1",
+  "jobAd": {
+   "sections": {
+    "companyDescription": {
+     "title": "Company Description",
+     "text": "<p>Company Introduction – T-Systems ICT India Pvt. Ltd. T-Systems Information and Communication Technology India Private Limited (T-Systems ICT India Pvt. Ltd.) is a certified Great Place To Work®, proudly recognized for its strong people-first culture and commitment to employee excellence. As a wholly owned subsidiary of T-Systems International GmbH, T-Systems India operates out of Pune and Bangalore, with a dynamic team of over 4,200 professionals delivering high-value IT services to group customers worldwide. T-Systems India plays a key role in this global vision by delivering integrated, end-to-end IT solutions and sector-specific software to drive transformation across industries, including automotive, manufacturing, logistics, transportation, healthcare, and the public sector. For over 25 years, T-Systems International GmbH has been at the forefront of digital innovation, driving progress and fostering digital optimism. As a leading European IT services provider and a proud part of Deutsche Telekom, T-Systems delivers transformative digitalization projects backed by deep expertise in consulting, cloud, AI, cybersecurity, and connectivity. With a global workforce of 26,000 employees across 26 countries, we set industry benchmarks in efficiency, sovereignty, security, and reliability—empowering organizations to unlock their full digital potential. With annual revenues exceeding EUR 4.0 billion (2024), T-Systems stands as one of Europe’s foremost digital transformation partners, committed to shaping the future of enterprise technology.</p>"
+    },
+    "jobDescription": {
+     "title": "Job Description",
+     "text": "<p><strong>Role -&#xa0;Full Stack Software Developer with strong DevOps Focus</strong></p><p><strong>Experience Required : 7+ Years</strong></p><p><strong>Location : Pune</strong></p><p>Join us in building cloud-native applications and scalable platforms that make a real impact. As a Full Stack Software Developer with a strong DevOps mindset, you will work across the entire software lifecycle, from designing and developing modern applications to automating deployments, operating cloud environments, and driving observability excellence on Microsoft Azure.</p><p><strong>Your Responsibilities</strong></p><ul><li>Design, develop, and maintain applications using <strong>.NET (C#), DevOps (Docker &amp; Kubernetes)&#xa0;</strong>and Angular (GTH)</li><li>Build and implement cloud-native solutions on <strong>Microsoft Azure</strong></li><li>Develop and optimize CI/CD pipelines and GitOps workflows</li><li>Deploy and operate containerized applications using <strong>Docker</strong> and <strong>Kubernetes</strong></li><li>Automate build, test, and deployment processes</li><li>Contribute to modern software and cloud architectures</li><li>Ensure application performance, reliability, and scalability</li><li>Collaborate closely with business stakeholders, architects, and development teams</li></ul><p><strong>Your Profile</strong></p><ul><li>6-9+ years of hands-on experience in full-stack software development using .NET (C#), modern web technologies, and DevOps practices</li><li>Hands-on experience with <strong>Angular</strong> and <strong>TypeScript (Nice to Have)</strong></li><li>Strong understanding of <strong>Microsoft Azure</strong> and cloud-native architectures</li><li>Practical experience with <strong>Docker</strong> and <strong>Kubernetes (Must Have)</strong></li><li>Experience managing Kubernetes deployments using <strong>Helm</strong> and <strong>Argo CD</strong></li><li>Knowledge of <strong>CI/CD</strong>, GitOps, and Infrastructure as Code principles</li><li>Experience implementing and optimizing monitoring, logging, and telemetry solutions</li><li>Knowledge of <strong>OpenTelemetry</strong>, <strong>Grafana Tempo</strong>, <strong>Prometheus</strong>, and <strong>Grafana</strong></li><li>Strong analytical and problem-solving skills with a hands-on mentality</li><li>Team player with a passion for modern DevOps practices and continuous improvement</li></ul><p><strong>Technologies:</strong> .NET, C#, Angular, TypeScript, Microsoft Azure, Docker, Kubernetes, Helm, Argo CD, OpenTelemetry, Grafana Tempo, Prometheus, Grafana, Loki, &#xa0;GitHub Actions, Terraform.</p>"
+    },
+    "qualifications": {
+     "title": "Qualifications",
+     "text": ""
+    },
+    "additionalInformation": {
+     "title": "Additional Information",
+     "text": "<div sr-tagline=\"\"></div><p><em>Please Note: Fraudulent job postings/job scams are increasingly common.&#xa0;</em>Beware of misleading advertisements and fraudulent communication issuing 'offer letters' on behalf of T-Systems in exchange for a fee. Please look for an authentic T-Systems email id -&#xa0;<a href=\"mailto:XYZ@t-systems.com\" rel=\"noopener noreferrer\">XYZ@t-systems.com</a>.</p><p>Stay vigilant. Protect yourself from recruitment fraud!</p><p>To know more please visit :&#xa0;<a href=\"https://careers.smartrecruiters.com/T-SystemsICTIndiaPvtLtd1/fraud-alert\" rel=\"noopener noreferrer\">Fraud Alert</a></p>"
+    }
+   }
+  },
+  "active": true,
+  "visibility": "PUBLIC",
+  "industry": {
+   "id": "it_and_services",
+   "label": "Information Technology And Services"
+  },
+  "function": {
+   "id": "engineering",
+   "label": "Engineering"
+  },
+  "experienceLevel": {
+   "id": "not_applicable",
+   "label": "Not Applicable"
+  },
+  "typeOfEmployment": {
+   "id": "permanent",
+   "label": "Full-time"
+  },
+  "language": {
+   "code": "en",
+   "label": "English",
+   "labelNative": "English (US)"
+  }
+ }
+}

@@ -1,0 +1,128 @@
+{
+ "jobs": [
+  {
+   "absolute_url": "https://databricks.com/company/careers/open-positions/job?gh_jid=6918763002",
+   "data_compliance": [
+    {
+     "type": "gdpr",
+     "requires_consent": false,
+     "requires_processing_consent": false,
+     "requires_retention_consent": false,
+     "retention_period": null,
+     "demographic_data_consent_applies": false
+    }
+   ],
+   "internal_job_id": 5632983002,
+   "location": {
+    "name": "Bengaluru, India; Mumbai, India"
+   },
+   "metadata": [
+    {
+     "id": 9740521002,
+     "name": "Company Assignment",
+     "value": "Databricks India Private Limited",
+     "value_type": "single_select"
+    },
+    {
+     "id": 24059030002,
+     "name": "Career Page Posting Category",
+     "value": [
+      "Sales"
+     ],
+     "value_type": "multi_select"
+    }
+   ],
+   "id": 6918763002,
+   "updated_at": "2026-09-21T13:22:12-04:00",
+   "requisition_id": "P-985",
+   "title": "Account Executive ",
+   "company_name": "Databricks",
+   "first_published": "2023-12-12T05:19:55-05:00",
+   "language": "en",
+   "application_deadline": null,
+   "content": "&lt;p&gt;As an Account Executive your mission will be to help further build our India business, which is one of our fastest growing markets in APJ. The Databricks Sales Team is driving growth through strategic and innovative partnership with our customers, helping businesses thrive by solving the world&#39;s toughest problems with our solutions. You will be inspiring and guiding customers on their data journey, making organisations more collaborative and productive than ever before. You will play an important role in the business in India, with the opportunity to strategically build your territory in close partnership with the business leaders. Using your passion with technology and drive to build, you will help businesses all across India reach their full potential, through the power of Databricks Data Intelligence Platform.&lt;/p&gt;\n&lt;p&gt;You know how to sell innovation and change and can guide deals forward to compress decision cycles. You love understanding a product in-depth and are passionate about communicating its value to customers and partners. Always prospecting for new opportunities, you will close new accounts while growing our business in existing accounts.&lt;/p& ...",
+   "departments": [
+    {
+     "id": 4003092002,
+     "name": "Enterprise Sales",
+     "child_ids": [],
+     "parent_id": 4001021002
+    }
+   ],
+   "offices": [
+    {
+     "id": 4056342002,
+     "name": "Mumbai, India",
+     "location": "Mumbai, India",
+     "child_ids": [],
+     "parent_id": 4033855002
+    }
+   ],
+   "ai_disclaimer": null,
+   "include_ai_disclaimer": null,
+   "ai_opt_out_request_url": null
+  },
+  {
+   "absolute_url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8756138002",
+   "data_compliance": [
+    {
+     "type": "gdpr",
+     "requires_consent": false,
+     "requires_processing_consent": false,
+     "requires_retention_consent": false,
+     "retention_period": null,
+     "demographic_data_consent_applies": false
+    }
+   ],
+   "internal_job_id": 6502383002,
+   "location": {
+    "name": "Bengaluru, India"
+   },
+   "metadata": [
+    {
+     "id": 9740521002,
+     "name": "Company Assignment",
+     "value": "Databricks India Private Limited",
+     "value_type": "single_select"
+    },
+    {
+     "id": 24059030002,
+     "name": "Career Page Posting Category",
+     "value": [
+      "Finance"
+     ],
+     "value_type": "multi_select"
+    }
+   ],
+   "id": 8756138002,
+   "updated_at": "2026-10-18T23:38:29-04:00",
+   "requisition_id": "GAQ427R213",
+   "title": "Credit and Collections Manager",
+   "company_name": "Databricks",
+   "first_published": "2026-08-31T14:35:16-04:00",
+   "language": "en",
+   "application_deadline": null,
+   "content": "&lt;p data-pm-slice=&quot;1 1 []&quot;&gt;&lt;strong&gt;GAQ427R213&lt;/strong&gt;&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;1648&quot;&gt;This Manager role within Databricks’ Credit &amp;amp; Collections organisation is responsible for driving credit strategy, strategic customer collections, AR performance, and complex escalations across a high-growth, usage-based Data/AI business. The role combines financial and commercial judgment with hands-on customer engagement, functional oversight of collection operations, and governance of the outsourced collections model. This is a high-impact opportunity for a CA, CPA, or experienced finance professional to take ownership of credit risk, cash, strategic customer relationships, and AR performance at Databricks scale. &lt;strong&gt;This is an individual contributor position with an expectation to be hands-on.&amp;nbsp;&lt;/strong&gt;&lt;/p&gt;\n&lt;p data-renderer-start-pos=&quot;2006&quot;&gt;&lt;strong data-renderer-mark=&quot;true&quot;&gt;The impact you will have: &lt;/strong&gt;&lt;/p&gt;\n&lt;ul&gt;\n&lt;li data-renderer-start-pos=&quot;2006&quot;&gt;Lead the Credit &amp;amp; Collections function for an assigned scope within Databric ...",
+   "departments": [
+    {
+     "id": 4001272002,
+     "name": "Finance",
+     "child_ids": [],
+     "parent_id": 4001019002
+    }
+   ],
+   "offices": [
+    {
+     "id": 4007112002,
+     "name": "Bengaluru, India",
+     "location": "Bengaluru, India",
+     "child_ids": [],
+     "parent_id": 4056341002
+    }
+   ],
+   "ai_disclaimer": null,
+   "include_ai_disclaimer": null,
+   "ai_opt_out_request_url": null
+  }
+ ]
+}
