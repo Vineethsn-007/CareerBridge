@@ -22,6 +22,10 @@ interface SkillGapSummaryProps {
 export function SkillGapSummary({ gap }: SkillGapSummaryProps) {
   const { coverage_pct, matched, missing, job_title } = gap;
 
+  // "0 missing" only means a full match when the listing actually required skills;
+  // scraped rows can have empty requirement lists (no structured skills extracted).
+  const hasRequirements = matched.length + missing.length > 0;
+
   // Group missing skills by priority
   const highPriority = missing.filter((m) => m.priority === "high");
   const mediumPriority = missing.filter((m) => m.priority === "medium");
@@ -113,10 +117,18 @@ export function SkillGapSummary({ gap }: SkillGapSummaryProps) {
             </Badge>
           </div>
 
-          {missing.length === 0 ? (
+          {missing.length === 0 && hasRequirements ? (
             <div className="p-4 rounded-lg bg-emerald-50 border border-[#18856B]/30 text-xs text-[#18856B] flex items-center gap-2">
               <Sparkles className="w-4 h-4 shrink-0" />
               <span>Congratulations! You match 100% of the skills required for this job.</span>
+            </div>
+          ) : missing.length === 0 ? (
+            <div className="p-4 rounded-lg bg-surface border border-border text-xs text-secondary-text flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 shrink-0 text-secondary-text" />
+              <span>
+                This listing has no structured skill requirements, so there is nothing to close.
+                Compare roles by description and experience instead.
+              </span>
             </div>
           ) : (
             <div className="flex flex-wrap gap-2">
