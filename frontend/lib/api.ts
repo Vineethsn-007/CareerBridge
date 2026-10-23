@@ -7,6 +7,10 @@ import type {
   JobMatch,
   MatchRequest,
   ParsedResume,
+  PersonaAnswerRequest,
+  PersonaAnswerResponse,
+  PersonaStartRequest,
+  PersonaStartResponse,
   PrepPlan,
   PrepPlanRequest,
   SkillGap,
@@ -68,5 +72,11 @@ export const api = {
   },
   evaluateAnswer(body: EvaluateRequest): Promise<AnswerFeedback> {
     return post<AnswerFeedback>("/interview/evaluate", body);
+  },
+  personaStart(body: PersonaStartRequest): Promise<PersonaStartResponse> {
+    return post<PersonaStartResponse>("/persona/start", body);
+  },
+  personaAnswer(body: PersonaAnswerRequest): Promise<PersonaAnswerResponse> {
+    return post<PersonaAnswerResponse>("/persona/answer", body);
   },
 };
