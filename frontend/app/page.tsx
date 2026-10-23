@@ -162,49 +162,50 @@ export default function Home() {
               {/* Soft blue visual accent behind image */}
               <div className="absolute -inset-4 bg-rock-blue/20 rounded-2xl transform -rotate-1 pointer-events-none" />
 
-              <div className="hero-image-wrap relative rounded-xl overflow-hidden border border-border shadow-float bg-pure-white">
-                <div className="relative aspect-[4/3] w-full">
+              <div className="hero-image-wrap relative rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white">
+                <div className="relative aspect-[1024/738] w-full">
                   <Image
                     src="/images/hero-student.jpg"
-                    alt="Indian college student working confidently on career planning"
+                    alt="Indian engineering student working on code projects on his laptop"
                     fill
                     priority
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 500px"
+                    sizes="(max-width: 768px) 100vw, 520px"
                   />
-                  {/* Subtle gradient vignette at bottom */}
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-deep-teal/60 to-transparent pointer-events-none" />
-                </div>
-
-                {/* Overlaid Bottom Title */}
-                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-                  <div>
-                    <p className="text-xs font-medium text-pale-blue">Aarav Sharma • 2026 Batch</p>
-                    <p className="text-sm font-semibold">Full Stack & Data Engineering</p>
-                  </div>
-                  <Badge variant="verified" size="sm">
-                    Verified Match
-                  </Badge>
                 </div>
               </div>
 
-              {/* Floating Product Preview 1: Match Score */}
-              <div className="hero-float-card absolute -bottom-6 -left-6 sm:-left-8 bg-pure-white border border-border rounded-lg p-3.5 shadow-float max-w-[210px] hidden sm:flex items-center gap-3">
+              {/* Floating Product Preview 1 (Top-Right): Active Prep Plan */}
+              <div className="hero-float-card absolute -top-4 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200/60 text-[#18856B] flex items-center justify-center font-bold text-xs shrink-0">
+                  4W
+                </div>
+                <div className="space-y-0.5 pr-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-deep-teal">Prep Plan Active</p>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#18856B] animate-pulse" />
+                  </div>
+                  <p className="text-[11px] text-secondary-text">Week 1: TypeScript & ORM</p>
+                </div>
+              </div>
+
+              {/* Floating Product Preview 2 (Bottom-Left): Match Score */}
+              <div className="hero-float-card absolute -bottom-5 -left-3 sm:-left-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
                 <ScoreRing score={88} size="sm" animate={true} />
-                <div className="space-y-0.5">
+                <div className="space-y-0.5 pr-1">
                   <p className="text-xs font-bold text-deep-teal">88% Match</p>
                   <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru</p>
                 </div>
               </div>
 
-              {/* Floating Product Preview 2: Prep Plan Status */}
-              <div className="hero-float-card absolute -top-4 -right-4 sm:-right-6 bg-pure-white border border-border rounded-lg p-3 shadow-float hidden sm:flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#18856B] flex items-center justify-center font-bold text-xs">
-                  4W
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-semibold text-deep-teal">Prep Plan Active</p>
-                  <p className="text-[10px] text-secondary-text">Week 1: TypeScript & ORM</p>
+              {/* Floating Product Preview 3 (Bottom-Right): Verified Candidate Profile */}
+              <div className="hero-float-card absolute -bottom-5 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-2.5 z-20">
+                <div className="space-y-0.5 text-left pr-0.5">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-deep-teal">Muhammad Haashid</p>
+                    <Badge variant="verified" size="sm">Verified Match</Badge>
+                  </div>
+                  <p className="text-[11px] text-secondary-text">Full Stack & Data Engineering</p>
                 </div>
               </div>
             </div>
@@ -268,76 +269,108 @@ export default function Home() {
       </section>
 
       {/* SECTION 4 — THE CHALLENGE */}
-      <section className="py-20 border-b border-border bg-merino">
+      <section className="py-20 lg:py-24 border-b border-border bg-merino">
         <Container size="xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Top Two-Column Composition: Left Editorial + Right Photograph */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* Left Column: Heading and Explanation */}
             <div className="lg:col-span-6 space-y-5">
               <Badge variant="priority-medium" size="sm">
                 The Real Challenge
               </Badge>
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-deep-teal leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-deep-teal leading-tight">
                 Career decisions shouldn&apos;t feel like guesswork.
               </h2>
-              <p className="text-base text-secondary-text leading-relaxed">
+              <p className="text-base sm:text-lg text-secondary-text leading-relaxed">
                 Students face many challenges when planning their careers.
                 CareerBridge brings everything together to help you make informed,
                 data-backed decisions.
               </p>
+              <p className="text-sm text-muted-text leading-relaxed pt-1">
+                From fragmented placement drives to conflicting online advice, navigating your first professional leap shouldn&apos;t be a solo trial-and-error experiment.
+              </p>
+            </div>
 
-              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-border shadow-card mt-6">
+            {/* Right Column: High-Quality Student Photograph */}
+            <div className="lg:col-span-6 relative">
+              {/* Soft blue visual accent behind image */}
+              <div className="absolute -inset-3 bg-rock-blue/20 rounded-3xl transform rotate-1 pointer-events-none" />
+
+              <div className="relative aspect-[1024/537] w-full rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white">
                 <Image
                   src="/images/collaborating-students.jpg"
-                  alt="Students collaborating together on career planning"
+                  alt="Indian engineering students working together on laptops during a hackathon"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 600px"
+                  priority
                 />
               </div>
-            </div>
 
-            {/* Right Column: 5 Concise Challenge Cards */}
-            <div className="lg:col-span-6 space-y-3.5">
+              {/* Authentic caption tag */}
+              <div className="absolute bottom-3 left-4 bg-deep-teal/85 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1 rounded-full flex items-center gap-1.5 shadow-subtle hidden sm:flex">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>Student Engineering Team • Live Hackathon Sprint</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Below: Five Concise Challenge Cards */}
+          <div className="mt-12 lg:mt-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {[
                 {
                   title: "Too many career options",
                   desc: "Endless job titles and conflicting advice make choosing a clear focus exhausting.",
                   num: "01",
+                  icon: Compass,
                 },
                 {
                   title: "Uncertainty about suitable jobs",
                   desc: "Hard to know whether your academic background truly matches market requirements.",
                   num: "02",
+                  icon: Target,
                 },
                 {
-                  title: "Confusion about which skills to learn",
+                  title: "Confusion on skills to learn",
                   desc: "Students waste months on outdated tutorials without knowing employer priorities.",
                   num: "03",
+                  icon: Layers,
                 },
                 {
                   title: "Resume not matching roles",
                   desc: "Generic resumes get filtered out by screening algorithms before a human ever looks.",
                   num: "04",
+                  icon: FileText,
                 },
                 {
                   title: "Limited interview practice",
                   desc: "Few students get realistic technical mock interviews with structured rubric feedback.",
                   num: "05",
+                  icon: MessageSquare,
                 },
-              ].map((c) => (
-                <div
-                  key={c.num}
-                  className="bg-pure-white border border-border rounded-lg p-4 shadow-subtle flex items-start gap-4 transition-all hover:border-rock-blue"
-                >
-                  <span className="text-xs font-serif font-bold text-rock-blue mt-0.5">
-                    {c.num}
-                  </span>
-                  <div className="space-y-0.5">
-                    <h4 className="text-sm font-bold text-deep-teal">{c.title}</h4>
-                    <p className="text-xs text-secondary-text leading-relaxed">{c.desc}</p>
+              ].map((c) => {
+                const Icon = c.icon;
+                return (
+                  <div
+                    key={c.num}
+                    className="bg-pure-white border border-border rounded-xl p-4 shadow-subtle flex flex-col justify-between gap-3 transition-all hover:border-rock-blue hover:shadow-card group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="w-8 h-8 rounded-lg bg-pale-blue/60 border border-border flex items-center justify-center text-venice-blue group-hover:bg-rock-blue/20 transition-colors">
+                        <Icon className="w-4 h-4 text-venice-blue" />
+                      </div>
+                      <span className="text-xs font-serif font-bold text-rock-blue">
+                        {c.num}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-deep-teal leading-snug">{c.title}</h4>
+                      <p className="text-xs text-secondary-text leading-relaxed">{c.desc}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </Container>

@@ -183,8 +183,8 @@ export function ResumeDropzone({
             onClick={() => {
               const sampleFile = new File(
                 [
-                  "Aarav Sharma\n" +
-                    "aarav.sharma@gmail.com\n" +
+                  "Muhammad Haashid\n" +
+                    "muhammad.haashid@gmail.com\n" +
                     "+91 9876543210\n" +
                     "Bangalore, India\n\n" +
                     "SUMMARY\n" +
