@@ -22,6 +22,47 @@ class Experience(BaseModel):
     company: str | None = None
     duration: str | None = None
     summary: str | None = None
+    # Additive (Task 2): evidence-rich experience fields.
+    start_date: str | None = None
+    end_date: str | None = None
+    duration_months: int | None = Field(default=None, ge=0)
+    technologies: list[str] = Field(default_factory=list)
+    impact: list[str] = Field(default_factory=list)
+    seniority: str | None = None
+
+
+class Certification(BaseModel):
+    name: str
+    issuer: str | None = None
+    year: str | None = None
+
+
+SkillEvidenceCategory = Literal["work experience", "project", "listed only"]
+
+
+class SkillEvidence(BaseModel):
+    """One skill with the evidence the resume actually contains for it."""
+
+    skill: str
+    category: SkillEvidenceCategory = "listed only"
+    weighted_strength: float = Field(default=0.3, ge=0, le=1)
+    proficiency: str | None = None  # e.g. "basic" | "intermediate" | "advanced"
+    years: float | None = Field(default=None, ge=0)
+
+
+class ResumeInsight(BaseModel):
+    """An evidence-tied insight: every claim points at resume evidence."""
+
+    text: str
+    evidence: str | None = None
+
+
+class ResumeInsights(BaseModel):
+    strengths: list[ResumeInsight] = Field(default_factory=list)
+    gaps: list[ResumeInsight] = Field(default_factory=list)
+    summary: str | None = None
+    target_roles: list[str] = Field(default_factory=list)
+    tips: list[str] = Field(default_factory=list)
 
 
 class ParsedResume(BaseModel):
@@ -34,6 +75,11 @@ class ParsedResume(BaseModel):
     experience: list[Experience] = Field(default_factory=list)
     projects: list[str] = Field(default_factory=list)
     raw_text: str = ""
+    # Additive (Task 2): evidence-weighted skills, certifications and insights.
+    skill_evidence: list[SkillEvidence] = Field(default_factory=list)
+    certifications: list[Certification] = Field(default_factory=list)
+    total_experience_months: int | None = Field(default=None, ge=0)
+    insights: ResumeInsights | None = None
 
 
 # ---------- Jobs & matching ----------
@@ -51,6 +97,8 @@ class Job(BaseModel):
     source_url: str
     verified: bool = False
     last_verified: str | None = None  # ISO date, e.g. "2026-10-20"
+    # Additive (Task 4 scraper): direct application link when one is verified.
+    apply_url: str | None = None
 
 
 class MatchRequest(BaseModel):
@@ -143,3 +191,146 @@ class AnswerFeedback(BaseModel):
     strengths: list[str]
     improvements: list[str]
     sample_answer: str | None = None
+
+
+# ---------- Admin scraping (Task 4, additive) ----------
+
+
+class AdminScrapeRequest(BaseModel):
+    company: str | None = None  # None -> every enabled source
+    dry_run: bool = False
+
+
+class SourceReport(BaseModel):
+    company: str
+    ats: str
+    fetched: int = 0
+    india_matches: int = 0
+    accepted: int = 0
+    verified: int = 0
+    rejected: int = 0
+    skipped: int = 0
+    errors: list[str] = Field(default_factory=list)
+    created: int = 0
+    updated: int = 0
+    stale_disabled: int = 0
+
+
+class ScrapeRunReport(BaseModel):
+    started_at: str
+    dry_run: bool
+    sources: list[SourceReport] = Field(default_factory=list)
+
+
+# ---------- Persona Q&A (additive, Task 3) ----------
+
+PersonaTopic = Literal[
+    "leadership", "teamwork", "ownership", "communication", "initiative", "learning agility"
+]
+
+
+class PersonaStartRequest(BaseModel):
+    resume: ParsedResume | None = None
+    resume_profile_id: int | None = None
+
+
+class PersonaQuestion(BaseModel):
+    index: int = Field(ge=1)
+    topic: PersonaTopic
+    question: str
+
+
+class PersonaStartResponse(BaseModel):
+    persona_id: int
+    resume_profile_id: int
+    total_questions: int
+    completed: bool = False
+    question: PersonaQuestion
+
+
+class PersonaAnswerRequest(BaseModel):
+    persona_id: int
+    question: PersonaQuestion
+    answer: str | None = None
+    skip: bool = False
+
+
+class PersonaStrength(BaseModel):
+    """A strength the candidate described in their own words, with a direct quote."""
+
+    strength: str
+    quote: str
+    topic: PersonaTopic
+
+
+class PersonaProfileResult(BaseModel):
+    persona_id: int
+    resume_profile_id: int
+    strengths: list[PersonaStrength] = Field(default_factory=list)
+    summary: str | None = None
+    confidence: Literal["high", "medium", "low"] = "low"
+    completed: bool = True
+
+
+class PersonaAnswerResponse(BaseModel):
+    completed: bool
+    question: PersonaQuestion | None = None
+    profile: PersonaProfileResult | None = None
+
+
+# ---------- Interview Sessions & Plan ----------
+
+
+class PersonaInput(BaseModel):
+    summary: str | None = None
+    strengths: list[str] = Field(default_factory=list)
+    confidence: str | None = None
+    answers: list[dict[str, str]] = Field(default_factory=list)
+
+
+class InterviewPlanQuestion(BaseModel):
+    id: str
+    text: str
+    type: Literal["warmup", "project", "technical", "behavioural", "closing"]
+    focus_skill_or_project: str | None = None
+    difficulty: Literal["easy", "medium", "hard"]
+    expected_key_points: list[str] = Field(default_factory=list)
+    follow_up: str | None = None
+    time_guide_seconds: int = 120
+
+
+class InterviewPlan(BaseModel):
+    job_id: str
+    role_title: str
+    company_name: str
+    questions: list[InterviewPlanQuestion]
+
+
+class ClientQuestion(BaseModel):
+    id: str
+    text: str
+    type: Literal["warmup", "project", "technical", "behavioural", "closing"]
+    focus_skill_or_project: str | None = None
+    difficulty: Literal["easy", "medium", "hard"]
+    time_guide_seconds: int = 120
+
+
+class InterviewSessionCreate(BaseModel):
+    resume: ParsedResume
+    job_id: str
+    persona: PersonaInput | None = None
+    num_questions: int = Field(default=5, ge=1, le=15)
+    duration_minutes: int | None = Field(default=15, ge=5, le=60)
+
+
+class InterviewSessionResponse(BaseModel):
+    session_id: str
+    job_id: str
+    role_title: str
+    company_name: str
+    status: str
+    num_questions: int
+    duration_minutes: int
+    questions: list[ClientQuestion]
+    conversation_url: str | None = None
+    created_at: str

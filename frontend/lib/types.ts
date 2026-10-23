@@ -11,6 +11,42 @@ export interface Experience {
   company?: string | null;
   duration?: string | null;
   summary?: string | null;
+  // Additive (resume parsing agent):
+  start_date?: string | null;
+  end_date?: string | null;
+  duration_months?: number | null;
+  technologies?: string[];
+  impact?: string[];
+  seniority?: string | null;
+}
+
+export interface Certification {
+  name: string;
+  issuer?: string | null;
+  year?: string | null;
+}
+
+export type SkillEvidenceCategory = "work experience" | "project" | "listed only";
+
+export interface SkillEvidence {
+  skill: string;
+  category: SkillEvidenceCategory;
+  weighted_strength: number;
+  proficiency?: string | null;
+  years?: number | null;
+}
+
+export interface ResumeInsight {
+  text: string;
+  evidence?: string | null;
+}
+
+export interface ResumeInsights {
+  strengths: ResumeInsight[];
+  gaps: ResumeInsight[];
+  summary?: string | null;
+  target_roles: string[];
+  tips: string[];
 }
 
 export interface ParsedResume {
@@ -23,6 +59,12 @@ export interface ParsedResume {
   experience: Experience[];
   projects: string[];
   raw_text: string;
+  // Additive (resume parsing agent): always present in API payloads since the
+  // agent PR; optional here so hand-built demo objects stay valid.
+  skill_evidence?: SkillEvidence[];
+  certifications?: Certification[];
+  total_experience_months?: number | null;
+  insights?: ResumeInsights | null;
 }
 
 export type JobType = "full-time" | "internship" | "part-time" | "contract";
@@ -40,6 +82,35 @@ export interface Job {
   source_url: string;
   verified: boolean;
   last_verified?: string | null;
+  // Additive (Task 4 scraper): direct application link when verified.
+  apply_url?: string | null;
+}
+
+// Additive (Task 4 scraper): admin scrape trigger/report.
+export interface AdminScrapeRequest {
+  company?: string | null;
+  dry_run?: boolean;
+}
+
+export interface ScrapeSourceReport {
+  company: string;
+  ats: string;
+  fetched: number;
+  india_matches: number;
+  accepted: number;
+  verified: number;
+  rejected: number;
+  skipped: number;
+  errors: string[];
+  created: number;
+  updated: number;
+  stale_disabled: number;
+}
+
+export interface ScrapeRunReport {
+  started_at: string;
+  dry_run: boolean;
+  sources: ScrapeSourceReport[];
 }
 
 export interface MatchRequest {
@@ -128,4 +199,103 @@ export interface AnswerFeedback {
   strengths: string[];
   improvements: string[];
   sample_answer?: string | null;
+}
+
+// ---------- Persona Q&A (additive) ----------
+
+export type PersonaTopic =
+  | "leadership"
+  | "teamwork"
+  | "ownership"
+  | "communication"
+  | "initiative"
+  | "learning agility";
+
+export interface PersonaStartRequest {
+  resume?: ParsedResume | null;
+  resume_profile_id?: number | null;
+}
+
+export interface PersonaQuestion {
+  index: number;
+  topic: PersonaTopic;
+  question: string;
+}
+
+export interface PersonaStartResponse {
+  persona_id: number;
+  resume_profile_id: number;
+  total_questions: number;
+  completed: boolean;
+  question: PersonaQuestion;
+}
+
+export interface PersonaAnswerRequest {
+  persona_id: number;
+  question: PersonaQuestion;
+  answer?: string | null;
+  skip?: boolean;
+}
+
+export interface PersonaStrength {
+  strength: string;
+  quote: string;
+  topic: PersonaTopic;
+}
+
+export interface PersonaProfileResult {
+  persona_id: number;
+  resume_profile_id: number;
+  strengths: PersonaStrength[];
+  summary?: string | null;
+  confidence: "high" | "medium" | "low";
+  completed: boolean;
+}
+
+export interface PersonaAnswerResponse {
+  completed: boolean;
+  question?: PersonaQuestion | null;
+  profile?: PersonaProfileResult | null;
+}
+
+// ---------- Interview Sessions & Plan ----------
+
+export interface PersonaInput {
+  summary?: string | null;
+  strengths?: string[];
+  confidence?: string | null;
+  answers?: Record<string, string>[];
+}
+
+export type QuestionType = "warmup" | "project" | "technical" | "behavioural" | "closing";
+export type QuestionDifficulty = "easy" | "medium" | "hard";
+
+export interface ClientQuestion {
+  id: string;
+  text: string;
+  type: QuestionType;
+  focus_skill_or_project?: string | null;
+  difficulty: QuestionDifficulty;
+  time_guide_seconds: number;
+}
+
+export interface InterviewSessionCreate {
+  resume: ParsedResume;
+  job_id: string;
+  persona?: PersonaInput | null;
+  num_questions?: number;
+  duration_minutes?: number | null;
+}
+
+export interface InterviewSessionResponse {
+  session_id: string;
+  job_id: string;
+  role_title: string;
+  company_name: string;
+  status: string;
+  num_questions: number;
+  duration_minutes: number;
+  questions: ClientQuestion[];
+  conversation_url?: string | null;
+  created_at: string;
 }

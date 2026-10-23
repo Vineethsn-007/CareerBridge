@@ -27,6 +27,16 @@ class Settings:
     youtube_api_key: str = os.getenv("YOUTUBE_API_KEY", "")
     jobs_path: Path = Path(os.getenv("JOBS_PATH", str(APP_DIR / "data" / "jobs.json")))
     max_upload_bytes: int = 5 * 1024 * 1024
+    # Task 4 scraper settings.
+    admin_token: str = os.getenv("ADMIN_TOKEN", "")
+    scraper_user_agent: str = os.getenv(
+        "SCRAPER_USER_AGENT",
+        "CareerBridge-Scraper/0.1 (+https://github.com/Vineethsn-007/CareerBridge)",
+    )
+    scraper_timeout: float = float(os.getenv("SCRAPER_TIMEOUT", "20"))
+    scraper_request_interval: float = float(os.getenv("SCRAPER_REQUEST_INTERVAL", "2.0"))
+    scraper_max_listings: int = int(os.getenv("SCRAPER_MAX_LISTINGS", "25"))
+    scraper_stale_days: int = int(os.getenv("SCRAPER_STALE_DAYS", "14"))
 
 
 settings = Settings()

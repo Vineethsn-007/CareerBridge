@@ -1,9 +1,6 @@
-"""Skill-gap analysis + preparation plan (owner: Teammate C).
+"""Skill-gap analysis + preparation plan (owner: Teammate C)."""
 
-Matches skills using the canonical taxonomy and synonyms, prioritizes missing skills
-via LLM with a heuristic fallback, and generates weekly prep plans using hand-curated resources.
-"""
-
+import logging
 from typing import Literal
 
 from app.core.llm import complete_json
@@ -24,6 +21,8 @@ from app.services.skills.prompts import (
     SKILL_GAP_SYSTEM,
 )
 from app.services.skills.resources import get_resources_for_skills
+
+logger = logging.getLogger(__name__)
 
 _SOFT_SKILLS: frozenset[str] = frozenset(
     {"communication", "teamwork", "leadership", "problem solving", "time management"}
@@ -55,9 +54,49 @@ def _is_skill_present(skill: str, resume_skill_set: set[str]) -> bool:
     return False
 
 
+def _candidate_evidence_lines(resume: ParsedResume) -> str:
+    """Compact evidence digest for the LLM prompt (bounded; no invented claims)."""
+    lines: list[str] = []
+    for entry in resume.skill_evidence[:15]:
+        parts = [entry.skill, f"{entry.category} ({round(entry.weighted_strength, 2)})"]
+        if entry.proficiency:
+            parts.append(entry.proficiency)
+        if entry.years is not None:
+            parts.append(f"{entry.years} yrs")
+        lines.append(" — ".join(parts))
+    return "; ".join(lines) if lines else "none available"
+
+
+def _candidate_context_lines(resume: ParsedResume) -> str:
+    """Bulleted, bounded digest of what the candidate has actually done."""
+    lines: list[str] = []
+    summary = (resume.summary or "").strip()
+    if summary:
+        lines.append(f"Summary: {summary[:300]}")
+    for exp in resume.experience[:3]:
+        head = exp.title or ""
+        if exp.company:
+            head += f" at {exp.company}"
+        if head:
+            lines.append(f"Experience: {head}")
+    project_titles = [p for p in resume.projects if str(p).strip()][:3]
+    if project_titles:
+        lines.append("Projects: " + "; ".join(str(p)[:120] for p in project_titles))
+    return " | ".join(lines) if lines else "no resume context provided"
+
+
+def _centrality(skill: str, job: Job, position_idx: int) -> float:
+    """0.5-1.0 importance from the skill's position in the job's own required list."""
+    n = len(job.skills_required)
+    if position_idx < 0 or position_idx >= n or n <= 1:
+        return 1.0
+    return 1.0 - 0.5 * position_idx / (n - 1)
+
+
 def _heuristic_priority_and_why(
-    skill: str, job: Job, index: int, total_missing: int
+    skill: str, job: Job, position_idx: int
 ) -> tuple[Literal["high", "medium", "low"], str]:
+    """Deterministic priority from centrality signals for the skill in `job`."""
     skill_clean = skill.strip()
     skill_lower = skill_clean.lower()
     canon = canonical_skill(skill)
@@ -65,6 +104,7 @@ def _heuristic_priority_and_why(
 
     title_lower = job.title.lower()
     desc_lower = job.description.lower()
+    weight = _centrality(skill, job, position_idx)
 
     if skill_lower in title_lower or canon_lower in title_lower:
         return (
@@ -78,30 +118,46 @@ def _heuristic_priority_and_why(
             f"{skill_clean} is an interpersonal skill supporting day-to-day work as {job.title}.",
         )
 
-    if (skill_lower in desc_lower or canon_lower in desc_lower) and index <= 2:
+    in_desc = skill_lower in desc_lower or canon_lower in desc_lower
+    if in_desc and weight >= 0.6:
         return (
             "high",
             f"{skill_clean} is emphasized in key requirements for {job.title}.",
         )
+    if in_desc:
+        return (
+            "medium",
+            f"{skill_clean} is mentioned in the requirements for {job.title}.",
+        )
 
-    if index < max(1, (total_missing + 1) // 2):
+    if weight >= 0.7:
         return (
             "high",
             f"{skill_clean} is a primary technical competency expected for this {job.title} role.",
         )
 
+    if weight >= 0.5:
+        return (
+            "medium",
+            f"{skill_clean} is an essential tool in the day-to-day workflow for a {job.title}.",
+        )
+
     return (
-        "medium",
-        f"{skill_clean} is an essential tool in the day-to-day workflow for a {job.title}.",
+        "low",
+        f"{skill_clean} is a nice-to-have for {job.title}; strengthen higher-priority gaps first.",
     )
 
 
-def _llm_analyze_missing(job: Job, missing_names: list[str]) -> list[MissingSkill]:
+def _llm_analyze_missing(
+    resume: ParsedResume, job: Job, missing_names: list[str]
+) -> list[MissingSkill]:
     prompt = SKILL_GAP_PROMPT.format(
         job_title=job.title,
         job_description=job.description,
         skills_required=", ".join(job.skills_required),
         missing_skills=", ".join(missing_names),
+        candidate_summary=_candidate_context_lines(resume),
+        candidate_evidence=_candidate_evidence_lines(resume),
     )
     payload = complete_json(prompt, system=SKILL_GAP_SYSTEM)
     items = payload.get("missing", [])
@@ -117,7 +173,7 @@ def _llm_analyze_missing(job: Job, missing_names: list[str]) -> list[MissingSkil
             continue
 
     results: list[MissingSkill] = []
-    for i, name in enumerate(missing_names):
+    for name in missing_names:
         name_clean = name.strip().lower()
         canon = canonical_skill(name)
         canon_clean = canon.lower() if canon else name_clean
@@ -127,29 +183,48 @@ def _llm_analyze_missing(job: Job, missing_names: list[str]) -> list[MissingSkil
             llm_m = evaluated[canon_clean]
             results.append(MissingSkill(skill=name, priority=llm_m.priority, why=llm_m.why))
         else:
-            priority, why = _heuristic_priority_and_why(name, job, i, len(missing_names))
+            job_position = _position_in_job(name, job)
+            priority, why = _heuristic_priority_and_why(name, job, job_position)
             results.append(MissingSkill(skill=name, priority=priority, why=why))
     return results
 
 
+def _position_in_job(skill: str, job: Job) -> int:
+    """Case-insensitive position of `skill` in the job's required list (-1 if absent)."""
+    target = skill.strip().lower()
+    for idx, entry in enumerate(job.skills_required):
+        if entry.strip().lower() == target:
+            return idx
+    return -1
+
+
 def analyze_gap(resume: ParsedResume, job: Job) -> SkillGap:
     have = _build_resume_skill_set(resume.skills)
-    matched = [s for s in job.skills_required if _is_skill_present(s, have)]
-    missing_names = [s for s in job.skills_required if not _is_skill_present(s, have)]
+
+    matched: list[str] = []
+    missing_names: list[str] = []
+    missing_positions: dict[str, int] = {}
+    for idx, skill in enumerate(job.skills_required):
+        if _is_skill_present(skill, have):
+            matched.append(skill)
+        else:
+            missing_names.append(skill)
+            missing_positions[skill] = idx
 
     if missing_names:
         try:
-            missing = _llm_analyze_missing(job, missing_names)
+            missing = _llm_analyze_missing(resume, job, missing_names)
         except Exception:
+            logger.debug("Skills gap LLM analysis failed; using heuristic fallback.")
             missing = [
                 MissingSkill(
                     skill=skill,
                     priority=priority,
                     why=why,
                 )
-                for i, skill in enumerate(missing_names)
+                for skill in missing_names
                 for priority, why in [
-                    _heuristic_priority_and_why(skill, job, i, len(missing_names))
+                    _heuristic_priority_and_why(skill, job, missing_positions[skill])
                 ]
             ]
     else:

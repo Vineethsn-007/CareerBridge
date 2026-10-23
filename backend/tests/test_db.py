@@ -12,6 +12,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.db import (
     SCHEMA_VERSION,
+    UTC,
     Base,
     CachedResource,
     Company,
@@ -102,8 +103,8 @@ def test_company_and_job_round_trip(session):
         skills_required=["Python", "SQL"],
         verified=True,
         last_verified=dt.date(2026, 10, 20),
-        first_seen=dt.datetime(2026, 10, 20, tzinfo=dt.UTC),
-        last_scraped_at=dt.datetime(2026, 10, 23, tzinfo=dt.UTC),
+        first_seen=dt.datetime(2026, 10, 20, tzinfo=UTC),
+        last_scraped_at=dt.datetime(2026, 10, 23, tzinfo=UTC),
         is_active=True,
     )
     session.add(job)

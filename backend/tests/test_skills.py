@@ -1,7 +1,15 @@
 """Tests for skills service: gap analysis, prep plan, resources, and LLM fallback."""
 
 from app.core.llm import LLMUnavailable
-from app.schemas import Job, MissingSkill, ParsedResume, PrepPlanRequest, SkillGap
+from app.schemas import (
+    Experience,
+    Job,
+    MissingSkill,
+    ParsedResume,
+    PrepPlanRequest,
+    SkillEvidence,
+    SkillGap,
+)
 from app.services.skills import service as skills_service
 from app.services.skills.resources import get_resources_for_skill, get_resources_for_skills
 
@@ -120,6 +128,151 @@ def test_analyze_gap_with_mocked_llm(monkeypatch):
     assert gap.missing[0].skill == "Docker"
     assert gap.missing[0].priority == "high"
     assert "microservices" in gap.missing[0].why
+
+
+# ---------------- Centrality-based heuristic priorities (Task 6) ----------------
+
+
+def test_analyze_gap_centrality_ladder():
+    """Title beats description beats plain position; late unmentioned skills rank lower."""
+    resume = ParsedResume(skills=[])
+    job = Job(
+        id="job-ladder",
+        title="Backend Developer",
+        company="Tech Corp",
+        location="Bengaluru",
+        skills_required=["Python", "SQL", "Docker", "Kafka"],
+        description="Build Python services and SQL data pipelines.",
+        source_url="https://example.com/job-ladder",
+    )
+    gap = skills_service.analyze_gap(resume, job)
+
+    missing_by_name = {m.skill: m for m in gap.missing}
+    assert len(missing_by_name) == 4
+
+    assert missing_by_name["Python"].priority == "high"  # in title + description
+    assert missing_by_name["SQL"].priority == "high"  # in description, early position
+    assert missing_by_name["Docker"].priority == "medium"  # mid position, unmentioned
+    assert missing_by_name["Kafka"].priority == "medium"  # last position, unmentioned
+
+
+def test_analyze_gap_late_title_mention_still_high():
+    """A title-mention skill gets high priority regardless of its position in the list."""
+    resume = ParsedResume(skills=[])
+    job = Job(
+        id="job-title",
+        title="Data Stack Generalist (Focus: Python)",
+        company="Tech Corp",
+        location="Remote",
+        skills_required=["Excel", "Tableau", "Power BI", "Python"],
+        description="Generalist analytics tooling.",
+        source_url="https://example.com/job-title",
+    )
+    gap = skills_service.analyze_gap(resume, job)
+
+    missing_by_name = {m.skill: m for m in gap.missing}
+    assert missing_by_name["Python"].priority == "high"
+    assert "title" in missing_by_name["Python"].why
+    # Excel leads the required list but is neither in title nor description.
+    assert missing_by_name["Excel"].priority in {"medium", "high"}
+
+
+def test_analyze_gap_priority_order_follows_centrality():
+    """After sorting by priority order, earlier required skills come first on ties."""
+    resume = ParsedResume(skills=[])
+    job = Job(
+        id="job-order",
+        title="Platform Engineer",
+        company="Tech Corp",
+        location="Pune",
+        skills_required=["Kubernetes", "Terraform", "Linux", "MongoDB"],
+        description="Maintain infrastructure.",
+        source_url="https://example.com/job-order",
+    )
+    gap = skills_service.analyze_gap(resume, job)
+
+    priority_rank = {"high": 0, "medium": 1, "low": 2}
+    priorities = [priority_rank[m.priority] for m in gap.missing]
+    assert priorities == sorted(priorities)
+    assert gap.missing[0].skill == "Kubernetes"
+
+
+def test_analyze_gap_single_skill_position_edge():
+    """A one-skill job defaults fully central instead of dividing by zero."""
+    resume = ParsedResume(skills=[])
+    gap = skills_service.analyze_gap(resume, _sample_job(skills=["Python"]))
+
+    assert len(gap.missing) == 1
+    assert gap.missing[0].priority == "high"
+
+
+# ---------------- Candidate-aware LLM prompt (Task 6) ----------------
+
+
+def test_analyze_gap_llm_prompt_carries_candidate_context(monkeypatch):
+    captured: dict[str, str] = {}
+
+    def mock_complete_json(prompt, system=None):
+        captured["prompt"] = prompt
+        return {"missing": []}
+
+    monkeypatch.setattr(skills_service, "complete_json", mock_complete_json)
+
+    resume = ParsedResume(
+        skills=["Python"],
+        summary="Fresher building data dashboards in academic projects.",
+        projects=["Sales telemetry pipeline"],
+        experience=[Experience(title="Data Intern", company="Acme")],
+        skill_evidence=[
+            SkillEvidence(skill="Python", category="project", weighted_strength=0.8),
+        ],
+    )
+    job = _sample_job(skills=["Python", "Docker"])
+    skills_service.analyze_gap(resume, job)
+
+    prompt = captured["prompt"]
+    assert "Fresher building data dashboards" in prompt
+    assert "Sales telemetry pipeline" in prompt
+    assert "Data Intern at Acme" in prompt
+    assert "Python — project (0.8)" in prompt
+    assert "Docker" in prompt  # the skill actually being evaluated
+
+
+def test_analyze_gap_returns_only_committed_missing_skills(monkeypatch):
+    """LLM entries for skills that are not actually missing are filtered out."""
+
+    def mock_complete_json(prompt, system=None):
+        return {
+            "missing": [
+                {"skill": "Docker", "priority": "medium", "why": "Real missing skill."},
+                {"skill": "QuantumBots", "priority": "high", "why": "Invented by the LLM."},
+            ]
+        }
+
+    monkeypatch.setattr(skills_service, "complete_json", mock_complete_json)
+
+    resume = ParsedResume(skills=["Python"])
+    job = _sample_job(skills=["Python", "Docker"])
+    gap = skills_service.analyze_gap(resume, job)
+
+    assert [m.skill for m in gap.missing] == ["Docker"]
+    assert gap.missing[0].priority == "medium"
+    assert gap.missing[0].why == "Real missing skill."
+
+
+def test_analyze_gap_without_evidence_data_still_asks_llm(monkeypatch):
+    """Resumes without skill_evidence still reach the LLM, with 'none available' evidence."""
+    captured: dict[str, str] = {}
+
+    def mock_complete_json(prompt, system=None):
+        captured["prompt"] = prompt
+        return {"missing": []}
+
+    monkeypatch.setattr(skills_service, "complete_json", mock_complete_json)
+
+    skills_service.analyze_gap(ParsedResume(skills=["Git"]), _sample_job(skills=["Git", "SQL"]))
+
+    assert "none available" in captured["prompt"]
 
 
 def test_analyze_gap_llm_fallback_on_unavailable(monkeypatch):
