@@ -6,7 +6,9 @@ APP_DIR = Path(__file__).resolve().parents[1]
 
 
 def _origins() -> list[str]:
-    raw = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+    # Unset falls back to the local dev default; an empty value falls back too, so a
+    # misconfigured (blank) production variable never silently disables CORS.
+    raw = os.getenv("CORS_ORIGINS") or "http://localhost:3000"
     return [o.strip() for o in raw.split(",") if o.strip()]
 
 
