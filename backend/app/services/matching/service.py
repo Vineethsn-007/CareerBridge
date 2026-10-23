@@ -211,10 +211,16 @@ def score_job(
     job_doc = _build_job_document(job)
 
     # Signal A: Weighted skill overlap (50%), scaled by per-skill evidence.
-    skill_ratio, matched, missing = compute_skill_overlap(
-        resume.skills, job.skills_required, skill_evidence=resume.skill_evidence
-    )
-    skill_points = skill_ratio * WEIGHT_SKILLS
+    # A listing with no structured skills earns NO free skill credit — scoring it
+    # full would hand every skill-less row the same inflated score.
+    if job.skills_required:
+        skill_ratio, matched, missing = compute_skill_overlap(
+            resume.skills, job.skills_required, skill_evidence=resume.skill_evidence
+        )
+        skill_points = skill_ratio * WEIGHT_SKILLS
+    else:
+        skill_ratio, matched, missing = 0.0, [], []
+        skill_points = 0.0
 
     # Signal B: TF-IDF similarity (30%)
     tfidf_ratio = compute_tfidf_similarity(resume_doc, job_doc)
@@ -230,10 +236,17 @@ def score_job(
     # Construct readable human rationale
     total_skills = len(job.skills_required)
     relevance_pct = int(round(tfidf_ratio * 100))
-    rationale = (
-        f"Matches {len(matched)} of {total_skills} required skills "
-        f"({relevance_pct}% text relevance; {exp_note.lower()})."
-    )
+    if total_skills:
+        rationale = (
+            f"Matches {len(matched)} of {total_skills} required skills "
+            f"({relevance_pct}% text relevance; {exp_note.lower()})."
+        )
+    else:
+        rationale = (
+            "No structured skill requirements on this listing; "
+            f"ranked on {relevance_pct}% text relevance and experience fit "
+            f"({exp_note.lower()})."
+        )
     if evidence := _candidate_evidence_strengths(resume.skill_evidence):
         evidenced = sum(
             1

@@ -312,6 +312,41 @@ def test_score_job_evidence_note_absent_without_evidence():
     assert "matches" in match.rationale.lower()
 
 
+# ---------------- Listings without structured skills ----------------
+
+
+def test_job_without_skills_gets_no_free_skill_credit():
+    """Skill-less listings must not land on the same inflated score by default."""
+    resume = ParsedResume(skills=["Python", "SQL"])
+    skillless = _make_job(skills=[], description="General engineering culture at scale.")
+
+    match = score_job(resume, skillless)
+
+    assert match.matched_skills == []
+    assert match.missing_skills == []
+    # Max possible: 30 (text) + 20 (experience) — no free 50 for zero requirements.
+    assert match.score < 51.0
+    assert "No structured skill requirements" in match.rationale
+    assert "text relevance" in match.rationale
+
+
+def test_skillless_listings_rank_by_content_not_by_default():
+    """Two skill-less listings score by text relevance, not the same number."""
+    resume = ParsedResume(skills=["Python", "SQL"], summary="Backend Python developer.")
+    relevant = _make_job(
+        skills=[], description="Build Python backend services and SQL data pipelines."
+    )
+    unrelated = _make_job(
+        skills=[], description="Field sales expansion across regional retail partners."
+    )
+
+    match_relevant = score_job(resume, relevant)
+    match_unrelated = score_job(resume, unrelated)
+
+    assert match_relevant.score > match_unrelated.score
+    assert match_relevant.rationale != match_unrelated.rationale
+
+
 # ---------------- Database-backed listings (scraper output) ----------------
 
 
