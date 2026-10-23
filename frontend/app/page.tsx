@@ -286,10 +286,10 @@ export default function Home() {
                 data-backed decisions.
               </p>
 
-              <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-border shadow-card mt-6">
+              <div className="relative aspect-[1024/537] w-full rounded-2xl overflow-hidden border border-border shadow-card mt-6">
                 <Image
                   src="/images/collaborating-students.jpg"
-                  alt="Indian engineering students collaborating on code and career preparation during a hackathon"
+                  alt="Indian engineering students working together on laptops during a hackathon"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 600px"
