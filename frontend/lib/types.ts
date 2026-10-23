@@ -399,3 +399,4 @@ export interface InterviewReport {
   integrity_summary?: IntegritySummary | null;
   created_at: string;
 }
+

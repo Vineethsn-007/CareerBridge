@@ -14,12 +14,13 @@ from __future__ import annotations
 import io
 import logging
 import re
+import time as _time
 from collections.abc import Iterable
 
 from docx import Document
 from pypdf import PdfReader
 
-from app.core.llm import complete_json
+from app.core.llm import LLMUnavailable, complete_json
 from app.core.strict_schema import UnsupportedSchemaError
 from app.core.taxonomy import canonical_skill
 from app.schemas import (
@@ -141,8 +142,12 @@ def parse_resume(filename: str, data: bytes) -> ParsedResume:
         extraction = _llm_extract(text)
     except UnsupportedSchemaError:  # not an extraction failure: the contract is broken
         raise
-    except Exception:
-        logger.debug("Resume LLM extraction failed; using regex/taxonomy fallback.")
+    except Exception as exc:
+        logger.warning(
+            "Resume LLM extraction failed after retry (%s: %s); using the regex/taxonomy fallback.",
+            type(exc).__name__,
+            exc,
+        )
         return _baseline_with_evidence(baseline)
     return _build_parsed_resume(baseline, extraction)
 
@@ -154,6 +159,154 @@ def _baseline_with_evidence(baseline: ParsedResume) -> ParsedResume:
     )
 
 
+# --------------------------------------------------------------------------
+# Section-aware fallback extraction (education, internships / experience).
+# Runs when the LLM path fails, so an LLM outage still yields usable education
+# and internship entries instead of silently empty cards. Deliberately
+# conservative: only explicit section headers followed by recognisable entries
+# are captured; anything ambiguous produces nothing rather than a guess.
+# --------------------------------------------------------------------------
+
+_EDUCATION_HEADER_RE = re.compile(
+    r"^\s*(?:education(?:al)?|academics?)"
+    r"(?:\s+(?:background|qualifications?|details|history|records?))?\s*[:\-]?\s*(.*)$",
+    re.I,
+)
+_EXPERIENCE_HEADER_RE = re.compile(
+    r"^\s*(?:work\s+|professional\s+|internship\s+|intern\s+|industry\s+|employment\s+"
+    r"|career\s+)*experience(?:\s*(?:&|and|with)\s*internships?)?\s*[:\-]?\s*(.*)$",
+    re.I,
+)
+_INTERNSHIP_HEADER_RE = re.compile(r"^\s*internships?\s*[:\-]?\s*(.*)$", re.I)
+_STOP_HEADER_RE = re.compile(
+    r"^\s*(?:projects?|portfolio|skills?(?:\s*&\s*tools)?|technical\s+skills|certifications?"
+    r"|achievements?|awards?|honors?|honours?|publications?|summary|profile|objective|courses?"
+    r"|relevant\s+coursework|activities|interests|hobbies|languages|leadership"
+    r"|positions\s+of\s+responsibility|volunteer(?:ing)?(?:\s+(?:experience|work|activity))?"
+    r"|extras|responsibilities|references|declaration|personal\s+(?:details|profile))"
+    r"\s*[:\-]?\s*$",
+    re.I,
+)
+_SECTION_HEADERS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("experience", _EXPERIENCE_HEADER_RE),
+    ("experience", _INTERNSHIP_HEADER_RE),
+    ("education", _EDUCATION_HEADER_RE),
+    ("stop", _STOP_HEADER_RE),
+)
+_KNOWN_SECTIONS = frozenset({"education", "experience"})
+
+_EDUCATION_ENTRY_RE = re.compile(
+    r"^(?P<degree>[^,;|]*\b(?:"
+    r"B\.?Tech(?:nology)?|M\.?Tech(?:nology)?"
+    r"|B\.?E\b|M\.?E\b"
+    r"|B\.?Sc|M\.?Sc"
+    r"|B\.?Com|M\.?Com"
+    r"|B\.?Arch|M\.?Arch"
+    r"|B\.?Pharm|M\.?Pharm"
+    r"|B\.?A\b|M\.?A\b"
+    r"|BCA|MCA|BBA|MBA|B\.?Voc|M\.?Voc|Ph\.?D"
+    r"|Diploma|Bachelor(?:'s)?|Master(?:'s)?"
+    r"|Secondary|Intermediate|SSLC|HSC|PUC|CBSE|ICSE|ISC"
+    r"|Class\s+(?:IX\b|X\b|XI\b|XII\b|1[0-2](?:st|nd|rd|th)?\b)"
+    r")[^,;|]*)",
+    re.I,
+)
+_EXPERIENCE_ENTRY_RE = re.compile(
+    r"^(?P<title>[^()\n]{2,90}?)\s+(?:[-\u2013\u2014|]\s*|at\s+|@\s*|,\s*)"
+    r"(?P<company>[^()\n]{2,90}?)[\s,.]*"
+    r"(?:\((?P<dates>[^)]+)\))?\s*[\s,.]*$",
+    re.I,
+)
+_BULLET_RE = re.compile(r"^\s*[\u2022\u25aa\u25cf*\-\u2013\u2014]\s+")
+
+
+def _collect_sections(lines: list[str]) -> dict[str, list[str]]:
+    """Split header-marked resume lines into education / experience buckets.
+
+    Lines between a recognised section header and the next header belong to that
+    section; a "stop" header ends collection. Content on the header line itself
+    ("EDUCATION: B.Tech CSE, NIT Trichy, 2027") is treated as the section's first
+    line. Unrecognised lines never leak into results.
+    """
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in lines:
+        header_hit = False
+        for name, header_re in _SECTION_HEADERS:
+            matched = header_re.match(line)
+            if matched is None:
+                continue
+            header_hit = True
+            if name == "stop":
+                current = None
+                break
+            content = (matched.group(1) or "").strip()
+            if content:
+                sections.setdefault(name, []).append(content)
+                current = None  # trailing prose after a header is not an entry
+            else:
+                current = name
+            break
+        if not header_hit and current in ("education", "experience"):
+            sections.setdefault(current, []).append(line)
+    return {name: collected for name, collected in sections.items() if name in _KNOWN_SECTIONS}
+
+
+def _years_from(line: str) -> str | None:
+    years = re.findall(r"\b(?:19|20)\d{2}\b", line)
+    return years[-1] if years else None
+
+
+def _baseline_education(lines: list[str]) -> list[Education]:
+    entries: list[Education] = []
+    for line in _collect_sections(lines).get("education", [])[:15]:
+        matched = _EDUCATION_ENTRY_RE.match(line)
+        if not matched:
+            continue
+        degree = matched.group("degree").strip(" ,.:-\u2013\u2014")
+        if not degree or len(degree) < 3:
+            continue
+        parts = [
+            part.strip(" ,.:-\u2013\u2014;")
+            for part in re.split(r"[;,\u2022]|\s+[-\u2013\u2014]\s+", line[matched.end() :].strip())
+            if part.strip(" ,.:-\u2013\u2014;")
+        ]
+        institution: str | None = None
+        year: str | None = None
+        for part in parts:
+            if year is None and re.fullmatch(r"(?:19|20)\d{2}", part):
+                year = part
+            elif institution is None and not re.search(r"\d|%|cgpa|c\.?gp[ai]|percent", part, re.I):
+                institution = part
+        if institution is None:
+            continue
+        entries.append(
+            Education(institution=institution, degree=degree, year=year or _years_from(line))
+        )
+    return entries[:8]
+
+
+def _baseline_experiences(lines: list[str]) -> list[Experience]:
+    entries: list[Experience] = []
+    for line in _collect_sections(lines).get("experience", [])[:25]:
+        bullet = bool(_BULLET_RE.match(line))
+        candidate = (_BULLET_RE.sub("", line, count=1)).strip()
+        if not candidate:
+            continue
+        matched = _EXPERIENCE_ENTRY_RE.match(candidate)
+        if not matched:
+            continue
+        title = (matched.group("title") or "").strip(" ,.:-\u2013\u2014")
+        company = (matched.group("company") or "").strip(" ,.:-\u2013\u2014")
+        dates = (matched.group("dates") or "").strip()
+        if not title or not company or len(title) > 90:
+            continue
+        if bullet and not dates:
+            continue  # impact bullets rarely carry the header's own date range
+        entries.append(Experience(title=title, company=company or None, duration=dates or None))
+    return entries[:8]
+
+
 def _baseline_parse(text: str) -> ParsedResume:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     email = EMAIL_RE.search(text)
@@ -162,6 +315,8 @@ def _baseline_parse(text: str) -> ParsedResume:
         name=lines[0] if lines else None,
         email=email.group(0) if email else None,
         phone=phone.group(0) if phone else None,
+        education=_baseline_education(lines),
+        experience=_baseline_experiences(lines),
         skills=extract_skills_sorted(text),
         raw_text=text,
     )
@@ -173,20 +328,42 @@ def extract_skills_sorted(text: str) -> list[str]:
     return extract_skills(text)
 
 
+_LLM_RETRY_SECONDS = 1.5
+
+
 def _llm_extract(text: str) -> ResumeExtraction:
-    """One strict structured-output call.
+    """One strict structured-output call, retried once on transient failures.
 
     Accepts either a validated `ResumeExtraction` (real `complete_json`) or a raw dict
-    (simple test doubles), always validating through Pydantic.
+    (simple test doubles), always validating through Pydantic. A single transient error
+    (rate limit, network blip) must not silently strip the structured parse, so the LLM
+    is attempted twice; `LLMUnavailable` and schema-contract errors are not retried.
     """
-    result = complete_json(
-        _EXTRACT_PROMPT.format(text=text[:_MAX_LLM_TEXT_CHARS]),
-        _EXTRACT_SYSTEM,
-        schema_model=ResumeExtraction,  # type: ignore[arg-type]
-    )
-    if isinstance(result, ResumeExtraction):
-        return result
-    return ResumeExtraction.model_validate(result)
+
+    def _call() -> ResumeExtraction:
+        result = complete_json(
+            _EXTRACT_PROMPT.format(text=text[:_MAX_LLM_TEXT_CHARS]),
+            _EXTRACT_SYSTEM,
+            schema_model=ResumeExtraction,  # type: ignore[arg-type]
+        )
+        if isinstance(result, ResumeExtraction):
+            return result
+        return ResumeExtraction.model_validate(result)
+
+    try:
+        return _call()
+    except (LLMUnavailable, UnsupportedSchemaError):
+        raise
+    except Exception as first_error:
+        logger.warning("Resume LLM extraction attempt failed (%s); retrying once.", first_error)
+        _time.sleep(_LLM_RETRY_SECONDS)
+        try:
+            return _call()
+        except UnsupportedSchemaError:
+            raise
+        except Exception as retry_error:
+            logger.debug("Resume LLM retry also failed: %s", retry_error)
+            raise
 
 
 def _skill_evidence_entries(
