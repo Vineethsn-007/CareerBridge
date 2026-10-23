@@ -22,12 +22,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       rightIcon,
       children,
       disabled,
+      type = "button",
       ...props
     },
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium rounded-DEFAULT transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue";
+      "inline-flex items-center justify-center font-medium rounded-DEFAULT transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue cursor-pointer";
 
     const variantStyles = {
       primary:
@@ -44,13 +45,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const sizeStyles = {
       sm: "text-xs px-3.5 py-1.5 gap-1.5 rounded-sm",
-      md: "text-sm px-4.5 py-2.5 gap-2 rounded-DEFAULT",
-      lg: "text-base px-6 py-3.5 gap-2.5 rounded-md",
+      md: "text-sm px-4 py-2 gap-2 rounded-DEFAULT",
+      lg: "text-base px-6 py-3 gap-2.5 rounded-md",
     };
 
     return (
       <button
         ref={ref}
+        type={type}
         disabled={disabled || isLoading}
         className={cn(
           baseStyles,

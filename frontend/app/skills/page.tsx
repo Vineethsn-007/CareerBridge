@@ -242,8 +242,8 @@ function SkillsContent() {
             {/* Coverage meter */}
             <Card className="p-6 space-y-5">
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-accent" />
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">Role Fit Score</h2>
+                <Target className="w-4 h-4 text-venice-blue" />
+                <h2 className="text-sm font-bold text-deep-teal uppercase tracking-wider">Role Fit Score</h2>
               </div>
               <Meter
                 value={gap.coverage_pct}
@@ -252,15 +252,15 @@ function SkillsContent() {
                 size="lg"
               />
               <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 space-y-1">
-                  <p className="text-xs font-semibold text-text-muted uppercase">You have</p>
-                  <p className="text-2xl font-bold text-emerald-400">{gap.matched.length}</p>
-                  <p className="text-xs text-text-muted">matched skills</p>
+                <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 space-y-1">
+                  <p className="text-xs font-semibold text-secondary-text uppercase">You have</p>
+                  <p className="text-2xl font-bold text-[#18856B]">{gap.matched.length}</p>
+                  <p className="text-xs text-secondary-text">matched skills</p>
                 </div>
-                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 space-y-1">
-                  <p className="text-xs font-semibold text-text-muted uppercase">You need</p>
-                  <p className="text-2xl font-bold text-rose-400">{gap.missing.length}</p>
-                  <p className="text-xs text-text-muted">missing skills</p>
+                <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 space-y-1">
+                  <p className="text-xs font-semibold text-secondary-text uppercase">You need</p>
+                  <p className="text-2xl font-bold text-[#B54747]">{gap.missing.length}</p>
+                  <p className="text-xs text-secondary-text">missing skills</p>
                 </div>
               </div>
             </Card>
@@ -269,8 +269,8 @@ function SkillsContent() {
             {gap.matched.length > 0 && (
               <Card className="p-6 space-y-4">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <h2 className="text-sm font-bold text-white uppercase tracking-wider">Skills You Already Have</h2>
+                  <CheckCircle2 className="w-4 h-4 text-[#18856B]" />
+                  <h2 className="text-sm font-bold text-deep-teal uppercase tracking-wider">Skills You Already Have</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {gap.matched.map((skill) => (
@@ -284,21 +284,21 @@ function SkillsContent() {
             {gap.missing.length > 0 && (
               <Card className="p-6 space-y-4">
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-400" />
-                  <h2 className="text-sm font-bold text-white uppercase tracking-wider">Skills to Learn</h2>
+                  <AlertCircle className="w-4 h-4 text-[#B54747]" />
+                  <h2 className="text-sm font-bold text-deep-teal uppercase tracking-wider">Skills to Learn</h2>
                 </div>
                 <div className="space-y-3">
                   {gap.missing.map((ms: MissingSkill) => {
                     const cfg = PRIORITY_CONFIG[ms.priority];
                     return (
-                      <div key={ms.skill} className="flex items-start gap-3 p-3 rounded-lg bg-surface-2/50 border border-border/40">
+                      <div key={ms.skill} className="flex items-start gap-3 p-3 rounded-lg bg-pale-blue/60 border border-border">
                         <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${cfg.dot}`} />
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-semibold text-text">{ms.skill}</span>
+                            <span className="text-sm font-semibold text-primary-text">{ms.skill}</span>
                             <Badge variant={cfg.badge} size="sm" showIcon={false}>{cfg.label} Priority</Badge>
                           </div>
-                          <p className="text-xs text-text-muted leading-relaxed">{ms.why}</p>
+                          <p className="text-xs text-secondary-text leading-relaxed">{ms.why}</p>
                         </div>
                       </div>
                     );
@@ -310,10 +310,10 @@ function SkillsContent() {
             {/* Prep plan */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-highlight" />
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">4-Week Prep Plan</h2>
+                <BookOpen className="w-4 h-4 text-venice-blue" />
+                <h2 className="text-sm font-bold text-deep-teal uppercase tracking-wider">4-Week Prep Plan</h2>
                 {planState === "loading" && (
-                  <span className="text-xs text-text-muted animate-pulse">Generating plan...</span>
+                  <span className="text-xs text-secondary-text animate-pulse">Generating plan...</span>
                 )}
               </div>
 
@@ -338,8 +338,8 @@ function SkillsContent() {
               )}
 
               {planState === "error" && (
-                <div className="p-4 rounded-lg bg-surface-2 border border-border text-sm text-text-muted flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-highlight shrink-0" />
+                <div className="p-4 rounded-lg bg-pale-blue border border-border text-sm text-secondary-text flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-venice-blue shrink-0" />
                   Could not generate prep plan. Focus on the missing skills listed above.
                 </div>
               )}
@@ -350,10 +350,10 @@ function SkillsContent() {
               <Button
                 id="practice-interview-btn"
                 size="lg"
-                variant="highlight"
+                variant="primary"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 onClick={() => router.push(`/interview?job=${encodeURIComponent(jobId!)}`)}
-                className="shadow-glow-saffron"
+                className="shadow-card"
               >
                 Practice Mock Interview for This Role
               </Button>

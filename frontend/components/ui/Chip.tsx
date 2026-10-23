@@ -54,7 +54,7 @@ export function Chip({
             e.stopPropagation();
             onRemove();
           }}
-          className="ml-0.5 -mr-1 p-0.5 rounded-full hover:bg-black/5 text-muted-text hover:text-primary-text transition-colors"
+          className="ml-0.5 -mr-1 p-0.5 rounded-full hover:bg-black/5 text-muted-text hover:text-primary-text transition-colors cursor-pointer"
           aria-label={`Remove ${label}`}
         >
           <X className="w-3 h-3" />
