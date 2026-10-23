@@ -30,30 +30,30 @@ export function Badge({
 
   const variantStyles = {
     verified:
-      "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium",
+      "bg-emerald-50 text-[#18856B] border border-[#18856B]/30 font-medium",
     "priority-high":
-      "bg-rose-500/10 text-rose-400 border border-rose-500/30 font-medium",
+      "bg-rose-50 text-[#B54747] border border-[#B54747]/30 font-medium",
     "priority-medium":
-      "bg-amber-500/10 text-amber-400 border border-amber-500/30 font-medium",
+      "bg-amber-50 text-[#B87926] border border-[#B87926]/30 font-medium",
     "priority-low":
-      "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-medium",
+      "bg-pale-blue text-deep-teal border border-rock-blue/30 font-medium",
     highlight:
-      "bg-orange-500/15 text-orange-400 border border-orange-500/30 font-semibold",
+      "bg-pale-blue text-venice-blue border border-rock-blue/40 font-semibold",
     neutral:
-      "bg-surface-2 text-text-muted border border-border font-medium",
+      "bg-pale-blue text-secondary-text border border-border font-medium",
     outline:
-      "bg-transparent text-text-muted border border-border",
+      "bg-transparent text-secondary-text border border-border",
   };
 
   const renderIcon = () => {
     if (!showIcon) return null;
     switch (variant) {
       case "verified":
-        return <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />;
+        return <ShieldCheck className="w-3.5 h-3.5 text-[#18856B] shrink-0" />;
       case "priority-high":
-        return <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0" />;
+        return <AlertCircle className="w-3.5 h-3.5 text-[#B54747] shrink-0" />;
       case "priority-medium":
-        return <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />;
+        return <AlertCircle className="w-3.5 h-3.5 text-[#B87926] shrink-0" />;
       default:
         return null;
     }

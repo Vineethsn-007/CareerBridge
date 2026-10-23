@@ -35,7 +35,6 @@ export function ScoreRing({
     const frame = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // easeOutCubic
       const ease = 1 - Math.pow(1 - progress, 3);
       setDisplayScore(Math.round(startValue + (score - startValue) * ease));
 
@@ -58,12 +57,11 @@ export function ScoreRing({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
-  // Score threshold coloring
   const getScoreColor = (val: number) => {
     if (val >= 80) return "url(#brand-gradient-score)";
-    if (val >= 60) return "#22D3EE";
-    if (val >= 40) return "#F59E0B";
-    return "#EF4444";
+    if (val >= 60) return "#16587B";
+    if (val >= 40) return "#B87926";
+    return "#B54747";
   };
 
   return (
@@ -79,8 +77,8 @@ export function ScoreRing({
       >
         <defs>
           <linearGradient id="brand-gradient-score" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6366F1" />
-            <stop offset="100%" stopColor="#22D3EE" />
+            <stop offset="0%" stopColor="#16587B" />
+            <stop offset="100%" stopColor="#84B3CE" />
           </linearGradient>
         </defs>
         {/* Track */}
@@ -88,7 +86,7 @@ export function ScoreRing({
           cx={dimension / 2}
           cy={dimension / 2}
           r={radius}
-          stroke="rgba(255, 255, 255, 0.08)"
+          stroke="#D8E1DE"
           strokeWidth={strokeWidth}
           fill="transparent"
         />
@@ -108,12 +106,12 @@ export function ScoreRing({
       </svg>
       {/* Center score readout */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={cn("font-bold tracking-tight text-text tabular-nums", fontSize)}>
+        <span className={cn("font-bold tracking-tight text-primary-text tabular-nums", fontSize)}>
           {displayScore}
-          <span className="text-[10px] text-text-muted font-normal">%</span>
+          <span className="text-[10px] text-secondary-text font-normal">%</span>
         </span>
       </div>
-      {label && <span className="mt-1 text-[11px] text-text-muted">{label}</span>}
+      {label && <span className="mt-1 text-[11px] text-secondary-text">{label}</span>}
     </div>
   );
 }

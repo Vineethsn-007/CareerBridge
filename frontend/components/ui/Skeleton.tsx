@@ -20,20 +20,20 @@ export function Skeleton({
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-surface-2/60 animate-pulse",
+        "relative overflow-hidden bg-pale-blue/80 animate-pulse",
         variantStyles[variant],
         className
       )}
       {...props}
     >
-      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-shimmer" />
+      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
     </div>
   );
 }
 
 export function SkeletonCard() {
   return (
-    <div className="rounded-md border border-border bg-surface p-6 space-y-4">
+    <div className="rounded-md border border-border bg-pure-white p-6 space-y-4 shadow-card">
       <div className="flex items-center justify-between">
         <div className="space-y-2 w-2/3">
           <Skeleton className="h-5 w-3/4" />

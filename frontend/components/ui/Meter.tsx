@@ -27,20 +27,20 @@ export function Meter({
   };
 
   const variantStyles = {
-    brand: "bg-brand-gradient shadow-glow",
-    saffron: "bg-saffron-gradient shadow-glow-saffron",
-    success: "bg-emerald-500",
-    warning: "bg-amber-500",
-    danger: "bg-rose-500",
+    brand: "bg-venice-blue",
+    saffron: "bg-rock-blue",
+    success: "bg-[#18856B]",
+    warning: "bg-[#B87926]",
+    danger: "bg-[#B54747]",
   };
 
   return (
     <div className={cn("w-full space-y-1.5", className)} {...props}>
       {(label || showValue) && (
         <div className="flex items-center justify-between text-xs">
-          {label && <span className="font-medium text-text-muted">{label}</span>}
+          {label && <span className="font-medium text-secondary-text">{label}</span>}
           {showValue && (
-            <span className="font-semibold text-text tabular-nums">
+            <span className="font-semibold text-primary-text tabular-nums">
               {Math.round(clampedValue)}%
             </span>
           )}
@@ -48,7 +48,7 @@ export function Meter({
       )}
       <div
         className={cn(
-          "w-full bg-surface-2 rounded-full overflow-hidden border border-border/50",
+          "w-full bg-pale-blue rounded-full overflow-hidden border border-border",
           sizeStyles[size]
         )}
         role="progressbar"

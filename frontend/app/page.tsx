@@ -1,295 +1,663 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { SpotlightCard } from "@/components/ui/SpotlightCard";
+import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { ScoreRing } from "@/components/ui/ScoreRing";
-import { Meter } from "@/components/ui/Meter";
 import { Chip } from "@/components/ui/Chip";
-import { BlurText } from "@/components/reactbits/BlurText";
-import { GradientText } from "@/components/reactbits/GradientText";
-import { Magnet } from "@/components/reactbits/Magnet";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "@/lib/motion";
+import { prefersReducedMotion } from "@/lib/motion";
 import {
   FileText,
   Briefcase,
   Target,
   MessageSquare,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
-  CheckCircle2,
+  Compass,
+  Code2,
+  Database,
+  BrainCircuit,
+  Lock,
+  Cloud,
+  Palette,
+  Clock,
+  Layers,
+  ChevronRight,
 } from "lucide-react";
 
 export default function Home() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const stepsRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (!heroRef.current || prefersReducedMotion()) return;
+
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.from(".hero-eyebrow", {
+        opacity: 0,
+        y: -12,
+        duration: 0.6,
+      })
+        .from(
+          ".hero-heading",
+          {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+          },
+          "-=0.4"
+        )
+        .from(
+          ".hero-desc",
+          {
+            opacity: 0,
+            y: 16,
+            duration: 0.7,
+          },
+          "-=0.5"
+        )
+        .from(
+          ".hero-actions",
+          {
+            opacity: 0,
+            y: 14,
+            duration: 0.6,
+          },
+          "-=0.4"
+        )
+        .from(
+          ".hero-image-wrap",
+          {
+            opacity: 0,
+            scale: 0.96,
+            duration: 0.9,
+          },
+          "-=0.6"
+        )
+        .from(
+          ".hero-float-card",
+          {
+            opacity: 0,
+            y: 20,
+            stagger: 0.15,
+            duration: 0.6,
+          },
+          "-=0.5"
+        );
+    },
+    { scope: heroRef }
+  );
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-mesh">
-      {/* Hero Section */}
-      <section className="relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden">
-        {/* Glow ambient background rings */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary/20 blur-[130px] rounded-full pointer-events-none -z-10" />
-        <div className="absolute top-1/3 right-1/4 w-[350px] h-[250px] bg-accent/15 blur-[100px] rounded-full pointer-events-none -z-10" />
-
+    <div className="relative min-h-screen bg-merino text-primary-text">
+      {/* SECTION 2 — HERO */}
+      <section
+        ref={heroRef}
+        className="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden border-b border-border bg-cream-mesh"
+      >
         <Container size="xl">
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto space-y-6">
-            {/* Pill Banner */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border/80 bg-surface/70 backdrop-blur-md shadow-sm">
-              <span className="flex h-2 w-2 rounded-full bg-accent animate-ping" />
-              <span className="text-xs font-medium text-text-muted">
-                National Hackathon Edition • AI Platform for Indian Students
-              </span>
-              <Badge variant="verified" size="sm" showIcon={false}>
-                Live
-              </Badge>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            {/* Left Column */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Eyebrow */}
+              <div className="hero-eyebrow inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pale-blue border border-border text-venice-blue">
+                <Compass className="w-3.5 h-3.5 text-venice-blue" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  AI-Powered Career Guidance
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-venice-blue" />
+                <span className="text-[11px] font-medium text-secondary-text">
+                  National Edition
+                </span>
+              </div>
 
-            {/* Headline Reveal via BlurText */}
-            <div className="space-y-3">
-              <BlurText
-                text="From College Campus to Verified Tech Career"
-                as="h1"
-                className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white justify-center leading-[1.15]"
-              />
-              <p className="text-base sm:text-lg md:text-xl text-text-muted max-w-2xl mx-auto leading-relaxed pt-2">
-                Drop your resume. Discover <GradientText>100% verified fresher listings</GradientText>, close your real-world skill gaps, and master technical interviews with AI rubric feedback.
+              {/* Large Editorial Serif Headline */}
+              <h1 className="hero-heading text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-deep-teal leading-[1.12]">
+                Your Skills. Your Future.{" "}
+                <span className="text-venice-blue italic">Your CareerBridge.</span>
+              </h1>
+
+              {/* Supporting Description */}
+              <p className="hero-desc text-base sm:text-lg md:text-xl text-secondary-text max-w-xl leading-relaxed">
+                Discover relevant jobs, identify skill gaps, and build
+                personalized preparation plans with AI — all in one place.
+              </p>
+
+              {/* CTAs */}
+              <div className="hero-actions flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+                <Link href="/resume">
+                  <Button
+                    size="lg"
+                    variant="primary"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                    className="w-full sm:w-auto px-7 py-3.5 shadow-card"
+                  >
+                    Build My Career Path
+                  </Button>
+                </Link>
+                <Link href="#how-it-works">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    Explore How It Works
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Short supporting statement */}
+              <p className="text-xs text-muted-text flex items-center gap-2 pt-1">
+                <ShieldCheck className="w-4 h-4 text-[#18856B]" />
+                <span>Designed for students, fresh graduates, and aspiring professionals.</span>
               </p>
             </div>
 
-            {/* Action Buttons with Magnet CTA */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 w-full sm:w-auto">
-              <Magnet strength={0.25}>
-                <Link href="/resume" className="w-full sm:w-auto">
-                  <Button
-                    size="lg"
-                    variant="highlight"
-                    rightIcon={<ArrowRight className="w-4 h-4" />}
-                    className="w-full sm:w-auto text-base shadow-glow-saffron px-8"
-                  >
-                    Upload Resume & Find Jobs
-                  </Button>
-                </Link>
-              </Magnet>
+            {/* Right Column: Editorial Visual & Product Cards */}
+            <div className="lg:col-span-5 relative">
+              {/* Soft blue visual accent behind image */}
+              <div className="absolute -inset-4 bg-rock-blue/20 rounded-2xl transform -rotate-1 pointer-events-none" />
 
-              <Link href="/jobs" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  leftIcon={<Briefcase className="w-4 h-4 text-accent" />}
-                  className="w-full sm:w-auto text-base"
+              <div className="hero-image-wrap relative rounded-xl overflow-hidden border border-border shadow-float bg-pure-white">
+                <div className="relative aspect-[4/3] w-full">
+                  <Image
+                    src="/images/hero-student.jpg"
+                    alt="Indian college student working confidently on career planning"
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 500px"
+                  />
+                  {/* Subtle gradient vignette at bottom */}
+                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-deep-teal/60 to-transparent pointer-events-none" />
+                </div>
+
+                {/* Overlaid Bottom Title */}
+                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
+                  <div>
+                    <p className="text-xs font-medium text-pale-blue">Aarav Sharma • 2026 Batch</p>
+                    <p className="text-sm font-semibold">Full Stack & Data Engineering</p>
+                  </div>
+                  <Badge variant="verified" size="sm">
+                    Verified Match
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Floating Product Preview 1: Match Score */}
+              <div className="hero-float-card absolute -bottom-6 -left-6 sm:-left-8 bg-pure-white border border-border rounded-lg p-3.5 shadow-float max-w-[210px] hidden sm:flex items-center gap-3">
+                <ScoreRing score={88} size="sm" animate={true} />
+                <div className="space-y-0.5">
+                  <p className="text-xs font-bold text-deep-teal">88% Match</p>
+                  <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru</p>
+                </div>
+              </div>
+
+              {/* Floating Product Preview 2: Prep Plan Status */}
+              <div className="hero-float-card absolute -top-4 -right-4 sm:-right-6 bg-pure-white border border-border rounded-lg p-3 shadow-float hidden sm:flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#18856B] flex items-center justify-center font-bold text-xs">
+                  4W
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs font-semibold text-deep-teal">Prep Plan Active</p>
+                  <p className="text-[10px] text-secondary-text">Week 1: TypeScript & ORM</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 3 — VALUE PROPOSITION STRIP */}
+      <section className="bg-pale-blue py-12 border-b border-border">
+        <Container size="xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-pure-white border border-border flex items-center justify-center text-venice-blue shadow-subtle shrink-0">
+                <Briefcase className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-deep-teal">Discover Opportunities</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Verified fresher and internship listings from official employer portals.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-pure-white border border-border flex items-center justify-center text-venice-blue shadow-subtle shrink-0">
+                <Target className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-deep-teal">Identify Skill Gaps</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Pinpoint missing technical competencies ranked by job priority.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-pure-white border border-border flex items-center justify-center text-venice-blue shadow-subtle shrink-0">
+                <Clock className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-deep-teal">Build a Plan</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Structured weekly milestones backed by curated free resources.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-pure-white border border-border flex items-center justify-center text-venice-blue shadow-subtle shrink-0">
+                <MessageSquare className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-deep-teal">Practice Interviews</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Role-tailored questions with STAR guidance and instant rubric scoring.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 4 — THE CHALLENGE */}
+      <section className="py-20 border-b border-border bg-merino">
+        <Container size="xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left Column: Heading and Explanation */}
+            <div className="lg:col-span-6 space-y-5">
+              <Badge variant="priority-medium" size="sm">
+                The Real Challenge
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-deep-teal leading-tight">
+                Career decisions shouldn&apos;t feel like guesswork.
+              </h2>
+              <p className="text-base text-secondary-text leading-relaxed">
+                Students face many challenges when planning their careers.
+                CareerBridge brings everything together to help you make informed,
+                data-backed decisions.
+              </p>
+
+              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-border shadow-card mt-6">
+                <Image
+                  src="/images/collaborating-students.jpg"
+                  alt="Students collaborating together on career planning"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 600px"
+                />
+              </div>
+            </div>
+
+            {/* Right Column: 5 Concise Challenge Cards */}
+            <div className="lg:col-span-6 space-y-3.5">
+              {[
+                {
+                  title: "Too many career options",
+                  desc: "Endless job titles and conflicting advice make choosing a clear focus exhausting.",
+                  num: "01",
+                },
+                {
+                  title: "Uncertainty about suitable jobs",
+                  desc: "Hard to know whether your academic background truly matches market requirements.",
+                  num: "02",
+                },
+                {
+                  title: "Confusion about which skills to learn",
+                  desc: "Students waste months on outdated tutorials without knowing employer priorities.",
+                  num: "03",
+                },
+                {
+                  title: "Resume not matching roles",
+                  desc: "Generic resumes get filtered out by screening algorithms before a human ever looks.",
+                  num: "04",
+                },
+                {
+                  title: "Limited interview practice",
+                  desc: "Few students get realistic technical mock interviews with structured rubric feedback.",
+                  num: "05",
+                },
+              ].map((c) => (
+                <div
+                  key={c.num}
+                  className="bg-pure-white border border-border rounded-lg p-4 shadow-subtle flex items-start gap-4 transition-all hover:border-rock-blue"
                 >
-                  Browse Verified Listings
-                </Button>
-              </Link>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-xs text-text-muted">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Zero fake jobs or ghost listings</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-accent" />
-                <span>Official company portal links</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-highlight" />
-                <span>STAR interview evaluation</span>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Interactive Feature Showcase Section */}
-      <section className="py-16 border-y border-border/60 bg-surface/30">
-        <Container size="xl">
-          <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
-            <span className="text-xs uppercase font-bold tracking-wider text-accent">
-              End-to-End Career Acceleration
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Built Specifically for the Indian Hiring Landscape
-            </h2>
-            <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
-              No generic suggestions. Every step uses deterministic taxonomy matching and AI evaluation tailored for freshers.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Step 1: Upload */}
-            <SpotlightCard className="flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-10 h-10 rounded bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shadow-glow">
-                  <FileText className="w-5 h-5 text-accent" />
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Step 01</span>
-                  <h3 className="text-lg font-bold text-white">Smart Resume Parsing</h3>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    Upload PDF or text resumes. Extracts skills, education, and projects into editable canonical taxonomy chips.
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  <Chip label="React" variant="matched" />
-                  <Chip label="Python" variant="matched" />
-                  <Chip label="SQL" variant="default" />
-                </div>
-              </div>
-              <div className="pt-6">
-                <Link href="/resume">
-                  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />} className="px-0 hover:bg-transparent text-accent">
-                    Try resume drop
-                  </Button>
-                </Link>
-              </div>
-            </SpotlightCard>
-
-            {/* Step 2: Match */}
-            <SpotlightCard className="flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-10 h-10 rounded bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <Briefcase className="w-5 h-5 text-emerald-400" />
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Step 02</span>
-                  <h3 className="text-lg font-bold text-white">Verified Matches</h3>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    Real-time match scoring against real internship & fresher jobs. Verified dates and direct apply links.
-                  </p>
-                </div>
-                <div className="p-3 rounded bg-surface-2/60 border border-border/80 flex items-center justify-between">
+                  <span className="text-xs font-serif font-bold text-rock-blue mt-0.5">
+                    {c.num}
+                  </span>
                   <div className="space-y-0.5">
-                    <p className="text-xs font-semibold text-text">SDE Intern</p>
-                    <p className="text-[10px] text-text-muted">Bengaluru • Full-time</p>
-                  </div>
-                  <ScoreRing score={92} size="sm" />
-                </div>
-              </div>
-              <div className="pt-6">
-                <Link href="/jobs">
-                  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />} className="px-0 hover:bg-transparent text-emerald-400">
-                    View matches
-                  </Button>
-                </Link>
-              </div>
-            </SpotlightCard>
-
-            {/* Step 3: Skill Gap */}
-            <SpotlightCard className="flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-10 h-10 rounded bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                  <Target className="w-5 h-5 text-amber-400" />
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Step 03</span>
-                  <h3 className="text-lg font-bold text-white">Skill Gap & Plan</h3>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    See exactly which high-priority skills stand between you and the offer, backed by a week-by-week plan.
-                  </p>
-                </div>
-                <div className="space-y-2 pt-1">
-                  <Meter value={76} label="Target Role Fit" variant="brand" size="sm" />
-                  <div className="flex gap-1.5">
-                    <Badge variant="priority-high" size="sm">Docker (High)</Badge>
-                    <Badge variant="priority-medium" size="sm">Redis</Badge>
+                    <h4 className="text-sm font-bold text-deep-teal">{c.title}</h4>
+                    <p className="text-xs text-secondary-text leading-relaxed">{c.desc}</p>
                   </div>
                 </div>
-              </div>
-              <div className="pt-6">
-                <Link href="/jobs">
-                  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />} className="px-0 hover:bg-transparent text-amber-400">
-                    Analyze gap
-                  </Button>
-                </Link>
-              </div>
-            </SpotlightCard>
-
-            {/* Step 4: Interview */}
-            <SpotlightCard className="flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-10 h-10 rounded bg-highlight/20 border border-highlight/30 flex items-center justify-center text-highlight shadow-glow-saffron">
-                  <MessageSquare className="w-5 h-5 text-highlight" />
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Step 04</span>
-                  <h3 className="text-lg font-bold text-white">Mock Interview AI</h3>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    Practice role-specific technical, behavioral, and HR questions with instant rubric scores and strengths.
-                  </p>
-                </div>
-                <div className="p-2.5 rounded bg-surface-2/60 border border-border/80 space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-text font-medium">STAR Answer</span>
-                    <span className="text-emerald-400 font-bold">9/10</span>
-                  </div>
-                  <p className="text-[10px] text-text-muted line-clamp-2">
-                    &quot;Strong structured breakdown of problem constraints and business outcome.&quot;
-                  </p>
-                </div>
-              </div>
-              <div className="pt-6">
-                <Link href="/interview">
-                  <Button variant="ghost" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />} className="px-0 hover:bg-transparent text-highlight">
-                    Start practice
-                  </Button>
-                </Link>
-              </div>
-            </SpotlightCard>
-          </div>
-        </Container>
-      </section>
-
-      {/* Proof / Metrics Strip */}
-      <section className="py-16">
-        <Container size="xl">
-          <div className="rounded-lg border border-border bg-surface p-8 sm:p-12 relative overflow-hidden shadow-card">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-brand-gradient opacity-10 blur-3xl pointer-events-none" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative z-10">
-              <div className="space-y-1">
-                <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">100%</p>
-                <p className="text-xs font-semibold text-accent uppercase tracking-wider">Verified Jobs</p>
-                <p className="text-[11px] text-text-muted">Direct from official hiring portals</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">0</p>
-                <p className="text-xs font-semibold text-highlight uppercase tracking-wider">Ghost Listings</p>
-                <p className="text-[11px] text-text-muted">Strict timestamp verification</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">4-Week</p>
-                <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Prep Plans</p>
-                <p className="text-[11px] text-text-muted">Curated free learning resources</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">&lt; 90s</p>
-                <p className="text-xs font-semibold text-text uppercase tracking-wider">Fast Demo Flow</p>
-                <p className="text-[11px] text-text-muted">Zero friction for hackathon judges</p>
-              </div>
+              ))}
             </div>
           </div>
         </Container>
       </section>
 
-      {/* Ready to Demo CTA */}
-      <section className="py-16 pb-24 text-center">
-        <Container size="md">
-          <div className="space-y-6">
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
-              Ready to see the student journey in action?
+      {/* SECTION 5 — PRODUCT CAPABILITIES */}
+      <section id="capabilities" className="py-20 border-b border-border bg-muted-cream">
+        <Container size="xl">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
+            <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
+              Comprehensive Toolkit
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-deep-teal">
+              Everything you need to move forward.
             </h2>
-            <p className="text-sm text-text-muted max-w-lg mx-auto leading-relaxed">
-              Start with the resume upload dropzone. Watch it extract skills and match verified openings in seconds.
+            <p className="text-sm text-secondary-text leading-relaxed">
+              From parsing messy resumes to practicing live mock interviews, every
+              step is powered by transparent, explainable AI.
             </p>
-            <div className="pt-2">
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Card 1 */}
+            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+                <FileText className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-deep-teal">Resume Intelligence</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Extracts skills, projects, and coursework with editable controls to fix mistakes.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link href="/resume" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                  <span>Upload resume</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Card 2 */}
+            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+                <Briefcase className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-deep-teal">Job Matching</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Calculates explainable match scores over real fresher roles verified against official portals.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link href="/jobs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                  <span>Browse matches</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Card 3 */}
+            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+                <Target className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-deep-teal">Skill Gap Analysis</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Categorizes missing skills into High, Medium, and Low priorities with clear explanations.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link href="/jobs/job-web-001" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                  <span>View sample gap</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Card 4 */}
+            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+                <Clock className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-deep-teal">Guided Preparation Plans</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Custom weekly task schedules sized to your hours with verified free course links.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link href="/jobs/job-web-001" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                  <span>Explore prep plan</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Card 5 */}
+            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+                <MessageSquare className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-deep-teal">Interview Practice</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  AI mock questions evaluated on rubric criteria with STAR method answer drawers.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link href="/interview" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                  <span>Practice questions</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </Card>
+
+            {/* Card 6 */}
+            <Card variant="default" className="p-6 space-y-4 hover:border-rock-blue transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-pale-blue flex items-center justify-center text-venice-blue">
+                <Layers className="w-5 h-5 text-venice-blue" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-deep-teal">Career Discovery</h3>
+                <p className="text-xs text-secondary-text leading-relaxed">
+                  Cross-disciplinary career roadmaps for Software, Data, Cloud, AI, and Product Design.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link href="#career-paths" className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal">
+                  <span>Explore pathways</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </Card>
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 6 — HOW IT WORKS */}
+      <section id="how-it-works" ref={stepsRef} className="py-20 border-b border-border bg-merino">
+        <Container size="xl">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
+            <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
+              Simple 5-Step Process
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-deep-teal">
+              Your journey to a better career, in five simple steps.
+            </h2>
+            <p className="text-sm text-secondary-text leading-relaxed">
+              Career planning designed to be methodical, transparent, and motivating.
+            </p>
+          </div>
+
+          {/* 5-Step Progression */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {[
+              {
+                step: "01",
+                title: "Upload Resume",
+                desc: "Drop your PDF or TXT resume to parse your skills and projects.",
+              },
+              {
+                step: "02",
+                title: "Discover Jobs",
+                desc: "Explore ranked opportunities with transparent match explanations.",
+              },
+              {
+                step: "03",
+                title: "Understand Gaps",
+                desc: "See exact missing requirements prioritized by job importance.",
+              },
+              {
+                step: "04",
+                title: "Build Prep Plan",
+                desc: "Get a structured weekly plan with curated free tutorials.",
+              },
+              {
+                step: "05",
+                title: "Practice & Ace",
+                desc: "Simulate technical & behavioral questions with AI rubric feedback.",
+              },
+            ].map((s, idx) => (
+              <div
+                key={s.step}
+                className="bg-pure-white border border-border rounded-lg p-5 shadow-subtle space-y-3 relative group hover:border-rock-blue transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="w-7 h-7 rounded-full bg-pale-blue text-venice-blue font-serif font-bold text-xs flex items-center justify-center">
+                    {s.step}
+                  </span>
+                  {idx < 4 && (
+                    <span className="hidden md:block text-muted-text/50 text-xs">→</span>
+                  )}
+                </div>
+                <h4 className="text-sm font-bold text-deep-teal">{s.title}</h4>
+                <p className="text-xs text-secondary-text leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 7 — CAREER PATHS */}
+      <section id="career-paths" className="py-20 border-b border-border bg-pale-blue/40">
+        <Container size="xl">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
+            <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
+              Role Taxonomies
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-deep-teal">
+              Curated Career Pathways
+            </h2>
+            <p className="text-sm text-secondary-text leading-relaxed">
+              Explore required skills, typical fresher responsibilities, and verified job demand.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Software Developer",
+                desc: "Build scalable web services, APIs, and modern frontends with modern frameworks.",
+                skills: ["JavaScript", "Python", "React", "PostgreSQL", "Git"],
+                icon: Code2,
+              },
+              {
+                title: "Data Analyst",
+                desc: "Transform operational databases into dashboards, KPI metrics, and business intelligence.",
+                skills: ["SQL", "Excel", "Python", "Power BI", "Pandas"],
+                icon: Database,
+              },
+              {
+                title: "AI / ML Engineer",
+                desc: "Implement predictive modeling, NLP pipelines, and generative AI integrations.",
+                skills: ["Python", "PyTorch", "Scikit-Learn", "FastAPI", "Docker"],
+                icon: BrainCircuit,
+              },
+              {
+                title: "Cybersecurity Analyst",
+                desc: "Safeguard cloud infrastructure, analyze vulnerabilities, and monitor threat logs.",
+                skills: ["Networking", "Linux", "SOC Analysis", "Wireshark", "Bash"],
+                icon: Lock,
+              },
+              {
+                title: "Cloud Engineer",
+                desc: "Deploy resilient infrastructure, CI/CD automated pipelines, and cloud containers.",
+                skills: ["AWS", "Docker", "Kubernetes", "Terraform", "Linux"],
+                icon: Cloud,
+              },
+              {
+                title: "UI / UX Designer",
+                desc: "Design user research flows, design systems, interactive Figma components, and usability tests.",
+                skills: ["Figma", "Design Systems", "Prototyping", "Wireframing"],
+                icon: Palette,
+              },
+            ].map((p) => {
+              const Icon = p.icon;
+              return (
+                <div
+                  key={p.title}
+                  className="bg-pure-white border border-border rounded-lg p-6 shadow-subtle space-y-4 hover:border-rock-blue transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-pale-blue text-venice-blue flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-venice-blue" />
+                    </div>
+                    <h3 className="text-base font-bold text-deep-teal">{p.title}</h3>
+                  </div>
+                  <p className="text-xs text-secondary-text leading-relaxed">{p.desc}</p>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {p.skills.map((s) => (
+                      <Chip key={s} label={s} variant="default" className="text-[11px]" />
+                    ))}
+                  </div>
+                  <div className="pt-2 border-t border-border">
+                    <Link
+                      href="/jobs"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal"
+                    >
+                      <span>Explore verified roles</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Container>
+      </section>
+
+      {/* SECTION 8 — FINAL CTA */}
+      <section className="py-20 bg-pale-blue border-b border-border">
+        <Container size="xl">
+          <div className="bg-pure-white border border-border rounded-2xl p-8 sm:p-12 shadow-float max-w-4xl mx-auto text-center space-y-6">
+            <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
+              Ready to Accelerate?
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-deep-teal leading-tight">
+              Your next opportunity starts with your next step.
+            </h2>
+            <p className="text-base text-secondary-text max-w-xl mx-auto leading-relaxed">
+              Build a clearer picture of your skills, explore relevant opportunities,
+              and create a practical path toward your career goals.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <Link href="/resume">
-                <Button size="lg" variant="highlight" rightIcon={<ArrowRight className="w-5 h-5" />}>
-                  Launch Interactive Demo
+                <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
+                  Start Your Career Journey
+                </Button>
+              </Link>
+              <Link href="/jobs">
+                <Button size="lg" variant="outline">
+                  Explore the Platform
                 </Button>
               </Link>
             </div>
+            <p className="text-xs text-muted-text">
+              100% Free for students • No credit card required • Real backend data
+            </p>
           </div>
         </Container>
       </section>

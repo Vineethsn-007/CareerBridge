@@ -27,25 +27,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-medium rounded-DEFAULT transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+      "inline-flex items-center justify-center font-medium rounded-DEFAULT transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue";
 
     const variantStyles = {
       primary:
-        "bg-brand-gradient text-white hover:opacity-95 shadow-glow hover:shadow-glow-accent border border-white/10",
+        "bg-venice-blue text-white hover:bg-deep-teal shadow-subtle border border-venice-blue",
       secondary:
-        "bg-surface-2 text-text hover:bg-surface-2/80 border border-border hover:border-white/20",
+        "bg-pale-blue text-primary-text hover:bg-light-blue border border-border",
       highlight:
-        "bg-saffron-gradient text-bg font-semibold hover:brightness-105 shadow-glow-saffron border border-highlight/30",
+        "bg-rock-blue text-dark-navy hover:bg-rock-blue/90 border border-rock-blue/40 font-semibold",
       outline:
-        "bg-transparent text-text border border-border hover:border-accent hover:text-accent",
+        "bg-transparent text-primary-text border border-border hover:bg-pale-blue hover:border-rock-blue",
       ghost:
-        "bg-transparent text-text-muted hover:text-text hover:bg-white/5",
+        "bg-transparent text-secondary-text hover:text-primary-text hover:bg-pale-blue/60",
     };
 
     const sizeStyles = {
-      sm: "text-xs px-3 py-1.5 gap-1.5",
-      md: "text-sm px-4 py-2.5 gap-2",
-      lg: "text-base px-6 py-3.5 gap-2.5",
+      sm: "text-xs px-3.5 py-1.5 gap-1.5 rounded-sm",
+      md: "text-sm px-4.5 py-2.5 gap-2 rounded-DEFAULT",
+      lg: "text-base px-6 py-3.5 gap-2.5 rounded-md",
     };
 
     return (

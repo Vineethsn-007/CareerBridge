@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "elevated" | "interactive";
+  variant?: "default" | "elevated" | "interactive" | "soft";
   padding?: "none" | "sm" | "md" | "lg";
 }
 
@@ -21,24 +21,23 @@ export function Card({
   };
 
   const variantStyles = {
-    default: "bg-surface border border-border shadow-card",
-    elevated: "bg-surface-2 border border-border shadow-card hover:border-white/15",
+    default: "bg-pure-white border border-border shadow-card",
+    elevated: "bg-pure-white border border-border shadow-float",
     interactive:
-      "bg-surface border border-border hover:border-accent/40 hover:bg-surface-2 transition-all duration-300 shadow-card hover:shadow-glow cursor-pointer",
+      "bg-pure-white border border-border hover:border-rock-blue hover:shadow-float transition-all duration-300 cursor-pointer",
+    soft: "bg-pale-blue border border-border",
   };
 
   return (
     <div
       className={cn(
-        "relative rounded-md overflow-hidden bg-card-reflection",
+        "relative rounded-md overflow-hidden",
         variantStyles[variant],
         paddingStyles[padding],
         className
       )}
       {...props}
     >
-      {/* Subtle top edge specular reflection */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
       {children}
     </div>
   );

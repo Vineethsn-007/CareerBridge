@@ -184,7 +184,7 @@ function SkillsContent() {
   const noJob = !jobId;
 
   return (
-    <div className="min-h-screen bg-mesh py-10">
+    <div className="min-h-screen bg-merino py-10">
       <Container size="lg">
         <PageHeader
           title="Skill Gap Analysis"
@@ -369,9 +369,12 @@ export default function SkillsPage() {
   return (
     <Suspense
       fallback={
-        <div className="py-10 bg-mesh min-h-screen">
-          <Container size="xl">
-            <SkeletonCard />
+        <div className="min-h-screen bg-merino py-10">
+          <Container size="lg">
+            <div className="space-y-4">
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
           </Container>
         </div>
       }

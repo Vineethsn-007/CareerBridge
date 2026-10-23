@@ -40,7 +40,7 @@ export default function ResumePage() {
   };
 
   return (
-    <div className="py-10 bg-mesh min-h-screen">
+    <div className="py-10 bg-merino min-h-screen">
       <Container size="xl">
         <PageHeader
           title="Resume Intelligence"
