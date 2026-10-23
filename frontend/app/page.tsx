@@ -306,12 +306,6 @@ export default function Home() {
                   priority
                 />
               </div>
-
-              {/* Authentic caption tag */}
-              <div className="absolute bottom-3 left-4 bg-deep-teal/85 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1 rounded-full flex items-center gap-1.5 shadow-subtle hidden sm:flex">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>Student Engineering Team • Live Hackathon Sprint</span>
-              </div>
             </div>
           </div>
 
