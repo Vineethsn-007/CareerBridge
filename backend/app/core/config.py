@@ -17,6 +17,9 @@ class Settings:
     cors_origins: list[str] = field(default_factory=_origins)
     llm_provider: str = os.getenv("LLM_PROVIDER", "mock")
     llm_api_key: str = os.getenv("LLM_API_KEY", "")
+    llm_base_url: str = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
+    llm_model: str = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
+    llm_timeout: float = float(os.getenv("LLM_TIMEOUT", "30"))
     jobs_path: Path = Path(os.getenv("JOBS_PATH", str(APP_DIR / "data" / "jobs.json")))
     max_upload_bytes: int = 5 * 1024 * 1024
 
