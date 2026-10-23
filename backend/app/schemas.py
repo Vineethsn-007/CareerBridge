@@ -97,6 +97,8 @@ class Job(BaseModel):
     source_url: str
     verified: bool = False
     last_verified: str | None = None  # ISO date, e.g. "2026-10-20"
+    # Additive (Task 4 scraper): direct application link when one is verified.
+    apply_url: str | None = None
 
 
 class MatchRequest(BaseModel):
@@ -189,3 +191,32 @@ class AnswerFeedback(BaseModel):
     strengths: list[str]
     improvements: list[str]
     sample_answer: str | None = None
+
+
+# ---------- Admin scraping (Task 4, additive) ----------
+
+
+class AdminScrapeRequest(BaseModel):
+    company: str | None = None  # None -> every enabled source
+    dry_run: bool = False
+
+
+class SourceReport(BaseModel):
+    company: str
+    ats: str
+    fetched: int = 0
+    india_matches: int = 0
+    accepted: int = 0
+    verified: int = 0
+    rejected: int = 0
+    skipped: int = 0
+    errors: list[str] = Field(default_factory=list)
+    created: int = 0
+    updated: int = 0
+    stale_disabled: int = 0
+
+
+class ScrapeRunReport(BaseModel):
+    started_at: str
+    dry_run: bool
+    sources: list[SourceReport] = Field(default_factory=list)
