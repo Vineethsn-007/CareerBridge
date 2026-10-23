@@ -1,372 +1,287 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Chip } from "@/components/ui/Chip";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { ScoreRing } from "@/components/ui/ScoreRing";
-import { SkeletonCard } from "@/components/ui/Skeleton";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { JobCard } from "@/components/jobs/JobCard";
+import { JobFilters } from "@/components/jobs/JobFilters";
+import { useResumeStore } from "@/lib/resumeStore";
 import { api } from "@/lib/api";
-import type { Job, JobMatch, ParsedResume } from "@/lib/types";
+import type { JobMatch, ParsedResume } from "@/lib/types";
+import { SkeletonCard } from "@/components/ui/Skeleton";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { prefersReducedMotion } from "@/lib/motion";
 import {
-  Search,
-  MapPin,
-  ExternalLink,
-  ShieldCheck,
-  Briefcase,
-  Clock,
-  Filter,
-  ArrowRight,
   FileText,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 
-type ViewMode = "browse" | "matched";
-type LoadState = "idle" | "loading" | "done" | "error";
-
-const JOB_TYPE_LABELS: Record<string, string> = {
-  "full-time": "Full-time",
-  internship: "Internship",
-  "part-time": "Part-time",
-  contract: "Contract",
+// Preloaded sample resume for instant demo without uploading
+const DEMO_RESUME: ParsedResume = {
+  name: "Aarav Sharma",
+  email: "aarav.sharma@gmail.com",
+  phone: "+91 9876543210",
+  summary: "Final year Computer Science student seeking fresher Software Engineer roles.",
+  skills: ["Python", "React", "TypeScript", "Next.js", "Node.js", "SQL", "Git", "REST API", "Problem Solving"],
+  education: [
+    {
+      institution: "Visvesvaraya Technological University (VTU)",
+      degree: "B.Tech in Computer Science & Engineering",
+      year: "2024",
+    },
+  ],
+  experience: [
+    {
+      title: "Frontend Development Intern",
+      company: "Tech Mahindra (Academic Track)",
+      duration: "3 months",
+      summary: "Built student management dashboards using React and Tailwind CSS.",
+    },
+  ],
+  projects: [
+    "Smart Campus Portal: Fullstack Next.js and FastAPI app for college events",
+    "E-Commerce Microservices: Python FastAPI order processing system",
+  ],
+  raw_text: "Aarav Sharma resume sample",
 };
-
-const JOB_TYPE_COLORS: Record<string, string> = {
-  "full-time": "bg-primary/10 text-primary border-primary/30",
-  internship: "bg-accent/10 text-accent border-accent/30",
-  "part-time": "bg-amber-500/10 text-amber-400 border-amber-500/30",
-  contract: "bg-violet-500/10 text-violet-400 border-violet-500/30",
-};
-
-function JobCard({ job, matchScore, matchedSkills, missingSkills, rationale, onViewGap }: {
-  job: Job;
-  matchScore?: number;
-  matchedSkills?: string[];
-  missingSkills?: string[];
-  rationale?: string;
-  onViewGap?: () => void;
-}) {
-  return (
-    <Card variant="interactive" className="p-0 group">
-      <div className="p-5 space-y-4">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-base font-bold text-white truncate">{job.title}</h2>
-              {job.verified && (
-                <Badge variant="verified" size="sm">Verified</Badge>
-              )}
-            </div>
-            <p className="text-sm text-accent font-medium truncate">{job.company}</p>
-            <div className="flex items-center gap-3 flex-wrap text-xs text-text-muted pt-0.5">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" />
-                {job.location}
-              </span>
-              <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium ${JOB_TYPE_COLORS[job.job_type] ?? "bg-surface-2 text-text-muted border-border"}`}
-              >
-                <Briefcase className="w-3 h-3" />
-                {JOB_TYPE_LABELS[job.job_type] ?? job.job_type}
-              </span>
-              {job.last_verified && (
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  Verified {job.last_verified}
-                </span>
-              )}
-            </div>
-          </div>
-          {matchScore !== undefined && (
-            <div className="shrink-0">
-              <ScoreRing score={Math.round(matchScore)} size="sm" />
-            </div>
-          )}
-        </div>
-
-        {/* Description */}
-        <p className="text-xs text-text-muted leading-relaxed line-clamp-2">{job.description}</p>
-
-        {/* Skills */}
-        {job.skills_required.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {job.skills_required.slice(0, 6).map((skill) => {
-              const isMatched = matchedSkills?.includes(skill);
-              const isMissing = missingSkills?.includes(skill);
-              return (
-                <Chip
-                  key={skill}
-                  label={skill}
-                  variant={isMatched ? "matched" : isMissing ? "missing" : "default"}
-                />
-              );
-            })}
-            {job.skills_required.length > 6 && (
-              <span className="text-xs text-text-muted self-center">+{job.skills_required.length - 6} more</span>
-            )}
-          </div>
-        )}
-
-        {/* Rationale */}
-        {rationale && (
-          <p className="text-xs text-text-muted italic border-l-2 border-primary/40 pl-3 leading-relaxed">
-            {rationale}
-          </p>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-border/50 bg-surface-2/30">
-        {onViewGap ? (
-          <Button size="sm" variant="ghost" rightIcon={<ArrowRight className="w-3.5 h-3.5" />} onClick={onViewGap} className="px-0 text-accent hover:bg-transparent">
-            View Skill Gap
-          </Button>
-        ) : (
-          <span />
-        )}
-        <a
-          href={job.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-white hover:text-accent transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Apply <ExternalLink className="w-3.5 h-3.5" />
-        </a>
-      </div>
-    </Card>
-  );
-}
 
 export default function JobsPage() {
-  const router = useRouter();
+  const { resume, isHydrated, saveResume } = useResumeStore();
 
-  const [viewMode, setViewMode] = useState<ViewMode>("browse");
-  const [loadState, setLoadState] = useState<LoadState>("idle");
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const [jobs, setJobs] = useState<Job[]>([]);
   const [matches, setMatches] = useState<JobMatch[]>([]);
-  const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [searchQ, setSearchQ] = useState("");
+  // Filters state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedJobType, setSelectedJobType] = useState("all");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 
-  // Detect resume in sessionStorage on mount
-  useEffect(() => {
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch job matches whenever active resume is present
+  const fetchMatches = async (activeResume: ParsedResume) => {
+    setIsLoading(true);
+    setError(null);
     try {
-      const raw = sessionStorage.getItem("parsedResume");
-      if (raw) {
-        const resume = JSON.parse(raw) as ParsedResume;
-        setParsedResume(resume);
-        setViewMode("matched");
+      // Call backend POST /api/match with real resume
+      const results = await api.match({
+        resume: activeResume,
+        top_k: 20,
+        verified_only: false, // ensure all verified + verified-source listings are retrieved
+      });
+      setMatches(results);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load matching jobs.";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isHydrated && resume) {
+      fetchMatches(resume);
+    }
+  }, [isHydrated, resume]);
+
+  // Extract unique locations from matches
+  const locations = useMemo(() => {
+    const locSet = new Set<string>();
+    matches.forEach((m) => {
+      if (m.job.location) locSet.add(m.job.location);
+    });
+    return Array.from(locSet).sort();
+  }, [matches]);
+
+  // Filtered and sorted matches
+  const filteredMatches = useMemo(() => {
+    return matches.filter((m) => {
+      // Location filter
+      if (selectedLocation !== "all" && m.job.location !== selectedLocation) {
+        return false;
       }
-    } catch {
-      // ignore
-    }
-  }, []);
+      // Job Type filter
+      if (selectedJobType !== "all" && m.job.job_type !== selectedJobType) {
+        return false;
+      }
+      // Verified only
+      if (verifiedOnly && !m.job.verified) {
+        return false;
+      }
+      // Text search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesTitle = m.job.title.toLowerCase().includes(q);
+        const matchesCompany = m.job.company.toLowerCase().includes(q);
+        const matchesLocation = m.job.location.toLowerCase().includes(q);
+        const matchesSkills = m.job.skills_required.some((s) =>
+          s.toLowerCase().includes(q)
+        );
+        if (!matchesTitle && !matchesCompany && !matchesLocation && !matchesSkills) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [matches, selectedLocation, selectedJobType, verifiedOnly, searchQuery]);
 
-  const loadJobs = useCallback(async () => {
-    setLoadState("loading");
-    setErrorMsg(null);
-    try {
-      const data = await api.listJobs({ verifiedOnly, q: searchQ || undefined });
-      setJobs(data);
-      setLoadState("done");
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to load jobs.");
-      setLoadState("error");
-    }
-  }, [verifiedOnly, searchQ]);
+  // GSAP staggered entrance animation for job cards
+  useGSAP(
+    () => {
+      if (isLoading || filteredMatches.length === 0 || !listContainerRef.current) return;
+      if (prefersReducedMotion()) {
+        gsap.set(listContainerRef.current.children, { opacity: 1, y: 0 });
+        return;
+      }
 
-  const loadMatches = useCallback(async (resume: ParsedResume) => {
-    setLoadState("loading");
-    setErrorMsg(null);
-    try {
-      const data = await api.match({ resume, verified_only: verifiedOnly, top_k: 20 });
-      setMatches(data);
-      setLoadState("done");
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to fetch matches.");
-      setLoadState("error");
-    }
-  }, [verifiedOnly]);
+      gsap.fromTo(
+        listContainerRef.current.children,
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power2.out",
+        }
+      );
+    },
+    { scope: listContainerRef, dependencies: [filteredMatches, isLoading] }
+  );
 
-  // Auto-load when mode changes or filters change
-  useEffect(() => {
-    if (viewMode === "matched" && parsedResume) {
-      loadMatches(parsedResume);
-    } else if (viewMode === "browse") {
-      loadJobs();
-    }
-  }, [viewMode, parsedResume, verifiedOnly]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    loadJobs();
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSelectedLocation("all");
+    setSelectedJobType("all");
+    setVerifiedOnly(false);
   };
-
-  const handleViewGap = (jobId: string) => {
-    router.push(`/skills?job=${encodeURIComponent(jobId)}`);
-  };
-
-  const isLoading = loadState === "loading";
-  const displayedJobs = viewMode === "matched"
-    ? matches.map((m) => m.job)
-    : jobs;
 
   return (
-    <div className="min-h-screen bg-mesh py-10">
+    <div className="py-10 bg-mesh min-h-screen">
       <Container size="xl">
         <PageHeader
-          title="Job Listings"
-          subtitle="Browse verified fresher &amp; internship openings or get AI-matched results based on your resume."
-          backHref="/"
-          backLabel="Home"
-          badge={<Badge variant="verified" showIcon={false}>{displayedJobs.length > 0 ? `${displayedJobs.length} listings` : "Live"}</Badge>}
+          title="Verified Job Matches"
+          subtitle="Ranked algorithmically based on your technical skills, education, and target career direction."
+          badge={
+            resume ? (
+              <Badge variant="verified">
+                Matched for {resume.name || "Candidate"}
+              </Badge>
+            ) : (
+              <Badge variant="neutral">Demo Mode</Badge>
+            )
+          }
           action={
-            <Button
-              size="sm"
-              variant="highlight"
-              leftIcon={<FileText className="w-4 h-4" />}
-              onClick={() => router.push("/resume")}
-            >
-              Upload Resume
-            </Button>
+            resume && (
+              <Link href="/resume">
+                <Button size="sm" variant="secondary" leftIcon={<FileText className="w-3.5 h-3.5" />}>
+                  Edit Skills ({resume.skills.length})
+                </Button>
+              </Link>
+            )
           }
         />
 
-        {/* Mode Toggle */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-surface-2 border border-border w-fit mb-6">
-          <button
-            id="browse-tab"
-            onClick={() => setViewMode("browse")}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-              viewMode === "browse"
-                ? "bg-primary text-white shadow-glow"
-                : "text-text-muted hover:text-text"
-            }`}
-          >
-            Browse All
-          </button>
-          <button
-            id="matched-tab"
-            onClick={() => {
-              if (!parsedResume) {
-                router.push("/resume");
-              } else {
-                setViewMode("matched");
-              }
-            }}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-              viewMode === "matched"
-                ? "bg-primary text-white shadow-glow"
-                : "text-text-muted hover:text-text"
-            }`}
-          >
-            AI Matched
-            {parsedResume && (
-              <span className="inline-flex w-2 h-2 rounded-full bg-accent animate-pulse" />
-            )}
-          </button>
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-8">
-          {viewMode === "browse" && (
-            <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-              <Input
-                id="jobs-search"
-                placeholder="Search by title, company, or skill..."
-                value={searchQ}
-                onChange={(e) => setSearchQ(e.target.value)}
-                leftIcon={<Search className="w-4 h-4" />}
-                className="flex-1"
-              />
-              <Button type="submit" size="sm" variant="secondary" id="jobs-search-btn">
-                Search
+        {/* Missing Resume Alert Banner */}
+        {isHydrated && !resume && (
+          <div className="mb-8 p-6 rounded-lg border border-primary/30 bg-surface-2/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-card">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-highlight" />
+                <span>No Resume Uploaded Yet</span>
+              </h3>
+              <p className="text-xs text-text-muted">
+                Upload your resume for personalized match scores, or test with our sample fresher profile.
+              </p>
+            </div>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <Button
+                size="sm"
+                variant="highlight"
+                onClick={() => {
+                  saveResume(DEMO_RESUME);
+                  fetchMatches(DEMO_RESUME);
+                }}
+              >
+                Load Sample Student Profile
               </Button>
-            </form>
-          )}
-          <button
-            id="verified-filter"
-            onClick={() => setVerifiedOnly((v) => !v)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium transition-all duration-200 shrink-0 ${
-              verifiedOnly
-                ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
-                : "bg-surface-2 border-border text-text-muted hover:text-text hover:border-white/20"
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4" />
-            Verified Only
-            {verifiedOnly && <Filter className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-
-        {/* Error */}
-        {loadState === "error" && errorMsg && (
-          <ErrorMessage
-            message={errorMsg}
-            onRetry={() => viewMode === "matched" && parsedResume ? loadMatches(parsedResume) : loadJobs()}
-          />
+              <Link href="/resume">
+                <Button size="sm" variant="secondary" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                  Upload My Resume
+                </Button>
+              </Link>
+            </div>
+          </div>
         )}
 
-        {/* Resume prompt for matched mode without resume */}
-        {viewMode === "matched" && !parsedResume && (
-          <EmptyState
-            title="No resume uploaded yet"
-            description="Upload your resume first so CareerBridge can find your best-matched jobs using AI skill analysis."
-            actionLabel="Upload Resume"
-            onAction={() => router.push("/resume")}
-          />
+        {/* Error Alert with Retry */}
+        {error && (
+          <div className="mb-8">
+            <ErrorMessage
+              title="Unable to load job matches"
+              message={error}
+              onRetry={() => resume && fetchMatches(resume)}
+              isRetrying={isLoading}
+            />
+          </div>
         )}
 
-        {/* Loading skeletons */}
+        {/* Filter Controls */}
+        {matches.length > 0 && (
+          <div className="mb-8">
+            <JobFilters
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedLocation={selectedLocation}
+              onLocationChange={setSelectedLocation}
+              selectedJobType={selectedJobType}
+              onJobTypeChange={setSelectedJobType}
+              verifiedOnly={verifiedOnly}
+              onVerifiedOnlyToggle={() => setVerifiedOnly(!verifiedOnly)}
+              locations={locations}
+              totalCount={matches.length}
+              filteredCount={filteredMatches.length}
+              onReset={resetFilters}
+            />
+          </div>
+        )}
+
+        {/* Loading State Skeletons */}
         {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonCard key={i} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        )}
+
+        {/* Job Matches Grid */}
+        {!isLoading && filteredMatches.length > 0 && (
+          <div ref={listContainerRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredMatches.map((match, idx) => (
+              <JobCard key={match.job.id} match={match} rank={idx + 1} />
             ))}
           </div>
         )}
 
-        {/* Job Grid */}
-        {!isLoading && loadState === "done" && (
-          <>
-            {displayedJobs.length === 0 ? (
-              <EmptyState
-                title="No jobs found"
-                description={verifiedOnly ? "No verified listings match your filters. Try turning off the verified filter." : "No listings match your search. Try different keywords."}
-                actionLabel={verifiedOnly ? "Show All" : undefined}
-                onAction={verifiedOnly ? () => setVerifiedOnly(false) : undefined}
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {viewMode === "matched"
-                  ? matches.map((m) => (
-                      <JobCard
-                        key={m.job.id}
-                        job={m.job}
-                        matchScore={m.score}
-                        matchedSkills={m.matched_skills}
-                        missingSkills={m.missing_skills}
-                        rationale={m.rationale}
-                        onViewGap={() => handleViewGap(m.job.id)}
-                      />
-                    ))
-                  : jobs.map((job) => (
-                      <JobCard key={job.id} job={job} />
-                    ))}
-              </div>
-            )}
-          </>
+        {/* Empty Filter State */}
+        {!isLoading && matches.length > 0 && filteredMatches.length === 0 && (
+          <EmptyState
+            title="No Matching Openings Found"
+            description="No jobs match your current filter parameters. Try clearing your filters or selecting 'All Cities'."
+            actionLabel="Reset All Filters"
+            onAction={resetFilters}
+          />
         )}
       </Container>
     </div>
