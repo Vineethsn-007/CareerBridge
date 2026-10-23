@@ -8,6 +8,11 @@ venv/
 .coverage
 htmlcov/
 
+# Local database files (never commit real data)
+*.db
+*.sqlite
+*.sqlite3
+
 # Node
 node_modules/
 .next/
