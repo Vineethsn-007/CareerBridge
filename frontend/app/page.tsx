@@ -175,9 +175,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Floating Product Preview 1 (Top-Left): Candidate Readiness & Active Prep Plan */}
-              <div className="hero-float-card absolute -top-4 -left-4 sm:-left-6 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
-                <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200/60 text-[#18856B] flex items-center justify-center font-bold text-xs shrink-0">
+              {/* Floating Product Preview 1 (Top-Right): Active Prep Plan */}
+              <div className="hero-float-card absolute -top-4 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
+                <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-200/60 text-[#18856B] flex items-center justify-center font-bold text-xs shrink-0">
                   4W
                 </div>
                 <div className="space-y-0.5 pr-1">
@@ -185,21 +185,27 @@ export default function Home() {
                     <p className="text-xs font-bold text-deep-teal">Prep Plan Active</p>
                     <span className="w-1.5 h-1.5 rounded-full bg-[#18856B] animate-pulse" />
                   </div>
-                  <p className="text-[11px] text-secondary-text">Week 1: TypeScript & System Design</p>
+                  <p className="text-[11px] text-secondary-text">Week 1: TypeScript & ORM</p>
                 </div>
               </div>
 
-              {/* Floating Product Preview 2 (Bottom-Right): Verified Match & Score */}
-              <div className="hero-float-card absolute -bottom-5 -right-4 sm:-right-6 bg-pure-white border border-border rounded-xl p-3.5 shadow-float hidden sm:flex items-center gap-3.5 z-20">
+              {/* Floating Product Preview 2 (Bottom-Left): Match Score */}
+              <div className="hero-float-card absolute -bottom-5 -left-3 sm:-left-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
                 <ScoreRing score={88} size="sm" animate={true} />
                 <div className="space-y-0.5 pr-1">
+                  <p className="text-xs font-bold text-deep-teal">88% Match</p>
+                  <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru</p>
+                </div>
+              </div>
+
+              {/* Floating Product Preview 3 (Bottom-Right): Verified Candidate Profile */}
+              <div className="hero-float-card absolute -bottom-5 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-2.5 z-20">
+                <div className="space-y-0.5 text-left pr-0.5">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs font-bold text-deep-teal">88% Match</p>
-                    <Badge variant="verified" size="sm">
-                      Verified Match
-                    </Badge>
+                    <p className="text-xs font-bold text-deep-teal">Aarav Sharma</p>
+                    <Badge variant="verified" size="sm">Verified Match</Badge>
                   </div>
-                  <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru (₹8–12 LPA)</p>
+                  <p className="text-[11px] text-secondary-text">Full Stack & Data Engineering</p>
                 </div>
               </div>
             </div>
