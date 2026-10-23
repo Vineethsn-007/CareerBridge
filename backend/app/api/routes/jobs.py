@@ -47,5 +47,7 @@ def job_detail(job_id: str, session: Annotated[Session | None, Depends(get_sessi
 
 
 @router.post("/match", response_model=list[JobMatch])
-def match(req: MatchRequest) -> list[JobMatch]:
-    return match_jobs(req)
+def match(
+    req: MatchRequest, session: Annotated[Session | None, Depends(get_session)]
+) -> list[JobMatch]:
+    return match_jobs(req, session=session)

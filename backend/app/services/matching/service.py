@@ -19,7 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from app.core.taxonomy import canonical_skill, normalize_skill
 from app.schemas import Job, JobMatch, MatchRequest, ParsedResume, SkillEvidence
-from app.services.jobs.service import list_jobs
+from app.services.jobs.service import list_jobs, list_jobs_from_db
 from app.services.parser.service import EVIDENCE_WEIGHTS
 
 # Configurable signal weights summing to 100.0 (transparent heuristic)
@@ -251,9 +251,20 @@ def score_job(
     )
 
 
-def match_jobs(req: MatchRequest) -> list[JobMatch]:
-    """Retrieve and rank matching jobs based on hybrid scoring."""
-    jobs = list_jobs(verified_only=req.verified_only)
+def match_jobs(req: MatchRequest, session=None) -> list[JobMatch]:
+    """Retrieve and rank matching jobs based on hybrid scoring.
+
+    When a database session is provided, scraper-backed (verified) listings take
+    precedence; the curated file store is the fallback when the database has none.
+    """
+    jobs: list[Job] = []
+    if session is not None:
+        try:
+            jobs = list_jobs_from_db(session, verified_only=req.verified_only)
+        except Exception:
+            jobs = []
+    if not jobs:
+        jobs = list_jobs(verified_only=req.verified_only)
     if req.location:
         loc = req.location.lower()
         jobs = [j for j in jobs if loc in j.location.lower()]

@@ -82,3 +82,15 @@ def get_job_from_db(session: Session, job_id: str) -> Job | None:
     if row is None or not row.is_active:
         return None
     return _row_to_schema(row)
+
+
+def resolve_job(session: Session | None, job_id: str) -> Job | None:
+    """Database-backed listing first (scraper output), curated file as fallback."""
+    if session is not None:
+        try:
+            db_job = get_job_from_db(session, job_id)
+        except Exception:
+            db_job = None
+        if db_job is not None:
+            return db_job
+    return get_job(job_id)
