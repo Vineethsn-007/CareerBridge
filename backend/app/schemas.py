@@ -22,6 +22,47 @@ class Experience(BaseModel):
     company: str | None = None
     duration: str | None = None
     summary: str | None = None
+    # Additive (Task 2): evidence-rich experience fields.
+    start_date: str | None = None
+    end_date: str | None = None
+    duration_months: int | None = Field(default=None, ge=0)
+    technologies: list[str] = Field(default_factory=list)
+    impact: list[str] = Field(default_factory=list)
+    seniority: str | None = None
+
+
+class Certification(BaseModel):
+    name: str
+    issuer: str | None = None
+    year: str | None = None
+
+
+SkillEvidenceCategory = Literal["work experience", "project", "listed only"]
+
+
+class SkillEvidence(BaseModel):
+    """One skill with the evidence the resume actually contains for it."""
+
+    skill: str
+    category: SkillEvidenceCategory = "listed only"
+    weighted_strength: float = Field(default=0.3, ge=0, le=1)
+    proficiency: str | None = None  # e.g. "basic" | "intermediate" | "advanced"
+    years: float | None = Field(default=None, ge=0)
+
+
+class ResumeInsight(BaseModel):
+    """An evidence-tied insight: every claim points at resume evidence."""
+
+    text: str
+    evidence: str | None = None
+
+
+class ResumeInsights(BaseModel):
+    strengths: list[ResumeInsight] = Field(default_factory=list)
+    gaps: list[ResumeInsight] = Field(default_factory=list)
+    summary: str | None = None
+    target_roles: list[str] = Field(default_factory=list)
+    tips: list[str] = Field(default_factory=list)
 
 
 class ParsedResume(BaseModel):
@@ -34,6 +75,11 @@ class ParsedResume(BaseModel):
     experience: list[Experience] = Field(default_factory=list)
     projects: list[str] = Field(default_factory=list)
     raw_text: str = ""
+    # Additive (Task 2): evidence-weighted skills, certifications and insights.
+    skill_evidence: list[SkillEvidence] = Field(default_factory=list)
+    certifications: list[Certification] = Field(default_factory=list)
+    total_experience_months: int | None = Field(default=None, ge=0)
+    insights: ResumeInsights | None = None
 
 
 # ---------- Jobs & matching ----------
