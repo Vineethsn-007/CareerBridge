@@ -354,3 +354,73 @@ class TavusWebhookPayload(BaseModel):
 
 class EndInterviewRequest(BaseModel):
     reason: str | None = None
+
+
+# ---------- Task 4: Interview Evaluation & Report ----------
+
+
+class QuestionEvaluation(BaseModel):
+    question_id: str
+    question_text: str
+    question_type: str = "technical"
+    focus_skill_or_project: str | None = None
+    difficulty: str = "medium"
+    score: float = Field(ge=0.0, le=10.0, description="Score from 0 to 10")
+    candidate_answer: str = ""
+    covered_points: list[str] = Field(default_factory=list)
+    missed_points: list[str] = Field(default_factory=list)
+    strengths: list[str] = Field(default_factory=list)
+    improvements: list[str] = Field(default_factory=list)
+    sample_answer: str = ""
+
+
+class CommunicationMetrics(BaseModel):
+    words_per_minute: float = 0.0
+    filler_word_count: int = 0
+    filler_percentage: float = 0.0
+    filler_breakdown: dict[str, int] = Field(default_factory=dict)
+    average_answer_duration_seconds: float = 0.0
+    average_answer_words: float = 0.0
+    long_pauses_count: int = 0
+    skipped_questions_count: int = 0
+    clarity_score: float = Field(default=8.0, ge=0.0, le=10.0)
+    conciseness_score: float = Field(default=8.0, ge=0.0, le=10.0)
+    confidence_score: float = Field(default=8.0, ge=0.0, le=10.0)
+    star_structure_score: float = Field(default=8.0, ge=0.0, le=10.0)
+
+
+class IntegritySummary(BaseModel):
+    integrity_score: int = 100
+    total_events: int = 0
+    tab_switch_count: int = 0
+    fullscreen_exit_count: int = 0
+    face_missing_count: int = 0
+    multiple_faces_count: int = 0
+    flags: list[str] = Field(default_factory=list)
+
+
+class ReportNextStep(BaseModel):
+    title: str
+    skill: str
+    action: str
+    url: str | None = None
+    kind: str = "practice"
+
+
+class InterviewReport(BaseModel):
+    session_id: str
+    job_id: str
+    role_title: str
+    company_name: str
+    candidate_name: str | None = None
+    overall_score: int = Field(ge=0, le=100)
+    readiness_level: str = "Nearly Ready"
+    summary: str
+    top_strengths: list[str] = Field(default_factory=list)
+    top_improvements: list[str] = Field(default_factory=list)
+    next_steps: list[ReportNextStep] = Field(default_factory=list)
+    question_evaluations: list[QuestionEvaluation] = Field(default_factory=list)
+    communication_metrics: CommunicationMetrics = Field(default_factory=CommunicationMetrics)
+    presentation_cues: list[str] | None = None
+    integrity_summary: IntegritySummary | None = None
+    created_at: str
