@@ -202,7 +202,7 @@ export default function Home() {
               <div className="hero-float-card absolute -bottom-5 -right-3 sm:-right-5 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-2.5 z-20">
                 <div className="space-y-0.5 text-left pr-0.5">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs font-bold text-deep-teal">Aarav Sharma</p>
+                    <p className="text-xs font-bold text-deep-teal">Muhammad Haashid</p>
                     <Badge variant="verified" size="sm">Verified Match</Badge>
                   </div>
                   <p className="text-[11px] text-secondary-text">Full Stack & Data Engineering</p>
