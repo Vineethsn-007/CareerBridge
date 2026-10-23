@@ -343,7 +343,9 @@ def test_stale_listings_hidden_after_14_days(session):
     upsert_jobs(session, CONFIG, [_row("https://jobs.test/a"), _row("https://jobs.test/b")])
     # Age one row past the cutoff by rewriting last_scraped_at.
     row = session.scalar(select(Job).where(Job.source_url == "https://jobs.test/b"))
-    stale_cutoff = dt.datetime(2026, 10, 1, tzinfo=dt.UTC)
+    from app.core.db import UTC
+
+    stale_cutoff = dt.datetime(2026, 10, 1, tzinfo=UTC)
     row.last_scraped_at = stale_cutoff
     session.commit()
 

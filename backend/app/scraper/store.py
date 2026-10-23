@@ -16,13 +16,13 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.db import Company, Job
+from app.core.db import UTC, Company, Job
 from app.schemas import Job as JobSchema
 from app.scraper.config import CompanyConfig
 

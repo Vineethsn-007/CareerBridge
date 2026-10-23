@@ -61,5 +61,13 @@ class Settings:
     scraper_max_listings: int = int(os.getenv("SCRAPER_MAX_LISTINGS", "25"))
     scraper_stale_days: int = int(os.getenv("SCRAPER_STALE_DAYS", "14"))
 
+    # Tavus Conversational Video Interface (CVI) config
+    tavus_api_key: str = os.getenv("TAVUS_API_KEY", "")
+    tavus_face_id: str = os.getenv("TAVUS_FACE_ID", "ra066ab28864")
+    tavus_pal_id: str = os.getenv("TAVUS_PAL_ID", "")
+    tavus_api_base: str = os.getenv("TAVUS_API_BASE", "https://tavusapi.com/v2")
+    webhook_base_url: str = os.getenv("WEBHOOK_BASE_URL", "http://localhost:8000")
+    max_interview_minutes: int = int(os.getenv("MAX_INTERVIEW_MINUTES", "30"))
+
 
 settings = Settings()
