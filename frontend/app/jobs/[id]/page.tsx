@@ -238,10 +238,10 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               <button
                 type="button"
                 onClick={() => setActiveTab("gap")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-DEFAULT text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-DEFAULT text-sm font-medium transition-all cursor-pointer ${
                   activeTab === "gap"
-                    ? "bg-brand-gradient text-white shadow-glow"
-                    : "bg-surface-2 text-text-muted hover:text-text"
+                    ? "bg-venice-blue text-white shadow-subtle border border-venice-blue font-semibold"
+                    : "bg-pure-white text-secondary-text hover:text-primary-text border border-border hover:bg-pale-blue"
                 }`}
               >
                 <Target className="w-4 h-4" />
@@ -251,10 +251,10 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               <button
                 type="button"
                 onClick={() => setActiveTab("plan")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-DEFAULT text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-DEFAULT text-sm font-medium transition-all cursor-pointer ${
                   activeTab === "plan"
-                    ? "bg-brand-gradient text-white shadow-glow"
-                    : "bg-surface-2 text-text-muted hover:text-text"
+                    ? "bg-venice-blue text-white shadow-subtle border border-venice-blue font-semibold"
+                    : "bg-pure-white text-secondary-text hover:text-primary-text border border-border hover:bg-pale-blue"
                 }`}
               >
                 <Calendar className="w-4 h-4" />

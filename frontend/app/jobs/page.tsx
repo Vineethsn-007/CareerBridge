@@ -193,13 +193,13 @@ export default function JobsPage() {
 
         {/* Missing Resume Alert Banner */}
         {isHydrated && !resume && (
-          <div className="mb-8 p-6 rounded-lg border border-primary/30 bg-surface-2/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-card">
+          <div className="mb-8 p-6 rounded-lg border border-border bg-pale-blue flex flex-col sm:flex-row items-center justify-between gap-4 shadow-card">
             <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-highlight" />
+              <h3 className="text-sm font-bold text-deep-teal flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-venice-blue" />
                 <span>No Resume Uploaded Yet</span>
               </h3>
-              <p className="text-xs text-text-muted">
+              <p className="text-xs text-secondary-text">
                 Upload your resume for personalized match scores, or test with our sample fresher profile.
               </p>
             </div>
@@ -214,7 +214,7 @@ export default function JobsPage() {
               >
                 Load Sample Student Profile
               </Button>
-              <Link href="/resume">
+              <Link href="/resume" className="inline-flex">
                 <Button size="sm" variant="secondary" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
                   Upload My Resume
                 </Button>

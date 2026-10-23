@@ -74,6 +74,23 @@ body {
   outline-offset: 2px;
 }
 
+/* Consistent interactive button cursor across elements */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"],
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[type="button"]:disabled,
+[type="reset"]:disabled,
+[type="submit"]:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 /* Editorial Serif Utility */
 .font-serif {
   font-family: var(--font-serif), Georgia, Cambria, "Times New Roman", Times, serif;

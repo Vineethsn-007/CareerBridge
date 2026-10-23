@@ -87,11 +87,11 @@ export function ParsedResumeView({
           >
             Re-upload
           </Button>
-          <Link href="/jobs">
+          <Link href="/jobs" className="inline-flex">
             <Button
-              size="md"
+              size="sm"
               variant="primary"
-              rightIcon={<ArrowRight className="w-4 h-4" />}
+              rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
             >
               Match Verified Jobs
             </Button>
