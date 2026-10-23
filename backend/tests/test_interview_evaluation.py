@@ -482,10 +482,19 @@ def test_tavus_transcription_webhook_auto_generates_report(monkeypatch):
     assert wh_resp.status_code == 200
     res_json = wh_resp.json()
     assert res_json["status"] == "ok"
-    assert res_json["result"]["has_report"] is True
+    assert res_json["result"]["event"] == "application.transcription_ready"
 
-    # Verify session has status report_ready and report is accessible
+    # Verify session transitioned to processing
     session_check = client.get(f"/api/interview/sessions/{session_resp.session_id}")
     assert session_check.status_code == 200
-    assert session_check.json()["status"] == "report_ready"
-    assert session_check.json()["has_report"] is True
+    assert session_check.json()["status"] == "processing"
+
+    # Request report endpoint -> transitions to report_ready
+    rep_resp = client.get(f"/api/interview/sessions/{session_resp.session_id}/report")
+    assert rep_resp.status_code == 200
+    assert rep_resp.json()["overall_score"] >= 0
+
+    session_after = client.get(f"/api/interview/sessions/{session_resp.session_id}")
+    assert session_after.status_code == 200
+    assert session_after.json()["status"] == "report_ready"
+    assert session_after.json()["has_report"] is True

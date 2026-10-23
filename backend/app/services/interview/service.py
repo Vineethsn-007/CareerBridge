@@ -940,23 +940,10 @@ async def handle_tavus_webhook(
         elif event_type == "application.transcription_ready":
             transcript = properties.get("transcript", [])
             model.transcript = transcript
-            try:
-                from app.services.interview.evaluate import generate_interview_report
-
-                report = generate_interview_report(model)
-                model.report = report.model_dump()
-                model.status = "report_ready"
-            except Exception as exc:
-                logger.warning("Error generating report from transcription webhook: %s", exc)
-                if model.status != "report_ready":
-                    model.status = "processing"
+            if model.status != "report_ready":
+                model.status = "processing"
             db_session.commit()
-            return {
-                "status": "processed",
-                "event": event_type,
-                "turns": len(transcript),
-                "has_report": bool(model.report),
-            }
+            return {"status": "processed", "event": event_type, "turns": len(transcript)}
 
         elif event_type == "application.recording_ready":
             rec_uri = properties.get("storage_uri") or properties.get("s3_key")
@@ -1003,16 +990,8 @@ async def poll_and_sync_transcript(
                 transcript = props.get("transcript", [])
                 if transcript:
                     model.transcript = transcript
-                    try:
-                        from app.services.interview.evaluate import generate_interview_report
-
-                        report = generate_interview_report(model)
-                        model.report = report.model_dump()
-                        model.status = "report_ready"
-                    except Exception as exc:
-                        logger.warning("Error generating report during sync: %s", exc)
-                        if model.status != "report_ready":
-                            model.status = "processing"
+                    if model.status != "report_ready":
+                        model.status = "processing"
                     updated = True
 
             if ev.get("event_type") == "application.perception_analysis":
