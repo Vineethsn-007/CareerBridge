@@ -107,3 +107,4 @@ Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to
 Admin bypass is left on by default so you can rescue a broken `main` during the hackathon.
 Run with `ENFORCE_ADMINS=true` to lock yourself out too, or `CODEOWNERS_REQUIRED=true` to
 require the folder owner's approval.
+
