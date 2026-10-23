@@ -3,6 +3,11 @@ import type {
   EvaluateRequest,
   InterviewQuestion,
   InterviewRequest,
+  InterviewSessionCreate,
+  InterviewSessionResponse,
+  EndInterviewRequest,
+  IntegrityEvent,
+  IntegrityReportResponse,
   Job,
   JobMatch,
   MatchRequest,
@@ -68,5 +73,17 @@ export const api = {
   },
   evaluateAnswer(body: EvaluateRequest): Promise<AnswerFeedback> {
     return post<AnswerFeedback>("/interview/evaluate", body);
+  },
+  createInterviewSession(body: InterviewSessionCreate): Promise<InterviewSessionResponse> {
+    return post<InterviewSessionResponse>("/interview/sessions", body);
+  },
+  getInterviewSession(sessionId: string): Promise<InterviewSessionResponse> {
+    return request<InterviewSessionResponse>(`/interview/sessions/${encodeURIComponent(sessionId)}`);
+  },
+  endInterviewSession(sessionId: string, body?: EndInterviewRequest): Promise<InterviewSessionResponse> {
+    return post<InterviewSessionResponse>(`/interview/sessions/${encodeURIComponent(sessionId)}/end`, body ?? {});
+  },
+  logIntegrityEvents(sessionId: string, events: IntegrityEvent[]): Promise<IntegrityReportResponse> {
+    return post<IntegrityReportResponse>(`/interview/sessions/${encodeURIComponent(sessionId)}/integrity`, { events });
   },
 };

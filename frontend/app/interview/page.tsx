@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Video, Sparkles, ArrowRight } from "lucide-react";
 
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -69,7 +70,10 @@ function InterviewPracticeContent() {
   const [stage, setStage] = useState<"answering" | "feedback" | "completed">("answering");
   const [isLoading, setIsLoading] = useState(true);
   const [isEvaluating, setIsEvaluating] = useState(false);
+  const [isLaunchingAvatar, setIsLaunchingAvatar] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   const activeResume = resume || DEMO_RESUME;
 
@@ -179,6 +183,58 @@ function InterviewPracticeContent() {
             )
           }
         />
+
+        {/* AI Avatar Video Interview Banner */}
+        <div className="mb-8 editorial-card rounded-xl p-5 bg-gradient-to-r from-pale-blue via-white to-surface-2 border border-venice-blue/30 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1 max-w-xl">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-venice-blue text-white flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                Featured: Tavus CVI
+              </span>
+              <span className="text-xs font-semibold text-venice-blue">
+                Realistic AI Avatar Mock Interview
+              </span>
+            </div>
+            <h2 className="text-base font-serif font-bold text-primary-text">
+              Practice Face-to-Face with Robin, Your AI Interviewer
+            </h2>
+            <p className="text-xs text-secondary-text leading-relaxed">
+              Experience dynamic WebRTC video dialog, real-time speech-to-text, and comprehensive STAR feedback with speech pace and filler word analytics.
+            </p>
+          </div>
+
+          <div className="flex-shrink-0 w-full sm:w-auto">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={async () => {
+                setIsLaunchingAvatar(true);
+                try {
+                  const s = await api.createInterviewSession({
+                    resume: activeResume,
+                    job_id: jobId,
+                    num_questions: 5,
+                    duration_minutes: 15,
+                    consent_recording: false,
+                    consent_transcript: true,
+                    consent_integrity: true,
+                  });
+                  router.push(`/candidate/interview/${s.session_id}`);
+                } catch (err: unknown) {
+                  setError(err instanceof Error ? err.message : "Failed to launch avatar interview.");
+                  setIsLaunchingAvatar(false);
+                }
+              }}
+              isLoading={isLaunchingAvatar}
+              leftIcon={<Video className="w-4 h-4" />}
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+              className="w-full sm:w-auto font-semibold px-5 shadow-sm"
+            >
+              {isLaunchingAvatar ? "Preparing Room..." : "Launch Video Interview (15m)"}
+            </Button>
+          </div>
+        </div>
 
         {/* Fallback notification if demo resume active */}
         {isHydrated && !resume && (
