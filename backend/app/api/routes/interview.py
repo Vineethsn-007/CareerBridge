@@ -1,5 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from app.core.db import get_session
 from app.schemas import (
     AnswerFeedback,
     EvaluateRequest,
@@ -14,14 +18,16 @@ from app.services.interview.service import (
     generate_questions,
     get_interview_session,
 )
-from app.services.jobs import service as jobs_service
+from app.services.jobs.service import resolve_job
 
 router = APIRouter()
 
 
 @router.post("/sessions", response_model=InterviewSessionResponse)
-def create_session(req: InterviewSessionCreate) -> InterviewSessionResponse:
-    job = jobs_service.get_job(req.job_id)
+def create_session(
+    req: InterviewSessionCreate, session: Annotated[Session | None, Depends(get_session)]
+) -> InterviewSessionResponse:
+    job = resolve_job(session, req.job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")
     return create_interview_session(
@@ -42,16 +48,20 @@ def get_session_by_id(session_id: str) -> InterviewSessionResponse:
 
 
 @router.post("/questions", response_model=list[InterviewQuestion])
-def questions(req: InterviewRequest) -> list[InterviewQuestion]:
-    job = jobs_service.get_job(req.job_id)
+def questions(
+    req: InterviewRequest, session: Annotated[Session | None, Depends(get_session)]
+) -> list[InterviewQuestion]:
+    job = resolve_job(session, req.job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")
     return generate_questions(req.resume, job, req.num_questions)
 
 
 @router.post("/evaluate", response_model=AnswerFeedback)
-def evaluate(req: EvaluateRequest) -> AnswerFeedback:
-    job = jobs_service.get_job(req.job_id)
+def evaluate(
+    req: EvaluateRequest, session: Annotated[Session | None, Depends(get_session)]
+) -> AnswerFeedback:
+    job = resolve_job(session, req.job_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found.")
     return evaluate_answer(job, req.question, req.answer)

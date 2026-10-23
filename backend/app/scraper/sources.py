@@ -181,6 +181,9 @@ class SmartRecruitersSource:
     def __init__(self) -> None:
         self._detail_cache: dict[str, Any] = {}
 
+    def url(self, token: str) -> str:
+        return f"https://api.smartrecruiters.com/v1/companies/{token}/postings"
+
     def load_details(self, token: str, listing_ids: list[str]) -> None:
         """Fetch one detail payload per listing (description + applyUrl).
 

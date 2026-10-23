@@ -310,3 +310,62 @@ def test_score_job_evidence_note_absent_without_evidence():
 
     assert "backed by direct evidence" not in match.rationale
     assert "matches" in match.rationale.lower()
+
+
+# ---------------- Database-backed listings (scraper output) ----------------
+
+
+def test_match_jobs_prefers_database_listings_with_session():
+    """With a session, scraper-produced DB rows rank when relevant; file store is the fallback."""
+    import datetime as dt
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.pool import StaticPool
+
+    from app.core.db import Company, init_db
+    from app.core.db import Job as JobRow
+    from app.services.matching.service import match_jobs as _match_jobs
+
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+        future=True,
+    )
+    init_db(engine)
+
+    from sqlalchemy.orm import sessionmaker
+
+    db = sessionmaker(bind=engine, expire_on_commit=False, future=True)()
+    try:
+        company = Company(name="DB Corp")
+        db.add(company)
+        db.flush()
+        db.add(
+            JobRow(
+                id="db-python-role",
+                company_id=company.id,
+                title="Python Backend Engineer",
+                location="Bengaluru",
+                job_type="internship",
+                experience_level="fresher",
+                source_url="https://boards.example/db-python-role",
+                description="Build Python services.",
+                must_skills=["Python"],
+                nice_skills=[],
+                skills_required=["Python", "SQL"],
+                verified=True,
+                last_verified=dt.date.today(),
+                is_active=True,
+            )
+        )
+        db.commit()
+
+        req = MatchRequest(resume=ParsedResume(skills=["Python"]), top_k=5)
+        with_session = _match_jobs(req, session=db)
+        assert [m.job.id for m in with_session] == ["db-python-role"]
+    finally:
+        db.close()
+
+    without_session = _match_jobs(req)
+    assert all(m.job.id != "db-python-role" for m in without_session)

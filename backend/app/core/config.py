@@ -5,6 +5,29 @@ from pathlib import Path
 APP_DIR = Path(__file__).resolve().parents[1]
 
 
+def _load_env_file() -> None:
+    """Load the local `.env` next to `app/` once, before any settings are read.
+
+    Real environment variables always win (override=False), so production
+    containers keep their injected configuration. This exists because the
+    documented start commands (`uvicorn app.main:app`) do NOT pass --env-file,
+    and without it the backend silently runs the mock LLM even when `.env`
+    contains a valid provider configuration.
+    """
+    try:
+        from dotenv import load_dotenv
+    except ImportError:  # dependency missing: behave as before
+        return
+    candidates = [Path.cwd() / ".env", APP_DIR.parent / ".env"]
+    for path in candidates:
+        if path.is_file():
+            load_dotenv(dotenv_path=str(path), override=False)
+            return
+
+
+_load_env_file()
+
+
 def _origins() -> list[str]:
     # Unset falls back to the local dev default; an empty value falls back too, so a
     # misconfigured (blank) production variable never silently disables CORS.
