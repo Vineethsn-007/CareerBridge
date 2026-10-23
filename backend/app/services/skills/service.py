@@ -1,7 +1,7 @@
 """Skill-gap analysis + preparation plan (owner: Teammate C).
 
 Matches skills using the canonical taxonomy and synonyms, prioritizes missing skills
-via LLM with a heuristic fallback, and generates weekly prep plans.
+via LLM with a heuristic fallback, and generates weekly prep plans using hand-curated resources.
 """
 
 from typing import Literal
@@ -15,14 +15,21 @@ from app.schemas import (
     PlanWeek,
     PrepPlan,
     PrepPlanRequest,
-    Resource,
     SkillGap,
 )
-from app.services.skills.prompts import SKILL_GAP_PROMPT, SKILL_GAP_SYSTEM
+from app.services.skills.prompts import (
+    PREP_PLAN_PROMPT,
+    PREP_PLAN_SYSTEM,
+    SKILL_GAP_PROMPT,
+    SKILL_GAP_SYSTEM,
+)
+from app.services.skills.resources import get_resources_for_skills
 
 _SOFT_SKILLS: frozenset[str] = frozenset(
     {"communication", "teamwork", "leadership", "problem solving", "time management"}
 )
+
+_PRIORITY_ORDER: dict[str, int] = {"high": 0, "medium": 1, "low": 2}
 
 
 def _build_resume_skill_set(skills: list[str]) -> set[str]:
@@ -158,19 +165,91 @@ def analyze_gap(resume: ParsedResume, job: Job) -> SkillGap:
     )
 
 
+def _heuristic_tasks(
+    focus_skills: list[str], hours_per_week: int, week: int, total_weeks: int
+) -> list[str]:
+    tasks: list[str] = []
+    if focus_skills:
+        skill_names = ", ".join(focus_skills)
+        tasks.append(
+            f"Study core documentation and fundamentals of {skill_names} "
+            f"(~{max(1, hours_per_week // 3)}h)."
+        )
+        tasks.append(
+            f"Implement practical coding exercises and patterns in {skill_names} "
+            f"(~{max(2, hours_per_week // 2)}h)."
+        )
+        if hours_per_week >= 15:
+            tasks.append(
+                f"Build and test a mini-project module utilizing {skill_names} "
+                f"(~{max(2, hours_per_week // 4)}h)."
+            )
+        if week == total_weeks or hours_per_week >= 20:
+            tasks.append(
+                f"Review common interview questions and edge cases on {skill_names} "
+                f"(~{max(1, hours_per_week // 5)}h)."
+            )
+    else:
+        tasks.append(
+            f"Review challenging technical concepts and project architecture "
+            f"(~{max(2, hours_per_week // 2)}h)."
+        )
+        tasks.append(
+            f"Conduct mock technical and behavioural interview drills "
+            f"(~{max(2, hours_per_week // 2)}h)."
+        )
+    return tasks
+
+
+def _llm_generate_tasks(
+    job_title: str,
+    week: int,
+    focus: str,
+    hours_per_week: int,
+    missing_skills: list[str],
+) -> list[str]:
+    prompt = PREP_PLAN_PROMPT.format(
+        job_title=job_title,
+        week_number=week,
+        focus=focus,
+        hours_per_week=hours_per_week,
+        missing_skills=", ".join(missing_skills) if missing_skills else "None (Revision)",
+    )
+    payload = complete_json(prompt, system=PREP_PLAN_SYSTEM)
+    tasks = payload.get("tasks", [])
+    if not isinstance(tasks, list) or not tasks:
+        raise ValueError("Payload 'tasks' must be a non-empty list.")
+    clean_tasks = [str(t).strip() for t in tasks if str(t).strip()]
+    if not clean_tasks:
+        raise ValueError("No valid tasks found in LLM payload.")
+    return clean_tasks
+
+
 def build_plan(req: PrepPlanRequest) -> PrepPlan:
-    skills = [m.skill for m in req.gap.missing]
+    sorted_missing = sorted(req.gap.missing, key=lambda m: _PRIORITY_ORDER.get(m.priority, 1))
+    skills = [m.skill for m in sorted_missing]
     weeks: list[PlanWeek] = []
+
     for week in range(1, req.weeks + 1):
-        # Spread missing skills across weeks round-robin.
         focus_skills = skills[week - 1 :: req.weeks]
-        focus = ", ".join(focus_skills) if focus_skills else "Revision and mock interviews"
-        tasks = [
-            f"Learn the fundamentals of {s} and build one small exercise." for s in focus_skills
-        ]
-        tasks = tasks or ["Revise weak topics and do a full mock interview."]
-        resources = [
-            Resource(title=f"Official {s} documentation", kind="docs") for s in focus_skills
-        ]
+        focus = (
+            ", ".join(focus_skills)
+            if focus_skills
+            else "Revision, Project Integration & Mock Drills"
+        )
+
+        try:
+            tasks = _llm_generate_tasks(
+                job_title=req.gap.job_title,
+                week=week,
+                focus=focus,
+                hours_per_week=req.hours_per_week,
+                missing_skills=skills,
+            )
+        except Exception:
+            tasks = _heuristic_tasks(focus_skills, req.hours_per_week, week, req.weeks)
+
+        resources = get_resources_for_skills(focus_skills)
         weeks.append(PlanWeek(week=week, focus=focus, tasks=tasks, resources=resources))
+
     return PrepPlan(job_id=req.gap.job_id, total_weeks=req.weeks, weeks=weeks)
