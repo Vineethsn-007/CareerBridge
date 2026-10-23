@@ -1,0 +1,45 @@
+# Verified scraping sources (Task 4).
+# Every token below was confirmed live against the documented public board API
+# on 2026-10-23; employers were chosen for India entry-level hiring activity.
+# To onboard a new source: probe its public board API manually, confirm the
+# employer's careers page permits programmatic reading, then add an entry here.
+companies:
+  - name: Databricks                # Greenhouse board with 88 India roles
+    ats: greenhouse
+    token: databricks
+    employer_domains: [databricks.com]
+    careers_url: https://www.databricks.com/company/careers/open-positions
+    india_only: true
+    enabled: true
+
+  - name: Acceldata                 # Lever board with Bengaluru/Gurgaon roles
+    ats: lever
+    token: acceldata
+    employer_domains: [acceldata.com]
+    careers_url: https://acceldata.io/careers
+    india_only: true
+    enabled: true
+
+  - name: Lambda                    # Ashby board with Bangalore roles
+    ats: ashby
+    token: lambda
+    employer_domains: [lambda.ai, lambda.com]
+    careers_url: https://jobs.ashbyhq.com/lambda
+    india_only: true
+    enabled: true
+
+  - name: T-Systems ICT India       # SmartRecruiters board (India-only company)
+    ats: smartrecruiters
+    token: T-SystemsICTIndiaPvtLtd1
+    employer_domains: [t-systems.com]
+    careers_url: https://jobs.smartrecruiters.com/T-SystemsICTIndiaPvtLtd1
+    india_only: true
+    enabled: true
+
+  - name: LinkedIn                  # Bengaluru "Software Engineer" roles present
+    ats: smartrecruiters
+    token: LinkedIn3
+    employer_domains: [linkedin.com]
+    careers_url: https://jobs.smartrecruiters.com/LinkedIn3
+    india_only: true
+    enabled: false                   # multi-country board; kept for future use

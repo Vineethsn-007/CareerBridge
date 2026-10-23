@@ -11,7 +11,8 @@ from app.core.db import init_db
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    # Idempotent schema bootstrap (create_all + schema_version table).
+    # Idempotent schema bootstrap (create_all + schema_version table);
+    # the scraper and jobs route rely on it.
     init_db()
     yield
 

@@ -1,0 +1,76 @@
+[
+ {
+  "additional": "",
+  "additionalPlain": "",
+  "categories": {
+   "commitment": "Full-Time",
+   "department": "Engineering",
+   "location": "Bengaluru",
+   "team": "QE",
+   "allLocations": [
+    "Bengaluru",
+    "India"
+   ]
+  },
+  "createdAt": 1732770885398,
+  "descriptionPlain": "About the Role: We are looking for an experienced Lead SDET for our Pulse team, specializing in ensuring the quality and performance of large-scale data systems.\nIn this role, you will work closely with development and operations teams to design and execute comprehensive test strategies for Pulse product. You will focus on test automation, performance tuning, and identifying bottlenecks in distributed data systems.\nYour key responsibilities will include writing test plans, creating automated test scripts, and conducting functional, regression, and performance testing. You will be responsible for identifying and resolving defects, ensuring data integrity, and improving testing processes. Strong collaboration skills are essential as you will be interacting with cross-functional teams and driving quality initiatives. Your work will directly contribute to maintaining high-quality standards for big data solutions and enhancing their reliability at scale.\nhttps://www.acceldata.io/pulse \n",
+  "description": "<p><strong style=\"font-size: 16px;\">About the Role: </strong><span style=\"font-size: 16px;\">We are looking for an experienced Lead SDET for our Pulse team, specializing in ensuring the quality and performance of large-scale data systems.</span></p>\n<p><span style=\"font-size: 16px;\">In this role, you will work closely with development and operations teams to design and execute comprehensive test strategies for </span><strong style=\"font-size: 16px;\">Pulse </strong><span style=\"font-size: 16px;\">product. You will focus on test automation, performance tuning, and identifying bottlenecks in distributed data systems.</span></p>\n<p><span style=\"font-size: 16px;\">Your key responsibilities will include writing test plans, creating automated test scripts, and conducting functional, regression, and performance testing. You will be responsible for identifying and resolving defects, ensuring data integrity, and improving testing processes. Strong collaboration skills are essential as you will be interacting with cross-functional teams and driving quality initiatives. Your work will directly contribute to maintaining high-quality standards for big data solutions and enhancing their reliability at scale.</span></p>\n<p><a href=\"https://www.acceldata.io/pulse\">https://www.acceldata.io/pulse</a>&nbsp;</p>",
+  "id": "495913ff-d0ef-4234-b44e-ac2470c53540",
+  "lists": [
+   {
+    "text": "You are a great fit for this role if you have",
+    "content": "\n<li>A proactive mindset to define and implement comprehensive test strategies that ensure the highest quality standards are met.</li>\n<li>Experience in working with both functional and non-functional testing, with a particular focus on automated test development.</li>\n<li>A collaborative team player with the ability to effectively work cross-functionally with development teams to resolve issues and deliver timely fixes.</li>\n<li>Strong communication skills with the ability to mentor junior engineers and share knowledge to improve testing practices across the team.</li>\n<li>A commitment to continuous improvement, with the ability to analyze testing processes and recommend enhancements to align with industry best practices.</li>\n<li>Ability to quickly learn new technologies</li>\n"
+   },
+   {
+    "text": "What we look for: ",
+    "content": "\n<li>4-8 years of hands-on experience in quality engineering and quality assurance, focusing on test automation, performance testing, and defect management.</li>\n<li>Proficiency in programming languages such as Java for writing test scripts and automating test cases with hands-on experience in developing automated tests using other test automation frameworks, ensuring robust and scalable test suites.</li>\n<li>Proven ability to define and execute comprehensive test strategies, including writing test plans, test cases, and scripts for both functional and non-functional testing to ensure predictable delivery of high-quality products and solutions&nbsp;</li>\n<li>Experience with version control systems like Git and CI/CD tools such as Jenkins or GitLab CI to manage code changes and automate test execution within the development pipeline.</li>\n<li>Expertise in identifying, tracking, and resolving defects and issues, collaborating closely with developers and product teams to ensure timely fixes.</li>\n<li>Strong communication skills with the ability to work cross-functionally with development teams and mentor junior team members to improve testing practices and tools.</li>\n<li>Ability to analyse testing processes, recommend improvements and ensure the testing environment aligns with industry best practices, contributing to the overall quality of software.</li>\n"
+   }
+  ],
+  "text": "Senior SDET - Hadoop Observability (Pulse)",
+  "country": "IN",
+  "workplaceType": "onsite",
+  "opening": "",
+  "openingPlain": "",
+  "descriptionBody": "<p><strong style=\"font-size: 16px;\">About the Role: </strong><span style=\"font-size: 16px;\">We are looking for an experienced Lead SDET for our Pulse team, specializing in ensuring the quality and performance of large-scale data systems.</span></p>\n<p><span style=\"font-size: 16px;\">In this role, you will work closely with development and operations teams to design and execute comprehensive test strategies for </span><strong style=\"font-size: 16px;\">Pulse </strong><span style=\"font-size: 16px;\">product. You will focus on test automation, performance tuning, and identifying bottlenecks in distributed data systems.</span></p>\n<p><span style=\"font-size: 16px;\">Your key responsibilities will include writing test plans, creating automated test scripts, and conducting functional, regression, and performance testing. You will be responsible for identifying and resolving defects, ensuring data integrity, and improving testing processes. Strong collaboration skills are essential as you will be interacting with cross-functional teams and driving quality initiatives. Your work will directly contribute to maintaining high-quality standards for big data solutions and enhancing their reliability at scale.</span></p>\n<p><a href=\"https://www.acceldata.io/pulse\">https://www.acceldata.io/pulse</a>&nbsp;</p>",
+  "descriptionBodyPlain": "About the Role: We are looking for an experienced Lead SDET for our Pulse team, specializing in ensuring the quality and performance of large-scale data systems.\nIn this role, you will work closely with development and operations teams to design and execute comprehensive test strategies for Pulse product. You will focus on test automation, performance tuning, and identifying bottlenecks in distributed data systems.\nYour key responsibilities will include writing test plans, creating automated test scripts, and conducting functional, regression, and performance testing. You will be responsible for identifying and resolving defects, ensuring data integrity, and improving testing processes. Strong collaboration skills are essential as you will be interacting with cross-functional teams and driving quality initiatives. Your work will directly contribute to maintaining high-quality standards for big data solutions and enhancing their reliability at scale.\nhttps://www.acceldata.io/pulse \n",
+  "hostedUrl": "https://jobs.lever.co/acceldata/495913ff-d0ef-4234-b44e-ac2470c53540",
+  "applyUrl": "https://jobs.lever.co/acceldata/495913ff-d0ef-4234-b44e-ac2470c53540/apply"
+ },
+ {
+  "additionalPlain": "Why Join Us\n•Impact at scale: Work on critical systems for Fortune 500 companies.\n•Open & modern stack: No vendor lock-in, Apache-aligned innovation.\n•Learning & growth: Solve problems across performance, reliability, cost, and cloud adoption.\n•Flexibility: Cloud, hybrid, and on-prem - ODP is designed for today’s enterprise reality.\n•Ownership: You’ll have end-to-end responsibility, not ticket-taking.\n",
+  "additional": "<div><strong>Why Join Us</strong></div>\n<div>•<strong>Impact at scale: </strong>Work on critical systems for Fortune 500 companies.</div>\n<div>•<strong>Open &amp; modern stack</strong>: No vendor lock-in, Apache-aligned innovation.</div>\n<div>•<strong>Learning &amp; growth:</strong> Solve problems across performance, reliability, cost, and cloud adoption.</div>\n<div>•<strong>Flexibility:</strong> Cloud, hybrid, and on-prem - ODP is designed for today’s enterprise reality.</div>\n<div>•<strong>Ownership:</strong> You’ll have end-to-end responsibility, not ticket-taking.</div>",
+  "categories": {
+   "commitment": "Full-Time",
+   "department": "Engineering",
+   "location": "Bengaluru",
+   "team": "R&D (Dev)",
+   "allLocations": [
+    "Bengaluru",
+    "India"
+   ]
+  },
+  "createdAt": 1756441866112,
+  "descriptionPlain": "About the Role: We’re hiring a software engineer to build and scale the Acceldata Open Data Platform (ODP) - an enterprise-grade, open-source, aligned platform that powers cloud, hybrid, and on-premises environments. You’ll work on deep technology challenges, from distributed systems to observability, helping global customers modernise their platforms without lock-in.\n \nThis role offers the opportunity to build cutting-edge data solutions, influence the open-source ecosystem, and collaborate with industry experts. Your contributions will have a lasting impact on both the data platform and the broader open-source community.\n",
+  "description": "<div><strong style=\"font-size: 16px;\">About the Role:&nbsp;</strong><span style=\"font-size: 16px;\">We’re hiring a software engineer to build and scale </span><strong style=\"font-size: 16px;\">the Acceldata Open Data Platform (ODP)</strong><span style=\"font-size: 16px;\">&nbsp;- an enterprise-grade, open-source, aligned platform that powers cloud, hybrid, and on-premises environments. You’ll work on deep technology challenges, from distributed systems to observability, helping global customers modernise their platforms without lock-in.</span></div>\n<div>&nbsp;</div>\n<div><span style=\"font-size: 16px;\">This role offers the opportunity to build cutting-edge data solutions, influence the open-source ecosystem, and collaborate with industry experts. Your contributions will have a lasting impact on both the data platform and the broader open-source community.</span></div>",
+  "id": "0c47e882-83ff-471e-ba75-5543796aa34a",
+  "lists": [
+   {
+    "text": "What You’ll Do",
+    "content": "<div>4+ years of experience in software engineering, with at least 2-3 years actively contributing to open-source projects, ideally within the Apache ecosystem.</div>\n\n<li>Proficiency in programming languages such as Java, Python, Scala, or Go is preferred. Experience with distributed computing and high-performance applications is also highly desired.</li>\n<li>Work across diverse environments: Hadoop, Kubernetes, Snowflake, Databricks, and multi-cloud platforms.</li>\n"
+   },
+   {
+    "text": "What We’re Looking For",
+    "content": "\n<li>Ability to work in <strong>fast-moving, customer-facing environments</strong> where impact is direct and visible.</li>\n<li>Strong coding, debugging, and troubleshooting skills to resolve issues, enhance software applications, and ensure smooth deployment.</li>\n<li>Communicate effectively with senior leadership, presenting technical accomplishments and strategic insights.</li>\n<li>Strong ability to collaborate with internal teams, external contributors, and the broader open-source community.</li>\n\n<div>&nbsp;</div>"
+   }
+  ],
+  "text": "Software Engineer - Open Data Platform (ODP)",
+  "country": "IN",
+  "workplaceType": "onsite",
+  "opening": "",
+  "openingPlain": "",
+  "descriptionBody": "<div><strong style=\"font-size: 16px;\">About the Role:&nbsp;</strong><span style=\"font-size: 16px;\">We&rsquo;re hiring a software engineer to build and scale </span><strong style=\"font-size: 16px;\">the Acceldata Open Data Platform (ODP)</strong><span style=\"font-size: 16px;\">&nbsp;- an enterprise-grade, open-source, aligned platform that powers cloud, hybrid, and on-premises environments. You&rsquo;ll work on deep technology challenges, from distributed systems to observability, helping global customers modernise their platforms without lock-in.</span></div>\n<div>&nbsp;</div>\n<div><span style=\"font-size: 16px;\">This role offers the opportunity to build cutting-edge data solutions, influence the open-source ecosystem, and collaborate with industry experts. Your contributions will have a lasting impact on both the data platform and the broader open-source community.</span></div>",
+  "descriptionBodyPlain": "About the Role: We’re hiring a software engineer to build and scale the Acceldata Open Data Platform (ODP) - an enterprise-grade, open-source, aligned platform that powers cloud, hybrid, and on-premises environments. You’ll work on deep technology challenges, from distributed systems to observability, helping global customers modernise their platforms without lock-in.\n \nThis role offers the opportunity to build cutting-edge data solutions, influence the open-source ecosystem, and collaborate with industry experts. Your contributions will have a lasting impact on both the data platform and the broader open-source community.\n",
+  "hostedUrl": "https://jobs.lever.co/acceldata/0c47e882-83ff-471e-ba75-5543796aa34a",
+  "applyUrl": "https://jobs.lever.co/acceldata/0c47e882-83ff-471e-ba75-5543796aa34a/apply"
+ }
+]

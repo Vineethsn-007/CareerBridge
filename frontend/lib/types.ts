@@ -82,6 +82,35 @@ export interface Job {
   source_url: string;
   verified: boolean;
   last_verified?: string | null;
+  // Additive (Task 4 scraper): direct application link when verified.
+  apply_url?: string | null;
+}
+
+// Additive (Task 4 scraper): admin scrape trigger/report.
+export interface AdminScrapeRequest {
+  company?: string | null;
+  dry_run?: boolean;
+}
+
+export interface ScrapeSourceReport {
+  company: string;
+  ats: string;
+  fetched: number;
+  india_matches: number;
+  accepted: number;
+  verified: number;
+  rejected: number;
+  skipped: number;
+  errors: string[];
+  created: number;
+  updated: number;
+  stale_disabled: number;
+}
+
+export interface ScrapeRunReport {
+  started_at: string;
+  dry_run: boolean;
+  sources: ScrapeSourceReport[];
 }
 
 export interface MatchRequest {
