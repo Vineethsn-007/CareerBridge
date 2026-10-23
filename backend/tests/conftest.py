@@ -15,3 +15,4 @@ import os
 
 os.environ["LLM_PROVIDER"] = "mock"
 os.environ["DATABASE_URL"] = "sqlite://"
+os.environ["TAVUS_API_KEY"] = ""

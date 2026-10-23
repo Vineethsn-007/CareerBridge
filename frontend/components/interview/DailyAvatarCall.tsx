@@ -7,7 +7,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from "react";
-import { Loader2, AlertCircle, RefreshCw, Volume2, UserCheck } from "lucide-react";
+import { Loader2, AlertCircle, RefreshCw, Volume2, UserCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 export interface DailyAvatarCallHandle {
@@ -47,9 +47,34 @@ export const DailyAvatarCall = forwardRef<
   const [isAvatarSpeaking, setIsAvatarSpeaking] = useState<boolean>(false);
   const [useIframeFallback, setUseIframeFallback] = useState<boolean>(false);
 
-  // Expose imperative methods to parent (e.g., "Done Speaking" button sends response message)
+  // Detect whether this is an offline mock room URL (e.g. from tests or offline dev mode)
+  const isMockUrl = Boolean(
+    !conversationUrl ||
+      conversationUrl.includes("mock") ||
+      conversationUrl.includes("mock-") ||
+      conversationUrl.startsWith("c_mock")
+  );
+
+  // Expose imperative methods to parent (e.g. candidate "Done Speaking" button sends message)
   useImperativeHandle(ref, () => ({
     sendRespond: (text: string) => {
+      if (isMockUrl) {
+        // In mock simulation, simulate interviewer acknowledgment & speech cycle
+        setIsAvatarSpeaking(true);
+        onAvatarStartedSpeaking?.();
+        setTimeout(() => {
+          onUtterance?.(
+            "Thank you for that response. Let's move to the next question in our plan.",
+            "interviewer"
+          );
+          setTimeout(() => {
+            setIsAvatarSpeaking(false);
+            onAvatarStoppedSpeaking?.();
+          }, 2000);
+        }, 1200);
+        return;
+      }
+
       if (callFrameRef.current) {
         try {
           callFrameRef.current.sendAppMessage(
@@ -62,11 +87,17 @@ export const DailyAvatarCall = forwardRef<
             "*"
           );
         } catch (err) {
-          console.warn("Failed to send respond app message via Daily:", err);
+          console.warn("Notice: Failed to send respond app-message via Daily:", err);
         }
       }
     },
     sendInterrupt: () => {
+      if (isMockUrl) {
+        setIsAvatarSpeaking(false);
+        onAvatarStoppedSpeaking?.();
+        return;
+      }
+
       if (callFrameRef.current) {
         try {
           callFrameRef.current.sendAppMessage(
@@ -78,13 +109,28 @@ export const DailyAvatarCall = forwardRef<
             "*"
           );
         } catch (err) {
-          console.warn("Failed to send interrupt app message via Daily:", err);
+          console.warn("Notice: Failed to send interrupt app-message via Daily:", err);
         }
       }
     },
   }));
 
   useEffect(() => {
+    // 1. If this is a mock URL, avoid initializing Daily JS against a non-existent daily.co room
+    if (isMockUrl) {
+      setStatus("live");
+      // Simulate initial greeting
+      const timer = setTimeout(() => {
+        setIsAvatarSpeaking(true);
+        onAvatarStartedSpeaking?.();
+        setTimeout(() => {
+          setIsAvatarSpeaking(false);
+          onAvatarStoppedSpeaking?.();
+        }, 3000);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+
     if (!conversationUrl) {
       setStatus("connecting");
       return;
@@ -108,7 +154,7 @@ export const DailyAvatarCall = forwardRef<
 
         if (!containerRef.current || !isMounted) return;
 
-        // Clean up any existing call frame
+        // Clean up any existing call frame in this container
         if (callFrameRef.current) {
           try {
             await callFrameRef.current.destroy();
@@ -117,8 +163,12 @@ export const DailyAvatarCall = forwardRef<
           }
           callFrameRef.current = null;
         }
+        if (containerRef.current) {
+          containerRef.current.innerHTML = "";
+        }
 
         const frame = DailyIframe.createFrame(containerRef.current, {
+          url: conversationUrl || undefined,
           showLeaveButton: false,
           showFullscreenButton: true,
           iframeStyle: {
@@ -147,10 +197,12 @@ export const DailyAvatarCall = forwardRef<
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         frame.on("error", (e: any) => {
-          console.error("Daily room error:", e);
+          // Log as info/warning rather than breaking console error
+          console.warn("Daily stream notice:", e);
           if (isMounted) {
-            setStatus("error");
-            setErrorMessage(e?.errorMsg || "Could not connect to interviewer video stream.");
+            // Gracefully switch to direct iframe fallback if Daily WebRTC encounters an issue
+            setUseIframeFallback(true);
+            setStatus("live");
           }
         });
 
@@ -174,9 +226,9 @@ export const DailyAvatarCall = forwardRef<
           }
         });
 
-        await frame.join({ url: conversationUrl || undefined });
+        await frame.join();
       } catch (err: unknown) {
-        console.error("Failed to initialize Daily video call:", err);
+        console.warn("Daily SDK init notice, falling back to direct embed:", err);
         if (isMounted) {
           // If Daily SDK errors, offer clean fallback to standard responsive iframe
           setUseIframeFallback(true);
@@ -198,14 +250,72 @@ export const DailyAvatarCall = forwardRef<
         callFrameRef.current = null;
       }
     };
-  }, [conversationUrl, useIframeFallback, onAvatarStartedSpeaking, onAvatarStoppedSpeaking, onUtterance, sessionId]);
+  }, [conversationUrl, useIframeFallback, isMockUrl, onAvatarStartedSpeaking, onAvatarStoppedSpeaking, onUtterance, sessionId]);
 
   return (
     <div className="relative w-full h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[580px] bg-dark-navy rounded-xl overflow-hidden border border-border shadow-md flex items-center justify-center">
-      {/* Container for Daily Iframe or fallback standard Iframe */}
-      {!useIframeFallback ? (
+      {/* Mock Avatar Simulation Mode */}
+      {isMockUrl ? (
+        <div className="w-full h-full absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-dark-navy via-[#1B445D] to-dark-navy text-center select-none">
+          {/* Animated Avatar Circle with Aura */}
+          <div className="relative mb-6">
+            <div
+              className={`absolute -inset-3 rounded-full blur-xl transition-all duration-700 ${
+                isAvatarSpeaking
+                  ? "bg-emerald-400/30 scale-110 animate-pulse"
+                  : "bg-rock-blue/20 scale-100"
+              }`}
+            />
+            <div
+              className={`relative w-28 h-28 sm:w-36 sm:h-36 rounded-full border-2 flex items-center justify-center shadow-xl transition-all duration-300 ${
+                isAvatarSpeaking
+                  ? "border-emerald-400 bg-emerald-950/40"
+                  : "border-rock-blue/40 bg-white/5"
+              }`}
+            >
+              <UserCheck
+                className={`w-14 h-14 sm:w-16 sm:h-16 transition-colors duration-300 ${
+                  isAvatarSpeaking ? "text-emerald-400" : "text-rock-blue"
+                }`}
+              />
+            </div>
+          </div>
+
+          <h3 className="text-xl sm:text-2xl font-serif font-semibold text-white mb-2">
+            Robin
+          </h3>
+          <p className="text-xs sm:text-sm text-rock-blue max-w-sm mb-4">
+            AI Technical Interviewer
+          </p>
+
+          {/* Equalizer animation when speaking */}
+          {isAvatarSpeaking ? (
+            <div className="flex items-center gap-1.5 h-8 px-4 py-1.5 rounded-full bg-black/40 border border-emerald-400/30 backdrop-blur-md">
+              <span className="w-1 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_100ms] h-4" />
+              <span className="w-1 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_200ms] h-6" />
+              <span className="w-1 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_300ms] h-5" />
+              <span className="w-1 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_400ms] h-7" />
+              <span className="w-1 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_200ms] h-4" />
+              <span className="text-xs font-medium text-emerald-400 ml-2">Speaking...</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/30 border border-white/10 backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-rock-blue animate-pulse" />
+              <span className="text-xs font-medium text-rock-blue">Listening to you</span>
+            </div>
+          )}
+
+          {/* Simulation mode watermark badge */}
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 border border-white/10 text-white/80 text-[11px] backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 text-accent-peach" />
+            <span>AI Mock Interview Simulator</span>
+          </div>
+        </div>
+      ) : !useIframeFallback ? (
+        /* Container for Daily Iframe */
         <div ref={containerRef} className="w-full h-full absolute inset-0" />
       ) : conversationUrl ? (
+        /* Fallback standard Iframe */
         <iframe
           src={conversationUrl}
           allow="camera; microphone; autoplay; display-capture; fullscreen"
@@ -214,8 +324,8 @@ export const DailyAvatarCall = forwardRef<
         />
       ) : null}
 
-      {/* Connecting Overlay */}
-      {status === "connecting" && (
+      {/* Connecting Overlay (for live room only) */}
+      {!isMockUrl && status === "connecting" && (
         <div className="absolute inset-0 bg-dark-navy/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center text-white">
           <div className="w-16 h-16 rounded-full bg-venice-blue/40 border border-venice-blue flex items-center justify-center mb-4">
             <Loader2 className="w-8 h-8 text-rock-blue animate-spin" />
@@ -229,8 +339,8 @@ export const DailyAvatarCall = forwardRef<
         </div>
       )}
 
-      {/* Error Overlay */}
-      {status === "error" && (
+      {/* Error Overlay (for live room only if fallback fails) */}
+      {!isMockUrl && status === "error" && (
         <div className="absolute inset-0 bg-dark-navy/95 z-20 flex flex-col items-center justify-center p-6 text-center text-white">
           <AlertCircle className="w-12 h-12 text-danger mb-3" />
           <h3 className="text-base font-semibold text-white mb-1">Connection Issue</h3>
