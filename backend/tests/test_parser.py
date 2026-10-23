@@ -204,6 +204,71 @@ def test_schema_invalid_llm_output_falls_back(monkeypatch):
     assert resume.email == "asha@example.com"
 
 
+FRESHER_RESUME = """Vineeth S N
+svineeth10@gmail.com
+
+SKILLS
+Python, SQL, Git
+
+EDUCATION
+B.Tech in Computer Science and Engineering, RV College of Engineering, 2026
+Class XII (PCMC), Sri Kumaran Children's Home, 2022
+
+EXPERIENCE
+Machine Learning Intern \u2014 ACITA Global Solutions (Jun 2025 - Sep 2025)
+- Built a CNN-based classifier with TensorFlow.
+"""
+
+
+def test_fallback_extracts_education_and_internship(monkeypatch):
+    """LLM outage must not leave education/internship empty: the regex fallback fills in."""
+    _mock_llm(monkeypatch, LLMUnavailable("unavailable"))
+    resume = parser_service.parse_resume("resume.txt", FRESHER_RESUME.encode())
+    assert [(e.degree, e.institution, e.year) for e in resume.education] == [
+        ("B.Tech in Computer Science and Engineering", "RV College of Engineering", "2026"),
+        ("Class XII (PCMC)", "Sri Kumaran Children's Home", "2022"),
+    ]
+    assert len(resume.experience) == 1
+    exp = resume.experience[0]
+    assert exp.title == "Machine Learning Intern"
+    assert exp.company == "ACITA Global Solutions"
+    assert "Jun 2025" in (exp.duration or "")
+
+
+def test_fallback_ignores_resumes_without_those_sections(monkeypatch):
+    _mock_llm(monkeypatch, LLMUnavailable("unavailable"))
+    resume = parser_service.parse_resume("resume.txt", RESUME_BYTES)
+    assert resume.education == []
+    assert resume.experience == []
+
+
+def test_transient_llm_error_is_retried(monkeypatch):
+    """One transient blip (e.g. rate limit) must not silently strip the structured parse."""
+
+    class Transient(Exception):
+        pass
+
+    attempts: list[int] = []
+
+    def flaky_complete_json(prompt, system=None, schema_model=None):
+        attempts.append(1)
+        if len(attempts) == 1:
+            raise Transient("429 rate limit")
+        return LLM_EXTRACTION
+
+    monkeypatch.setattr(parser_service, "complete_json", flaky_complete_json)
+    monkeypatch.setattr(parser_service._time, "sleep", lambda _seconds: None)
+    resume = parser_service.parse_resume("resume.txt", RESUME_BYTES)
+    assert len(attempts) == 2
+    assert resume.experience[0].company == "Acme"
+
+
+def test_llm_unavailable_is_not_retried(monkeypatch):
+    calls = _mock_llm(monkeypatch, LLMUnavailable("unavailable"))
+    parser_service.parse_resume("resume.txt", RESUME_BYTES)
+    assert len(calls) == 1  # a misconfigured provider cannot recover via retry
+
+
 def test_empty_resume_skips_llm_but_returns_baseline(monkeypatch):
     calls = _mock_llm(monkeypatch, LLM_EXTRACTION)
     resume = parser_service.parse_resume("resume.txt", b"")

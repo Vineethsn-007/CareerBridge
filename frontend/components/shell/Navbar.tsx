@@ -21,6 +21,7 @@ export function Navbar() {
     { href: "/#how-it-works", label: "How It Works" },
     { href: "/#career-paths", label: "Career Paths" },
     { href: "/jobs", label: "Jobs" },
+    { href: "/persona", label: "Persona Q&A" },
     { href: "/pricing", label: "Pricing" },
     { href: "/interview", label: "Practice" },
   ];
