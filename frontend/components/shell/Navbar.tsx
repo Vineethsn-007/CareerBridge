@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import {
-  Compass,
   Menu,
   X,
 } from "lucide-react";
@@ -31,20 +31,21 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-merino/90 backdrop-blur-md transition-all">
       <Container size="xl">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo / Editorial Brand Wordmark */}
+          {/* Logo / Official CareerBridge Brand */}
           <Link
             href="/"
             onClick={closeMenu}
-            className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue rounded-DEFAULT py-1 px-1.5"
+            className="flex items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue rounded-DEFAULT py-1 px-1"
+            aria-label="CareerBridge Home"
           >
-            <div className="w-8 h-8 rounded-DEFAULT bg-venice-blue flex items-center justify-center text-white shadow-subtle group-hover:scale-105 transition-transform duration-200">
-              <Compass className="w-4 h-4 text-rock-blue" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-serif font-bold tracking-tight text-deep-teal">
-                Career<span className="text-venice-blue">Bridge</span>
-              </span>
-            </div>
+            <Image
+              src="/images/logo-horizontal.png"
+              alt="CareerBridge"
+              width={160}
+              height={36}
+              className="h-8 sm:h-9 w-auto object-contain group-hover:scale-[1.02] transition-transform duration-200"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
