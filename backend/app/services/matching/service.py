@@ -1,7 +1,10 @@
 """Job matching service (owner: Teammate B).
 
 Transparent hybrid matching combining three normalized signals:
-1. Signal A (Skill Overlap): canonical skill normalization and job-importance weighting (50%)
+1. Signal A (Skill Overlap): canonical skill normalization and job-importance weighting (50%),
+   further scaled by the candidate's evidence strength per skill (Task 2 `skill_evidence`):
+   a skill demonstrated through work experience or a project counts more than one merely
+   listed. Resumes without evidence data keep the legacy behaviour (full credit).
 2. Signal B (TF-IDF Similarity): sublinear TF-IDF cosine similarity between resume & job (30%)
 3. Signal C (Experience Compatibility): parsed resume experience vs. job experience level (20%)
 """
@@ -15,29 +18,61 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app.core.taxonomy import canonical_skill, normalize_skill
-from app.schemas import Job, JobMatch, MatchRequest, ParsedResume
+from app.schemas import Job, JobMatch, MatchRequest, ParsedResume, SkillEvidence
 from app.services.jobs.service import list_jobs
+from app.services.parser.service import EVIDENCE_WEIGHTS
 
 # Configurable signal weights summing to 100.0 (transparent heuristic)
 WEIGHT_SKILLS: float = 50.0
 WEIGHT_TFIDF: float = 30.0
 WEIGHT_EXPERIENCE: float = 20.0
 
+# Weight applied to a matched skill for candidates who do carry evidence data but
+# have no evidence entry for it: uncorroborated claims count as "listed only".
+_LISTED_ONLY_WEIGHT = EVIDENCE_WEIGHTS["listed only"]
+
 # Pre-compiled regex for word extraction
 _WORD_RE = re.compile(r"[a-zA-Z0-9+#.]+")
+
+
+def _candidate_evidence_strengths(
+    skill_evidence: Sequence[SkillEvidence] | None,
+) -> dict[str, float]:
+    """Map canonical candidate-skill names to their strongest evidence strength.
+
+    Multiple entries for the same canonical skill collapse onto the highest
+    weighted_strength, mirroring `parser._skill_evidence_entries` aggregation.
+    An empty map means the resume carries no evidence data (legacy behaviour).
+    """
+    strengths: dict[str, float] = {}
+    for entry in skill_evidence or []:
+        key = canonical_skill(entry.skill) or normalize_skill(entry.skill).lower()
+        if not key:
+            continue
+        strength = max(0.0, min(1.0, entry.weighted_strength))
+        strengths[key] = max(strengths.get(key, 0.0), strength)
+    return strengths
 
 
 def compute_skill_overlap(
     resume_skills: Sequence[str],
     job_skills: Sequence[str],
+    skill_evidence: Sequence[SkillEvidence] | None = None,
 ) -> tuple[float, list[str], list[str]]:
     """Compute weighted skill overlap using canonical taxonomy mapping.
 
     Returns (normalized_score_0_to_1, matched_skills, missing_skills).
     Uses job-importance position weighting: earlier listed skills are weighted higher.
+    Each matched skill additionally scales its contribution by the candidate's
+    evidence strength for it (work experience > project > listed only) when the
+    resume carries `skill_evidence` data; otherwise legacy full credit applies.
     """
     if not job_skills:
         return 1.0 if resume_skills else 0.0, [], []
+
+    evidence_strength = _candidate_evidence_strengths(skill_evidence)
+    # Unless the resume provides evidence data, unknown skills keep full credit.
+    default_strength = _LISTED_ONLY_WEIGHT if evidence_strength else 1.0
 
     # Map candidate skills to canonical set
     have_canonical: set[str] = set()
@@ -64,7 +99,7 @@ def compute_skill_overlap(
 
         if target in have_canonical:
             matched.append(skill)
-            weighted_matched += weight
+            weighted_matched += weight * evidence_strength.get(target, default_strength)
         else:
             missing.append(skill)
 
@@ -175,8 +210,10 @@ def score_job(
         resume_doc = _build_resume_document(resume)
     job_doc = _build_job_document(job)
 
-    # Signal A: Weighted skill overlap (50%)
-    skill_ratio, matched, missing = compute_skill_overlap(resume.skills, job.skills_required)
+    # Signal A: Weighted skill overlap (50%), scaled by per-skill evidence.
+    skill_ratio, matched, missing = compute_skill_overlap(
+        resume.skills, job.skills_required, skill_evidence=resume.skill_evidence
+    )
     skill_points = skill_ratio * WEIGHT_SKILLS
 
     # Signal B: TF-IDF similarity (30%)
@@ -197,6 +234,13 @@ def score_job(
         f"Matches {len(matched)} of {total_skills} required skills "
         f"({relevance_pct}% text relevance; {exp_note.lower()})."
     )
+    if evidence := _candidate_evidence_strengths(resume.skill_evidence):
+        evidenced = sum(
+            1
+            for skill in matched
+            if evidence.get(canonical_skill(skill) or normalize_skill(skill).lower(), 0.0) >= 0.7
+        )
+        rationale += f" {evidenced} of {len(matched)} matched skills are backed by direct evidence."
 
     return JobMatch(
         job=job,

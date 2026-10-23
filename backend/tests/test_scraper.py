@@ -405,7 +405,7 @@ def test_full_pipeline_persists_verified_rows(session, monkeypatch):
     rows = list(session.scalars(select(Job)))
     assert rows
     # Verification harness said ok -> rows must be verified with today's date.
-    assert any(r.verified and r.last_verified == dt.date(2026, 10, 23) for r in rows)
+    assert any(r.verified and r.last_verified == dt.date.today() for r in rows)
     assert all(r.company_id for r in rows)
 
 
