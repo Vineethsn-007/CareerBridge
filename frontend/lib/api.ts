@@ -83,6 +83,7 @@ export const api = {
   },
   personaAnswer(body: PersonaAnswerRequest): Promise<PersonaAnswerResponse> {
     return post<PersonaAnswerResponse>("/persona/answer", body);
+  },
   createInterviewSession(body: InterviewSessionCreate): Promise<InterviewSessionResponse> {
     return post<InterviewSessionResponse>("/interview/sessions", body);
   },
