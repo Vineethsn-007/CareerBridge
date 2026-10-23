@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -117,7 +117,7 @@ function WeekCard({ week, isOpen, onToggle }: {
   );
 }
 
-export default function SkillsPage() {
+function SkillsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const jobId = searchParams.get("job");
@@ -362,5 +362,21 @@ export default function SkillsPage() {
         )}
       </Container>
     </div>
+  );
+}
+
+export default function SkillsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-10 bg-mesh min-h-screen">
+          <Container size="xl">
+            <SkeletonCard />
+          </Container>
+        </div>
+      }
+    >
+      <SkillsContent />
+    </Suspense>
   );
 }
