@@ -117,7 +117,7 @@ function WeekCard({ week, isOpen, onToggle }: {
   );
 }
 
-function SkillsPageContent() {
+function SkillsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const jobId = searchParams.get("job");
@@ -379,8 +379,7 @@ export default function SkillsPage() {
         </div>
       }
     >
-      <SkillsPageContent />
+      <SkillsContent />
     </Suspense>
   );
 }
-
