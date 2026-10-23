@@ -1,7 +1,8 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
-import { Compass, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export function Footer() {
   return (
@@ -9,14 +10,19 @@ export function Footer() {
       <Container size="xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-border">
           <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded bg-venice-blue flex items-center justify-center text-white shadow-subtle">
-                <Compass className="w-4 h-4 text-rock-blue" />
-              </div>
-              <span className="text-lg font-serif font-bold text-deep-teal">
-                Career<span className="text-venice-blue">Bridge</span>
-              </span>
-            </div>
+            <Link
+              href="/"
+              className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue rounded-DEFAULT"
+              aria-label="CareerBridge Home"
+            >
+              <Image
+                src="/images/logo-horizontal.png"
+                alt="CareerBridge"
+                width={150}
+                height={34}
+                className="h-8 w-auto object-contain"
+              />
+            </Link>
             <p className="text-xs text-secondary-text max-w-sm leading-relaxed">
               Your Skills. Your Future. Your CareerBridge. Discover relevant jobs, identify your skill gaps, and build a personalized path toward your career goals.
             </p>
