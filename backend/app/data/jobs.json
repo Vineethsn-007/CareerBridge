@@ -1,66 +1,989 @@
 [
   {
-    "id": "sample-001",
-    "title": "Junior Python Developer (SAMPLE)",
-    "company": "Sample Company A",
+    "id": "job-web-001",
+    "title": "Junior Python Backend Developer",
+    "company": "Tata Consultancy Services",
     "location": "Bengaluru",
     "job_type": "full-time",
     "experience_level": "fresher",
-    "skills_required": ["Python", "SQL", "Git", "REST API", "Problem Solving"],
-    "description": "SAMPLE ENTRY. Build and maintain backend services in Python.",
-    "source_url": "https://example.com/jobs/sample-001",
+    "skills_required": [
+      "Python",
+      "SQL",
+      "Git",
+      "REST API",
+      "Problem Solving"
+    ],
+    "description": "Develop backend services and REST APIs supporting enterprise applications using Python and relational databases.",
+    "source_url": "https://www.tcs.com/careers/india/entry-level-hiring",
     "verified": false,
     "last_verified": null
   },
   {
-    "id": "sample-002",
-    "title": "Frontend Intern (SAMPLE)",
-    "company": "Sample Company B",
-    "location": "Remote",
+    "id": "job-web-002",
+    "title": "React Frontend Intern",
+    "company": "Zoho Corporation",
+    "location": "Chennai",
     "job_type": "internship",
     "experience_level": "fresher",
-    "skills_required": ["JavaScript", "React", "HTML", "CSS", "Git"],
-    "description": "SAMPLE ENTRY. Work on a React web app with a small product team.",
-    "source_url": "https://example.com/jobs/sample-002",
+    "skills_required": [
+      "JavaScript",
+      "React",
+      "HTML",
+      "CSS",
+      "Git"
+    ],
+    "description": "Work with engineering teams to build modern responsive web user interfaces in React.",
+    "source_url": "https://www.zoho.com/careers/",
     "verified": false,
     "last_verified": null
   },
   {
-    "id": "sample-003",
-    "title": "Data Analyst Trainee (SAMPLE)",
-    "company": "Sample Company C",
-    "location": "Mangalore",
+    "id": "job-web-003",
+    "title": "Full Stack Web Trainee",
+    "company": "Infosys",
+    "location": "Pune",
     "job_type": "full-time",
     "experience_level": "fresher",
-    "skills_required": ["SQL", "Excel", "Power BI", "Data Analysis", "Communication"],
-    "description": "SAMPLE ENTRY. Prepare dashboards and reports for business teams.",
-    "source_url": "https://example.com/jobs/sample-003",
+    "skills_required": [
+      "JavaScript",
+      "TypeScript",
+      "React",
+      "Node.js",
+      "SQL"
+    ],
+    "description": "End-to-end full stack web application development across modern React and Node.js environments.",
+    "source_url": "https://career.infosys.com/joblist",
     "verified": false,
     "last_verified": null
   },
   {
-    "id": "sample-004",
-    "title": "ML Engineer Intern (SAMPLE)",
-    "company": "Sample Company D",
+    "id": "job-web-004",
+    "title": "Junior Node.js Developer",
+    "company": "Cognizant",
+    "location": "Hyderabad",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "JavaScript",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "REST API"
+    ],
+    "description": "Build and scale backend microservices and asynchronous API services using Node.js and Express.",
+    "source_url": "https://careers.cognizant.com/in/en",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-005",
+    "title": "Django Web Developer Intern",
+    "company": "Wipro",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Django",
+      "PostgreSQL",
+      "Git",
+      "HTML"
+    ],
+    "description": "Design clean server-rendered web applications and internal tools using the Django framework.",
+    "source_url": "https://careers.wipro.com/careers-home/jobs",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-006",
+    "title": "Angular Frontend Developer",
+    "company": "Tech Mahindra",
+    "location": "Noida",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": [
+      "TypeScript",
+      "Angular",
+      "HTML",
+      "CSS",
+      "REST API"
+    ],
+    "description": "Maintain and expand corporate client portals using Angular and TypeScript architectures.",
+    "source_url": "https://careers.techmahindra.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-007",
+    "title": "Java Spring Boot Trainee",
+    "company": "LTI Mindtree",
+    "location": "Mumbai",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Java",
+      "Spring Boot",
+      "MySQL",
+      "Git",
+      "OOP"
+    ],
+    "description": "Contribute to robust enterprise banking and commerce backend services using Java and Spring Boot.",
+    "source_url": "https://www.ltimindtree.com/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-008",
+    "title": "Junior Next.js / TypeScript Engineer",
+    "company": "HCLTech",
+    "location": "Chennai",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "TypeScript",
+      "Next.js",
+      "React",
+      "Tailwind CSS",
+      "Git"
+    ],
+    "description": "Build modern SEO-optimized digital web applications using Next.js and Tailwind CSS.",
+    "source_url": "https://www.hcltech.com/careers/early-careers",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-009",
+    "title": "Web Developer Apprentice (Representative Profile)",
+    "company": "Apprenticeship India",
+    "location": "Bengaluru",
+    "job_type": "contract",
+    "experience_level": "fresher",
+    "skills_required": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "PHP",
+      "MySQL"
+    ],
+    "description": "Representative apprentice role profile based on NATS curriculum standards in website authoring and database administration. Reference link points to the Apprenticeship India opportunity portal.",
+    "source_url": "https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity-search",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-010",
+    "title": "API Backend Developer Intern",
+    "company": "Persistent Systems",
+    "location": "Pune",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Java",
+      "REST API",
+      "Docker",
+      "Git",
+      "Data Structures"
+    ],
+    "description": "Collaborate with core platform engineers to architect and unit-test high-throughput REST APIs.",
+    "source_url": "https://www.persistent.com/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-011",
+    "title": "Junior Vue.js Developer",
+    "company": "Capgemini",
+    "location": "Kolkata",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": [
+      "JavaScript",
+      "Vue",
+      "HTML",
+      "CSS",
+      "Git"
+    ],
+    "description": "Create interactive web components and maintain front-office dashboards using Vue.",
+    "source_url": "https://www.capgemini.com/in-en/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-web-012",
+    "title": "Flask Backend Trainee",
+    "company": "Accenture India",
+    "location": "Gurugram",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Flask",
+      "SQL",
+      "REST API",
+      "Docker"
+    ],
+    "description": "Construct lightweight backend APIs and batch automation workflows using Python and Flask.",
+    "source_url": "https://www.accenture.com/in-en/careers/jobsearch",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-001",
+    "title": "Data Analyst Trainee",
+    "company": "Mu Sigma",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "SQL",
+      "Excel",
+      "Python",
+      "Data Analysis",
+      "Communication"
+    ],
+    "description": "Analyze client business data to produce actionable insights and executive dashboards.",
+    "source_url": "https://www.mu-sigma.com/careers",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-002",
+    "title": "Business Intelligence Intern",
+    "company": "Amazon India",
     "location": "Hyderabad",
     "job_type": "internship",
     "experience_level": "fresher",
-    "skills_required": ["Python", "Machine Learning", "PyTorch", "Pandas", "NumPy"],
-    "description": "SAMPLE ENTRY. Train and evaluate models on tabular and text data.",
-    "source_url": "https://example.com/jobs/sample-004",
+    "skills_required": [
+      "SQL",
+      "Excel",
+      "Power BI",
+      "Data Analysis",
+      "Problem Solving"
+    ],
+    "description": "Extract large-scale transaction datasets and create operational BI reporting dashboards.",
+    "source_url": "https://www.amazon.jobs/en/landing_pages/students-graduates",
     "verified": false,
     "last_verified": null
   },
   {
-    "id": "sample-005",
-    "title": "Full Stack Developer (SAMPLE)",
-    "company": "Sample Company E",
+    "id": "job-data-003",
+    "title": "Junior SQL / Data Engineer",
+    "company": "Tata Consultancy Services",
+    "location": "Chennai",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "SQL",
+      "PostgreSQL",
+      "Python",
+      "Linux",
+      "Git"
+    ],
+    "description": "Maintain relational data pipelines and optimize database query execution plans.",
+    "source_url": "https://www.tcs.com/careers/india/entry-level-hiring",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-004",
+    "title": "Power BI Reporting Analyst",
+    "company": "Wipro",
     "location": "Pune",
     "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Power BI",
+      "Excel",
+      "SQL",
+      "Data Analysis",
+      "Communication"
+    ],
+    "description": "Build interactive telemetry dashboards and generate periodic management reports.",
+    "source_url": "https://careers.wipro.com/careers-home/jobs",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-005",
+    "title": "Data Analytics Intern",
+    "company": "Dell Technologies",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "SQL",
+      "Excel"
+    ],
+    "description": "Perform exploratory data analysis and assist in cleansing customer telemetry data.",
+    "source_url": "https://jobs.dell.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-006",
+    "title": "Junior Tableau Analyst",
+    "company": "Cognizant",
+    "location": "Coimbatore",
+    "job_type": "full-time",
     "experience_level": "junior",
-    "skills_required": ["TypeScript", "React", "Node.js", "PostgreSQL", "Docker", "Git"],
-    "description": "SAMPLE ENTRY. Own features end to end across a React and Node.js stack.",
-    "source_url": "https://example.com/jobs/sample-005",
+    "skills_required": [
+      "Tableau",
+      "SQL",
+      "Data Analysis",
+      "Excel",
+      "Communication"
+    ],
+    "description": "Transform business requirements into visual data models and Tableau stories.",
+    "source_url": "https://careers.cognizant.com/in/en",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-007",
+    "title": "Data Engineering Apprentice (Representative Profile)",
+    "company": "Apprenticeship India",
+    "location": "Hyderabad",
+    "job_type": "contract",
+    "experience_level": "fresher",
+    "skills_required": [
+      "SQL",
+      "MySQL",
+      "Python",
+      "Linux",
+      "Data Structures"
+    ],
+    "description": "Representative apprentice role profile based on NATS curriculum covering basic ETL pipelining and data warehouse operations. Reference link points to the Apprenticeship India opportunity portal.",
+    "source_url": "https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity-search",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-008",
+    "title": "Analytics Trainee (Representative Profile)",
+    "company": "National Career Service",
+    "location": "New Delhi",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Excel",
+      "SQL",
+      "Data Analysis",
+      "Problem Solving",
+      "Teamwork"
+    ],
+    "description": "Representative role profile for entry-level data verification and reporting based on National Career Service guidance. Reference link points to the NCS portal.",
+    "source_url": "https://www.ncs.gov.in/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-data-009",
+    "title": "Junior Database Administrator",
+    "company": "Oracle India",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "SQL",
+      "MySQL",
+      "Linux",
+      "Networking",
+      "Problem Solving"
+    ],
+    "description": "Support database uptime monitoring and routine backup and recovery operations.",
+    "source_url": "https://www.oracle.com/corporate/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-001",
+    "title": "ML Engineer Intern",
+    "company": "Google",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Machine Learning",
+      "TensorFlow",
+      "Algorithms",
+      "Data Structures"
+    ],
+    "description": "Research and implement machine learning algorithms on large-scale datasets.",
+    "source_url": "https://careers.google.com/jobs/results/?q=intern&location=India",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-002",
+    "title": "AI Research Intern",
+    "company": "Microsoft India",
+    "location": "Hyderabad",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "PyTorch",
+      "Deep Learning",
+      "Algorithms",
+      "Data Structures"
+    ],
+    "description": "Prototype deep learning architectures and evaluate neural network checkpoints.",
+    "source_url": "https://careers.microsoft.com/v2/global/en/home.html",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-003",
+    "title": "Junior Computer Vision Engineer",
+    "company": "Bosch India",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": [
+      "Python",
+      "Computer Vision",
+      "PyTorch",
+      "C++",
+      "Linux"
+    ],
+    "description": "Develop computer vision algorithms for automated optical inspection and driver assistance.",
+    "source_url": "https://careers.bosch.com/en/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-004",
+    "title": "NLP Engineer Trainee",
+    "company": "Infosys",
+    "location": "Mysuru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "NLP",
+      "Scikit-learn",
+      "Machine Learning",
+      "Git"
+    ],
+    "description": "Train and deploy text classification and natural language understanding models.",
+    "source_url": "https://career.infosys.com/joblist",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-005",
+    "title": "Machine Learning Trainee",
+    "company": "Wipro",
+    "location": "Hyderabad",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Scikit-learn",
+      "Pandas",
+      "NumPy",
+      "Machine Learning"
+    ],
+    "description": "Build predictive regression and classification pipelines for enterprise analytics clients.",
+    "source_url": "https://careers.wipro.com/careers-home/jobs",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-006",
+    "title": "Deep Learning Intern",
+    "company": "Intel India",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "PyTorch",
+      "Deep Learning",
+      "Linux",
+      "C++"
+    ],
+    "description": "Benchmark and accelerate deep learning workloads on cutting-edge hardware architectures.",
+    "source_url": "https://jobs.intel.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-007",
+    "title": "Junior AI Developer",
+    "company": "Tech Mahindra",
+    "location": "Pune",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Machine Learning",
+      "FastAPI",
+      "Docker",
+      "Git"
+    ],
+    "description": "Wrap machine learning models into high-performance REST APIs for client solutions.",
+    "source_url": "https://careers.techmahindra.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-ml-008",
+    "title": "Data Science & ML Intern",
+    "company": "Persistent Systems",
+    "location": "Pune",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Pandas",
+      "NumPy",
+      "Scikit-learn",
+      "Data Analysis"
+    ],
+    "description": "Assist data science teams in data feature engineering and cross-validation experiments.",
+    "source_url": "https://www.persistent.com/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-001",
+    "title": "QA Automation Trainee",
+    "company": "Cognizant",
+    "location": "Chennai",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Java",
+      "Testing",
+      "Git",
+      "OOP",
+      "Agile"
+    ],
+    "description": "Write automated integration test suites and validate web application functionality.",
+    "source_url": "https://careers.cognizant.com/in/en",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-002",
+    "title": "Software Testing Intern",
+    "company": "Zoho Corporation",
+    "location": "Tenkasi",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Testing",
+      "HTML",
+      "CSS",
+      "Communication",
+      "Problem Solving"
+    ],
+    "description": "Execute manual functional testing and report reproducible defects across Zoho applications.",
+    "source_url": "https://www.zoho.com/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-003",
+    "title": "Junior QA Engineer",
+    "company": "Tata Consultancy Services",
+    "location": "Kolkata",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "SQL",
+      "Testing",
+      "Agile",
+      "Git",
+      "Communication"
+    ],
+    "description": "Perform regression testing and create comprehensive test documentation in agile sprints.",
+    "source_url": "https://www.tcs.com/careers/india/entry-level-hiring",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-004",
+    "title": "Python Test Automation Intern",
+    "company": "Wipro",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Python",
+      "Testing",
+      "Git",
+      "Linux",
+      "REST API"
+    ],
+    "description": "Develop automated API test scripts in Python to validate backend endpoint responses.",
+    "source_url": "https://careers.wipro.com/careers-home/jobs",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-005",
+    "title": "Performance Testing Associate",
+    "company": "Capgemini",
+    "location": "Hyderabad",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": [
+      "Testing",
+      "Java",
+      "Linux",
+      "Networking",
+      "Problem Solving"
+    ],
+    "description": "Analyze server response latencies and simulate heavy user loads on critical workflows.",
+    "source_url": "https://www.capgemini.com/in-en/careers/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-006",
+    "title": "Quality Assurance Apprentice (Representative Profile)",
+    "company": "Apprenticeship India",
+    "location": "Pune",
+    "job_type": "contract",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Testing",
+      "Excel",
+      "SQL",
+      "Problem Solving",
+      "Teamwork"
+    ],
+    "description": "Representative apprentice role profile covering software quality standards and test case lifecycle execution based on NATS guidelines. Reference link points to the Apprenticeship India opportunity portal.",
+    "source_url": "https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity-search",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-007",
+    "title": "Mobile & Web QA Trainee",
+    "company": "HCLTech",
+    "location": "Noida",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Testing",
+      "Git",
+      "Agile",
+      "Communication",
+      "Problem Solving"
+    ],
+    "description": "Verify cross-browser and mobile web consistency for global enterprise web products.",
+    "source_url": "https://www.hcltech.com/careers/early-careers",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-qa-008",
+    "title": "QA Analyst (Representative Profile)",
+    "company": "National Career Service",
+    "location": "Ahmedabad",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Testing",
+      "SQL",
+      "HTML",
+      "Excel",
+      "Communication"
+    ],
+    "description": "Representative role profile for web portal validation and grievance tracking workflows based on National Career Service guidance. Reference link points to the NCS portal.",
+    "source_url": "https://www.ncs.gov.in/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-001",
+    "title": "Embedded Software Engineer Trainee",
+    "company": "Bosch India",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "C",
+      "Embedded Systems",
+      "Linux",
+      "Git",
+      "IoT"
+    ],
+    "description": "Write low-level firmware in C for automotive sensor units and controllers.",
+    "source_url": "https://careers.bosch.com/en/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-002",
+    "title": "IoT Firmware Intern",
+    "company": "Texas Instruments",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "C",
+      "C++",
+      "Embedded Systems",
+      "IoT",
+      "Testing"
+    ],
+    "description": "Design and test device drivers for low-power wireless connected IoT edge devices.",
+    "source_url": "https://careers.ti.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-003",
+    "title": "Junior Embedded C Developer",
+    "company": "Qualcomm India",
+    "location": "Hyderabad",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "C",
+      "Data Structures",
+      "Embedded Systems",
+      "Linux",
+      "Algorithms"
+    ],
+    "description": "Develop hardware-abstracted software layers for mobile and connected IoT platforms.",
+    "source_url": "https://www.qualcomm.com/company/careers",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-004",
+    "title": "Hardware / Embedded Apprentice (Representative Profile)",
+    "company": "Apprenticeship India",
+    "location": "Mysuru",
+    "job_type": "contract",
+    "experience_level": "fresher",
+    "skills_required": [
+      "C",
+      "Embedded Systems",
+      "IoT",
+      "Testing",
+      "Problem Solving"
+    ],
+    "description": "Representative apprentice role profile for technician training on PCB circuit testing and microcontroller programming based on NATS guidelines. Reference link points to the Apprenticeship India opportunity portal.",
+    "source_url": "https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity-search",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-005",
+    "title": "Microcontroller Firmware Intern",
+    "company": "AMD India",
+    "location": "Bengaluru",
+    "job_type": "internship",
+    "experience_level": "fresher",
+    "skills_required": [
+      "C",
+      "C++",
+      "Linux",
+      "Embedded Systems",
+      "Git"
+    ],
+    "description": "Firmware development and hardware bring-up testing on x86 embedded development boards.",
+    "source_url": "https://careers.amd.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-006",
+    "title": "IoT Solutions Trainee",
+    "company": "Tata Elxsi",
+    "location": "Thiruvananthapuram",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "C++",
+      "IoT",
+      "Networking",
+      "Linux",
+      "REST API"
+    ],
+    "description": "Build telemetry protocols and device management integrations for smart appliances.",
+    "source_url": "https://www.tataelxsi.com/careers",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-007",
+    "title": "Embedded Systems Engineer",
+    "company": "Continental India",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": [
+      "C",
+      "Embedded Systems",
+      "Testing",
+      "Linux",
+      "Communication"
+    ],
+    "description": "Validate safety-critical electronic control unit firmware in automotive systems.",
+    "source_url": "https://www.continental.com/en/career/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-iot-008",
+    "title": "Linux Embedded Systems Trainee (Representative Profile)",
+    "company": "National Career Service",
+    "location": "Pune",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Linux",
+      "C",
+      "Networking",
+      "Git",
+      "Testing"
+    ],
+    "description": "Representative role profile for configuring and testing embedded Linux devices based on National Career Service guidance. Reference link points to the NCS portal.",
+    "source_url": "https://www.ncs.gov.in/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-001",
+    "title": "Technical Support Engineer Trainee",
+    "company": "Dell Technologies",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Linux",
+      "Networking",
+      "Communication",
+      "Problem Solving",
+      "Teamwork"
+    ],
+    "description": "Diagnose and resolve enterprise client hardware and operating system inquiries.",
+    "source_url": "https://jobs.dell.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-002",
+    "title": "IT Support Associate",
+    "company": "Amazon India",
+    "location": "Hyderabad",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Linux",
+      "Networking",
+      "Problem Solving",
+      "Communication",
+      "Teamwork"
+    ],
+    "description": "Provide tier-1 IT operations support and manage corporate workstation configurations.",
+    "source_url": "https://www.amazon.jobs/en/landing_pages/students-graduates",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-003",
+    "title": "Technical Support Specialist",
+    "company": "HP Inc.",
+    "location": "Chennai",
+    "job_type": "full-time",
+    "experience_level": "junior",
+    "skills_required": [
+      "Networking",
+      "Linux",
+      "Problem Solving",
+      "Communication",
+      "Teamwork"
+    ],
+    "description": "Resolve customer network connectivity and device configuration technical challenges.",
+    "source_url": "https://jobs.hp.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-004",
+    "title": "Systems & Network Support Trainee",
+    "company": "Cisco Systems",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Networking",
+      "Linux",
+      "Cybersecurity",
+      "Problem Solving",
+      "Communication"
+    ],
+    "description": "Monitor network device diagnostics and assist field engineers in configuration troubleshooting.",
+    "source_url": "https://jobs.cisco.com/",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-005",
+    "title": "Cloud Support Associate",
+    "company": "Microsoft India",
+    "location": "Bengaluru",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Azure",
+      "Linux",
+      "Networking",
+      "Communication",
+      "Problem Solving"
+    ],
+    "description": "Assist customers in troubleshooting cloud service deployments and virtual networking.",
+    "source_url": "https://careers.microsoft.com/v2/global/en/home.html",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-006",
+    "title": "IT Helpdesk Apprentice (Representative Profile)",
+    "company": "Apprenticeship India",
+    "location": "Mumbai",
+    "job_type": "contract",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Networking",
+      "Communication",
+      "Teamwork",
+      "Problem Solving",
+      "Excel"
+    ],
+    "description": "Representative apprentice role profile covering service desk ticket handling and hardware maintenance based on NATS guidelines. Reference link points to the Apprenticeship India opportunity portal.",
+    "source_url": "https://www.apprenticeshipindia.gov.in/apprenticeship/opportunity-search",
+    "verified": false,
+    "last_verified": null
+  },
+  {
+    "id": "job-sup-007",
+    "title": "Technical Customer Support Executive (Representative Profile)",
+    "company": "National Career Service",
+    "location": "Jaipur",
+    "job_type": "full-time",
+    "experience_level": "fresher",
+    "skills_required": [
+      "Communication",
+      "Problem Solving",
+      "Teamwork",
+      "Excel",
+      "Networking"
+    ],
+    "description": "Representative role profile for portal user assistance and connectivity diagnostics based on National Career Service guidance. Reference link points to the NCS portal.",
+    "source_url": "https://www.ncs.gov.in/",
     "verified": false,
     "last_verified": null
   }
