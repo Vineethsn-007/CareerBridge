@@ -42,13 +42,13 @@ export function EditorialHeading({
         {
           yPercent: 0,
           opacity: 1,
-          duration: 0.85,
+          duration: 0.8,
           ease: "power3.out",
-          stagger: 0.12,
+          stagger: 0.1,
           delay,
           scrollTrigger: {
             trigger: headingRef.current,
-            start: "top 88%",
+            start: "top 92%",
             once: true,
           },
         }
@@ -111,7 +111,7 @@ export function ImageMaskReveal({
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
-          start: "top 85%",
+          start: "top 90%",
           once: true,
         },
         delay,
@@ -119,7 +119,7 @@ export function ImageMaskReveal({
 
       tl.to(container, {
         clipPath: "inset(0% 0% 0% 0%)",
-        duration: 1.1,
+        duration: 1.0,
         ease: "power3.inOut",
       });
 
@@ -128,7 +128,7 @@ export function ImageMaskReveal({
           innerImg,
           {
             scale: 1,
-            duration: 1.3,
+            duration: 1.2,
             ease: "power2.out",
           },
           0

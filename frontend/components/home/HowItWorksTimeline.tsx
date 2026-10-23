@@ -82,29 +82,29 @@ export function HowItWorksTimeline() {
             scrollTrigger: {
               trigger: container,
               start: "top 75%",
-              end: "bottom 85%",
-              scrub: 0.6,
+              end: "bottom 80%",
+              scrub: 0.5,
             },
           }
         );
       }
 
-      // Step cards staggered entrance
+      // Step cards staggered entrance with early trigger so content is never blank
       gsap.fromTo(
         stepCards,
         {
           opacity: 0,
-          y: 35,
+          y: 22,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.7,
-          stagger: 0.12,
+          duration: 0.6,
+          stagger: 0.1,
           ease: "power3.out",
           scrollTrigger: {
             trigger: container,
-            start: "top 70%",
+            start: "top 86%",
             once: true,
           },
         }
@@ -114,7 +114,7 @@ export function HowItWorksTimeline() {
       stepDots.forEach((dot, idx) => {
         ScrollTrigger.create({
           trigger: dot,
-          start: "top 70%",
+          start: "top 75%",
           onEnter: () => {
             gsap.to(dot, {
               backgroundColor: "#16587B",
@@ -184,7 +184,7 @@ export function HowItWorksTimeline() {
             return (
               <div
                 key={s.step}
-                className="workflow-step-card bg-pure-white border border-border rounded-xl p-5 shadow-subtle hover:border-rock-blue hover:shadow-card transition-all flex flex-col justify-between space-y-4 group"
+                className="workflow-step-card bg-pure-white border border-border rounded-xl p-5 shadow-subtle hover:border-rock-blue hover:shadow-card transition-all flex flex-col justify-between space-y-4 group will-change-transform"
               >
                 <div className="space-y-3">
                   {/* Step Header with Step Dot */}

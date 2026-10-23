@@ -54,75 +54,85 @@ const STAGES = [
 
 export function PinnedStorytelling() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const pinWrapperRef = useRef<HTMLDivElement>(null);
+  const stagesContainerRef = useRef<HTMLDivElement>(null);
+  const progressFillRef = useRef<HTMLDivElement>(null);
+  const previewCardsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const stageCardsRef = useRef<Array<HTMLDivElement | null>>([]);
   const [activeStage, setActiveStage] = useState(0);
+
+  const setPreviewCardRef = (index: number) => (el: HTMLDivElement | null) => {
+    previewCardsRef.current[index] = el;
+  };
+
+  const setStageCardRef = (index: number) => (el: HTMLDivElement | null) => {
+    stageCardsRef.current[index] = el;
+  };
 
   useGSAP(
     () => {
       if (!sectionRef.current || prefersReducedMotion()) return;
 
-      const sectionEl = sectionRef.current;
-      const mm = gsap.matchMedia();
+      const stagesContainer = stagesContainerRef.current;
+      const progressFill = progressFillRef.current;
+      const stageCards = stageCardsRef.current.filter((c): c is HTMLDivElement => c !== null);
+      const previewCards = previewCardsRef.current.filter((c): c is HTMLDivElement => c !== null);
 
-      // Desktop Pinning Experience (1024px and up)
-      mm.add("(min-width: 1024px)", () => {
-        const previewCards = sectionEl.querySelectorAll<HTMLElement>(".preview-stage-card");
-        const stageProgress = sectionEl.querySelector<HTMLElement>(".pinned-progress-fill");
+      if (!stagesContainer || !stageCards.length || !previewCards.length) return;
 
-        const trigger = ScrollTrigger.create({
-          trigger: sectionEl,
-          start: "top top",
-          end: "+=180%",
-          pin: pinWrapperRef.current,
-          scrub: 0.8,
-          onUpdate: (self) => {
-            const rawProgress = self.progress;
-            // Advance progress fill
-            if (stageProgress) {
-              gsap.to(stageProgress, {
-                scaleY: rawProgress,
-                duration: 0.1,
-                ease: "none",
-              });
-            }
+      // ScrollTrigger for the vertical progress line on desktop
+      if (progressFill) {
+        gsap.fromTo(
+          progressFill,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: stagesContainer,
+              start: "top 65%",
+              end: "bottom 65%",
+              scrub: 0.4,
+            },
+          }
+        );
+      }
 
-            // Determine active stage
-            const step = Math.min(2, Math.floor(rawProgress * 3));
-            setActiveStage(step);
-
-            // Cross-fade preview cards
-            previewCards.forEach((card, idx) => {
-              if (idx === step) {
-                gsap.to(card, {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  duration: 0.4,
-                  ease: "power2.out",
-                  pointerEvents: "auto",
-                });
-              } else {
-                gsap.to(card, {
-                  opacity: 0,
-                  y: idx < step ? -18 : 18,
-                  scale: 0.97,
-                  duration: 0.4,
-                  ease: "power2.out",
-                  pointerEvents: "none",
-                });
-              }
-            });
-          },
+      // Activate preview cards as each stage enters the viewport center
+      stageCards.forEach((card, idx) => {
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top 60%",
+          end: "bottom 40%",
+          onEnter: () => switchStage(idx),
+          onEnterBack: () => switchStage(idx),
         });
-
-        return () => {
-          trigger.kill();
-        };
       });
 
-      return () => {
-        mm.revert();
-      };
+      function switchStage(targetIdx: number) {
+        setActiveStage(targetIdx);
+
+        previewCards.forEach((cardEl, i) => {
+          if (i === targetIdx) {
+            gsap.to(cardEl, {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 0.45,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          } else {
+            gsap.to(cardEl, {
+              opacity: 0,
+              scale: 0.96,
+              y: i < targetIdx ? -14 : 14,
+              duration: 0.35,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          }
+        });
+      }
     },
     { scope: sectionRef }
   );
@@ -131,130 +141,131 @@ export function PinnedStorytelling() {
     <section
       id="storytelling"
       ref={sectionRef}
-      className="relative bg-muted-cream border-b border-border py-20 lg:py-0 overflow-hidden"
+      className="relative bg-muted-cream border-b border-border py-20 lg:py-24"
     >
-      <div
-        ref={pinWrapperRef}
-        className="lg:min-h-screen lg:flex lg:items-center py-12 lg:py-20"
-      >
-        <Container size="xl">
-          {/* Section Header */}
-          <div className="mb-12 lg:mb-16 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pale-blue border border-border text-venice-blue mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-venice-blue" />
-              <span className="text-xs font-semibold uppercase tracking-wider">
-                Progressive Career Journey
-              </span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-deep-teal leading-tight">
-              From Your Resume to Your Next Opportunity.
-            </h2>
-            <p className="text-sm sm:text-base text-secondary-text mt-3 leading-relaxed">
-              A cohesive, transparent progression designed to eliminate guesswork at every step.
-            </p>
+      <Container size="xl">
+        {/* Section Header */}
+        <div className="mb-14 lg:mb-16 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pale-blue border border-border text-venice-blue mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-venice-blue" />
+            <span className="text-xs font-semibold uppercase tracking-wider">
+              Progressive Career Journey
+            </span>
           </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-deep-teal leading-tight">
+            From Your Resume to Your Next Opportunity.
+          </h2>
+          <p className="text-sm sm:text-base text-secondary-text mt-3 leading-relaxed">
+            A cohesive, transparent progression designed to eliminate guesswork at every step.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Left Column: Stage Progress & Text (Desktop + Mobile) */}
-            <div className="lg:col-span-6 relative">
-              {/* Desktop Progress Bar Track */}
-              <div className="hidden lg:block absolute left-4 top-4 bottom-4 w-0.5 bg-border rounded-full">
-                <div className="pinned-progress-fill w-full h-full bg-venice-blue origin-top scale-y-0 rounded-full will-change-transform" />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+          {/* Left Column: Stage Cards & Continuous Progress Line */}
+          <div ref={stagesContainerRef} className="lg:col-span-6 relative">
+            {/* Desktop Progress Bar Track */}
+            <div className="hidden lg:block absolute left-4 top-6 bottom-6 w-0.5 bg-border rounded-full">
+              <div
+                ref={progressFillRef}
+                className="w-full h-full bg-venice-blue origin-top scale-y-0 rounded-full will-change-transform"
+              />
+            </div>
 
-              <div className="space-y-8 lg:pl-12">
-                {STAGES.map((s, idx) => {
-                  const isActive = activeStage === idx;
-                  const Icon = s.icon;
+            <div className="space-y-8 lg:space-y-12 lg:pl-12">
+              {STAGES.map((s, idx) => {
+                const isActive = activeStage === idx;
+                const Icon = s.icon;
 
-                  return (
-                    <div
-                      key={s.num}
-                      className={cn(
-                        "p-5 rounded-xl border transition-all duration-300",
-                        isActive
-                          ? "bg-pure-white border-venice-blue/40 shadow-float"
-                          : "bg-pure-white/40 border-border/80 opacity-70 hover:opacity-90"
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-3 mb-2">
-                        <div className="flex items-center gap-2.5">
-                          <span
-                            className={cn(
-                              "w-7 h-7 rounded-full text-xs font-serif font-bold flex items-center justify-center transition-colors",
-                              isActive
-                                ? "bg-venice-blue text-white"
-                                : "bg-pale-blue text-secondary-text"
-                            )}
-                          >
-                            {s.num}
-                          </span>
-                          <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
-                            {s.label}
-                          </span>
-                        </div>
-                        <Icon className="w-4 h-4 text-venice-blue" />
-                      </div>
-
-                      <h3 className="text-lg font-bold text-deep-teal mt-2">
-                        {s.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-secondary-text leading-relaxed mt-1.5">
-                        {s.desc}
-                      </p>
-
-                      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
-                        <Link
-                          href={s.href}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group"
+                return (
+                  <div
+                    key={s.num}
+                    ref={setStageCardRef(idx)}
+                    className={cn(
+                      "p-6 rounded-xl border transition-all duration-300",
+                      isActive
+                        ? "bg-pure-white border-venice-blue/50 shadow-card"
+                        : "bg-pure-white/70 border-border opacity-85 hover:opacity-100 hover:border-rock-blue"
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={cn(
+                            "w-7 h-7 rounded-full text-xs font-serif font-bold flex items-center justify-center transition-colors",
+                            isActive
+                              ? "bg-venice-blue text-white"
+                              : "bg-pale-blue text-secondary-text"
+                          )}
                         >
-                          <span>{s.cta}</span>
-                          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-                        </Link>
-                        {isActive && (
-                          <span className="text-[11px] font-medium text-[#18856B] flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" /> Active Stage
-                          </span>
-                        )}
+                          {s.num}
+                        </span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-venice-blue">
+                          {s.label}
+                        </span>
                       </div>
-
-                      {/* Mobile Inline Product Preview */}
-                      <div className="lg:hidden mt-4 pt-4 border-t border-border">
-                        <PreviewCardContent stageIndex={idx} />
-                      </div>
+                      <Icon className="w-4 h-4 text-venice-blue" />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
 
-            {/* Right Column: Desktop Pinned Showcase Area */}
-            <div className="hidden lg:block lg:col-span-6 relative h-[480px]">
-              {/* Background ambient accent */}
-              <div className="absolute inset-0 bg-rock-blue/15 rounded-3xl transform rotate-1 pointer-events-none" />
+                    <h3 className="text-lg sm:text-xl font-bold text-deep-teal mt-2">
+                      {s.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-secondary-text leading-relaxed mt-2">
+                      {s.desc}
+                    </p>
 
-              {/* Stage Previews (Stacked and Cross-Fading) */}
-              {STAGES.map((_, idx) => (
-                <div
-                  key={idx}
-                  className={cn(
-                    "preview-stage-card absolute inset-0 bg-pure-white border border-border rounded-2xl p-6 shadow-float flex flex-col justify-between overflow-hidden",
-                    idx === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
-                  )}
-                >
-                  <PreviewCardContent stageIndex={idx} />
-                </div>
-              ))}
+                    <div className="mt-5 pt-3.5 border-t border-border flex items-center justify-between">
+                      <Link
+                        href={s.href}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-venice-blue hover:text-deep-teal group"
+                      >
+                        <span>{s.cta}</span>
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                      </Link>
+                      {isActive && (
+                        <span className="text-[11px] font-medium text-[#18856B] flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Active Stage
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Mobile Inline Product Preview */}
+                    <div className="lg:hidden mt-5 pt-4 border-t border-border">
+                      <PreviewCardContent stageIndex={idx} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </Container>
-      </div>
+
+          {/* Right Column: Desktop Sticky Showcase Area (No layout clipping, no blank gap) */}
+          <div className="hidden lg:block lg:col-span-6 lg:sticky lg:top-28 h-[520px]">
+            {/* Background ambient accent */}
+            <div className="absolute inset-0 bg-rock-blue/15 rounded-3xl transform rotate-1 pointer-events-none" />
+
+            {/* Stage Previews (Stacked and Cross-Fading cleanly via GSAP) */}
+            {STAGES.map((_, idx) => (
+              <div
+                key={idx}
+                ref={setPreviewCardRef(idx)}
+                style={{ opacity: idx === 0 ? 1 : 0 }}
+                className={cn(
+                  "absolute inset-0 bg-pure-white border border-border rounded-2xl p-7 shadow-float flex flex-col justify-between overflow-hidden will-change-transform",
+                  idx === 0 ? "pointer-events-auto" : "pointer-events-none"
+                )}
+              >
+                <PreviewCardContent stageIndex={idx} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </Container>
     </section>
   );
 }
 
 /**
- * PreviewCardContent: Renders the authentic visual representation for each stage
+ * PreviewCardContent: Renders authentic UI representation for each stage
  */
 function PreviewCardContent({ stageIndex }: { stageIndex: number }) {
   if (stageIndex === 0) {
@@ -287,7 +298,7 @@ function PreviewCardContent({ stageIndex }: { stageIndex: number }) {
           </div>
         </div>
 
-        <div className="p-3 rounded-lg bg-pale-blue/50 border border-border space-y-1.5">
+        <div className="p-3.5 rounded-lg bg-pale-blue/50 border border-border space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span className="font-semibold text-deep-teal">Coursework & Capstones:</span>
             <span className="text-[11px] text-[#18856B] font-medium">94% Confidence</span>
@@ -298,7 +309,7 @@ function PreviewCardContent({ stageIndex }: { stageIndex: number }) {
           </p>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-muted-text pt-2">
+        <div className="flex items-center justify-between text-xs text-muted-text pt-2 border-t border-border">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#18856B]" />
             Zero ATS parsing penalties detected

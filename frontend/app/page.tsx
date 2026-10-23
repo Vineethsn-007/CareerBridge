@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  const mainRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const valPropRef = useRef<HTMLDivElement>(null);
   const challengeRef = useRef<HTMLDivElement>(null);
@@ -258,16 +259,16 @@ export default function Home() {
         const challengeCards = challengeRef.current.querySelectorAll(".challenge-card");
         gsap.fromTo(
           challengeCards,
-          { opacity: 0, y: 30 },
+          { opacity: 0, y: 22 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.65,
-            stagger: 0.1,
+            duration: 0.6,
+            stagger: 0.08,
             ease: "power3.out",
             scrollTrigger: {
               trigger: challengeRef.current,
-              start: "top 75%",
+              start: "top 86%",
               once: true,
             },
           }
@@ -281,16 +282,16 @@ export default function Home() {
         const capCards = capabilitiesRef.current.querySelectorAll(".capability-card");
         gsap.fromTo(
           capCards,
-          { opacity: 0, y: 35 },
+          { opacity: 0, y: 24 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.1,
+            duration: 0.65,
+            stagger: 0.08,
             ease: "power3.out",
             scrollTrigger: {
               trigger: capabilitiesRef.current,
-              start: "top 75%",
+              start: "top 86%",
               once: true,
             },
           }
@@ -304,16 +305,16 @@ export default function Home() {
         const pathCards = careerPathsRef.current.querySelectorAll(".career-path-card");
         gsap.fromTo(
           pathCards,
-          { opacity: 0, y: 32 },
+          { opacity: 0, y: 24 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            stagger: 0.12,
+            duration: 0.65,
+            stagger: 0.08,
             ease: "power3.out",
             scrollTrigger: {
               trigger: careerPathsRef.current,
-              start: "top 75%",
+              start: "top 86%",
               once: true,
             },
           }
@@ -327,27 +328,27 @@ export default function Home() {
         const ctaCard = finalCtaRef.current.querySelector(".final-cta-card");
         gsap.fromTo(
           ctaCard,
-          { opacity: 0, y: 35, scale: 0.98 },
+          { opacity: 0, y: 24, scale: 0.98 },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.85,
+            duration: 0.75,
             ease: "power3.out",
             scrollTrigger: {
               trigger: finalCtaRef.current,
-              start: "top 80%",
+              start: "top 86%",
               once: true,
             },
           }
         );
       }
     },
-    { scope: heroRef }
+    { scope: mainRef }
   );
 
   return (
-    <div className="relative min-h-screen bg-merino text-primary-text">
+    <div ref={mainRef} className="relative min-h-screen bg-merino text-primary-text">
       {/* SECTION 2 — HERO SECTION (CINEMATIC OPENING & SCROLL PARALLAX) */}
       <section
         ref={heroRef}
