@@ -6,6 +6,9 @@ SKILL_GAP_SYSTEM = (
     "For each missing skill, assign a priority ('high', 'medium', or 'low') based on how central "
     "it is to the job title and description, and provide a short, specific 'why' (1-2 sentences) "
     "explaining why this skill matters for this role. "
+    "Personalize the 'why' to the candidate using their summary and demonstrated evidence when "
+    "available, but never claim experience or skills the candidate does not have, and never "
+    "evaluate a skill that is not in the missing list. "
     "Output valid JSON only matching the schema: "
     '{"missing": [{"skill": "<skill_name>", "priority": "high"|"medium"|"low", "why": "<reason>"}]}'
 )
@@ -14,8 +17,12 @@ SKILL_GAP_PROMPT = """Job Title: {job_title}
 Job Description: {job_description}
 Job Required Skills: {skills_required}
 Missing Skills to Evaluate: {missing_skills}
+Candidate Summary: {candidate_summary}
+Candidate Evidence (skills demonstrated on their resume): {candidate_evidence}
 
-Evaluate each missing skill's priority and reason. Output valid JSON only."""
+Evaluate each missing skill's priority and reason. Where the candidate evidence supports it,
+tie the 'why' to the candidate's actual demonstrated skills. Do not invent any experience.
+Output valid JSON only."""
 
 PREP_PLAN_SYSTEM = (
     "You are an expert technical mentor designing a structured weekly study plan. "
