@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.schemas import Experience, Job, JobMatch, MatchRequest, ParsedResume
+from app.schemas import Experience, Job, JobMatch, MatchRequest, ParsedResume, SkillEvidence
 from app.services.matching.service import (
     compute_experience_compatibility,
     compute_skill_overlap,
@@ -197,3 +197,116 @@ def test_deterministic_ranking_for_identical_scores():
     ids1 = [m.job.id for m in matches1]
     ids2 = [m.job.id for m in matches2]
     assert ids1 == ids2
+
+
+# ---------------- Evidence-weighted Skill Overlap (Task 5) ----------------
+
+
+def _evidence(**overrides) -> SkillEvidence:
+    """One evidence entry; defaults to a fully evidenced work-experience skill."""
+    base = dict(skill="Python", category="work experience", weighted_strength=1.0)
+    base.update(overrides)
+    return SkillEvidence(**base)
+
+
+def test_evidence_weighting_scales_overlap_score():
+    """Same matched skills, different evidence: proven skills outrank merely listed ones."""
+    job = _make_job(skills=["Python", "SQL", "Git"])
+
+    strong = ParsedResume(
+        skills=["Python", "SQL", "Git"],
+        skill_evidence=[_evidence(skill=s) for s in ("Python", "SQL", "Git")],
+    )
+    weak = ParsedResume(
+        skills=["Python", "SQL", "Git"],
+        skill_evidence=[
+            _evidence(skill=s, category="listed only", weighted_strength=0.3)
+            for s in ("Python", "SQL", "Git")
+        ],
+    )
+
+    ratio_strong, matched_strong, _ = compute_skill_overlap(
+        strong.skills, job.skills_required, skill_evidence=strong.skill_evidence
+    )
+    ratio_weak, matched_weak, _ = compute_skill_overlap(
+        weak.skills, job.skills_required, skill_evidence=weak.skill_evidence
+    )
+
+    assert matched_strong == matched_weak
+    assert ratio_strong == 1.0
+    assert ratio_weak < ratio_strong
+    assert ratio_weak == 0.3
+
+
+def test_uncorroborated_skill_counts_as_listed_only():
+    """With evidence data present, a matched skill lacking an entry scores at listed-only."""
+    ratio, matched, _ = compute_skill_overlap(
+        resume_skills=["Python", "SQL"],
+        job_skills=["Python", "SQL"],
+        skill_evidence=[_evidence(skill="Python")],
+    )
+    assert set(matched) == {"Python", "SQL"}
+    # Python fully evidenced (weight 1.0), SQL uncorroborated (0.3):
+    # job position weights are 1.0 and 0.5.
+    assert ratio == (1.0 * 1.0 + 0.5 * 0.3) / 1.5
+
+
+def test_no_evidence_data_keeps_legacy_full_credit():
+    """Resumes without skill_evidence behave exactly as before the upgrade."""
+    ratio_none, matched_none, _ = compute_skill_overlap(
+        ["Python", "SQL"], ["Python", "SQL"], skill_evidence=None
+    )
+    ratio_empty, _, _ = compute_skill_overlap(
+        ["Python", "SQL"], ["Python", "SQL"], skill_evidence=[]
+    )
+    assert matched_none == ["Python", "SQL"]
+    assert ratio_none == 1.0
+    assert ratio_empty == 1.0
+
+
+def test_evidence_synonyms_and_duplicates_collapse_to_strongest():
+    """Case/synonym variants map canonically, duplicates keep the highest strength."""
+    ratio, matched, _ = compute_skill_overlap(
+        resume_skills=["ml"],
+        job_skills=["Machine Learning"],
+        skill_evidence=[
+            _evidence(skill="ml", category="project", weighted_strength=0.7),
+            _evidence(skill="Machine Learning", category="work experience", weighted_strength=1.0),
+        ],
+    )
+    assert matched == ["Machine Learning"]
+    assert ratio == 1.0
+
+
+def test_score_job_prefers_evidenced_resume_with_identical_skills():
+    """End to end: identical skill lists, only evidence differs, proven resume wins."""
+    job = _make_job()
+    evidenced = ParsedResume(
+        name="Proven",
+        skills=["Python", "SQL", "Git", "REST API"],
+        skill_evidence=[_evidence(skill=s) for s in ("Python", "SQL", "Git", "REST API")],
+    )
+    listed = ParsedResume(
+        name="Claims",
+        skills=["Python", "SQL", "Git", "REST API"],
+        skill_evidence=[
+            _evidence(skill=s, category="listed only", weighted_strength=0.3)
+            for s in ("Python", "SQL", "Git", "REST API")
+        ],
+    )
+
+    match_proven = score_job(evidenced, job)
+    match_claims = score_job(listed, job)
+
+    assert match_proven.score > match_claims.score
+    assert match_proven.matched_skills == match_claims.matched_skills
+    assert "backed by direct evidence" in match_proven.rationale
+
+
+def test_score_job_evidence_note_absent_without_evidence():
+    """Resumes without evidence data keep the original rationale wording."""
+    resume = ParsedResume(name="Plain", skills=["Python"])
+    match = score_job(resume, _make_job())
+
+    assert "backed by direct evidence" not in match.rationale
+    assert "matches" in match.rationale.lower()
