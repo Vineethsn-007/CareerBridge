@@ -72,12 +72,12 @@ export function Navbar() {
 
           {/* Action CTAs */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/resume">
+            <Link href="/resume" className="inline-flex">
               <Button size="sm" variant="ghost">
                 Sign In
               </Button>
             </Link>
-            <Link href="/resume">
+            <Link href="/resume" className="inline-flex">
               <Button size="sm" variant="primary">
                 Get Started
               </Button>
@@ -89,7 +89,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-secondary-text hover:text-primary-text rounded-DEFAULT hover:bg-pale-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue"
+              className="p-2 text-secondary-text hover:text-primary-text rounded-DEFAULT hover:bg-pale-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? (
@@ -124,7 +124,7 @@ export function Navbar() {
             );
           })}
           <div className="pt-3 border-t border-border flex flex-col gap-2">
-            <Link href="/resume" onClick={closeMenu}>
+            <Link href="/resume" onClick={closeMenu} className="w-full block">
               <Button size="md" variant="primary" className="w-full">
                 Get Started
               </Button>

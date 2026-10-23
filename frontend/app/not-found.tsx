@@ -26,13 +26,13 @@ export default function NotFound() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <Link href="/" className="w-full sm:w-auto">
+            <Link href="/" className="w-full sm:w-auto inline-flex justify-center">
               <Button size="md" variant="primary" leftIcon={<Home className="w-4 h-4" />} className="w-full sm:w-auto">
                 Back to Home
               </Button>
             </Link>
 
-            <Link href="/jobs" className="w-full sm:w-auto">
+            <Link href="/jobs" className="w-full sm:w-auto inline-flex justify-center">
               <Button size="md" variant="outline" leftIcon={<Briefcase className="w-4 h-4 text-venice-blue" />} className="w-full sm:w-auto">
                 Browse Verified Jobs
               </Button>

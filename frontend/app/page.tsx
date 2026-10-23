@@ -133,7 +133,7 @@ export default function Home() {
 
               {/* CTAs */}
               <div className="hero-actions flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-                <Link href="/resume">
+                <Link href="/resume" className="w-full sm:w-auto inline-flex">
                   <Button
                     size="lg"
                     variant="primary"
@@ -143,7 +143,7 @@ export default function Home() {
                     Build My Career Path
                   </Button>
                 </Link>
-                <Link href="#how-it-works">
+                <Link href="#how-it-works" className="w-full sm:w-auto inline-flex">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
                     Explore How It Works
                   </Button>
@@ -305,12 +305,6 @@ export default function Home() {
                   sizes="(max-width: 768px) 100vw, 600px"
                   priority
                 />
-              </div>
-
-              {/* Authentic caption tag */}
-              <div className="absolute bottom-3 left-4 bg-deep-teal/85 backdrop-blur-md text-white text-[11px] font-medium px-3 py-1 rounded-full flex items-center gap-1.5 shadow-subtle hidden sm:flex">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>Student Engineering Team • Live Hackathon Sprint</span>
               </div>
             </div>
           </div>
@@ -677,13 +671,13 @@ export default function Home() {
               and create a practical path toward your career goals.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link href="/resume">
-                <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />}>
+              <Link href="/resume" className="w-full sm:w-auto inline-flex justify-center">
+                <Button size="lg" variant="primary" rightIcon={<ArrowRight className="w-4 h-4" />} className="w-full sm:w-auto shadow-card">
                   Start Your Career Journey
                 </Button>
               </Link>
-              <Link href="/jobs">
-                <Button size="lg" variant="outline">
+              <Link href="/jobs" className="w-full sm:w-auto inline-flex justify-center">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
                   Explore the Platform
                 </Button>
               </Link>
