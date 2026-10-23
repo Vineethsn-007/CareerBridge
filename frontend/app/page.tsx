@@ -162,49 +162,44 @@ export default function Home() {
               {/* Soft blue visual accent behind image */}
               <div className="absolute -inset-4 bg-rock-blue/20 rounded-2xl transform -rotate-1 pointer-events-none" />
 
-              <div className="hero-image-wrap relative rounded-xl overflow-hidden border border-border shadow-float bg-pure-white">
-                <div className="relative aspect-[4/3] w-full">
+              <div className="hero-image-wrap relative rounded-2xl overflow-hidden border border-border shadow-float bg-pure-white">
+                <div className="relative aspect-[1024/738] w-full">
                   <Image
                     src="/images/hero-student.jpg"
-                    alt="Indian college student working confidently on career planning"
+                    alt="Indian engineering student working on code projects on his laptop"
                     fill
                     priority
                     className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 500px"
+                    sizes="(max-width: 768px) 100vw, 520px"
                   />
-                  {/* Subtle gradient vignette at bottom */}
-                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-deep-teal/60 to-transparent pointer-events-none" />
-                </div>
-
-                {/* Overlaid Bottom Title */}
-                <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-                  <div>
-                    <p className="text-xs font-medium text-pale-blue">Aarav Sharma • 2026 Batch</p>
-                    <p className="text-sm font-semibold">Full Stack & Data Engineering</p>
-                  </div>
-                  <Badge variant="verified" size="sm">
-                    Verified Match
-                  </Badge>
                 </div>
               </div>
 
-              {/* Floating Product Preview 1: Match Score */}
-              <div className="hero-float-card absolute -bottom-6 -left-6 sm:-left-8 bg-pure-white border border-border rounded-lg p-3.5 shadow-float max-w-[210px] hidden sm:flex items-center gap-3">
-                <ScoreRing score={88} size="sm" animate={true} />
-                <div className="space-y-0.5">
-                  <p className="text-xs font-bold text-deep-teal">88% Match</p>
-                  <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru</p>
-                </div>
-              </div>
-
-              {/* Floating Product Preview 2: Prep Plan Status */}
-              <div className="hero-float-card absolute -top-4 -right-4 sm:-right-6 bg-pure-white border border-border rounded-lg p-3 shadow-float hidden sm:flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#18856B] flex items-center justify-center font-bold text-xs">
+              {/* Floating Product Preview 1 (Top-Left): Candidate Readiness & Active Prep Plan */}
+              <div className="hero-float-card absolute -top-4 -left-4 sm:-left-6 bg-pure-white border border-border rounded-xl p-3 shadow-float hidden sm:flex items-center gap-3 z-20">
+                <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200/60 text-[#18856B] flex items-center justify-center font-bold text-xs shrink-0">
                   4W
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-semibold text-deep-teal">Prep Plan Active</p>
-                  <p className="text-[10px] text-secondary-text">Week 1: TypeScript & ORM</p>
+                <div className="space-y-0.5 pr-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-bold text-deep-teal">Prep Plan Active</p>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#18856B] animate-pulse" />
+                  </div>
+                  <p className="text-[11px] text-secondary-text">Week 1: TypeScript & System Design</p>
+                </div>
+              </div>
+
+              {/* Floating Product Preview 2 (Bottom-Right): Verified Match & Score */}
+              <div className="hero-float-card absolute -bottom-5 -right-4 sm:-right-6 bg-pure-white border border-border rounded-xl p-3.5 shadow-float hidden sm:flex items-center gap-3.5 z-20">
+                <ScoreRing score={88} size="sm" animate={true} />
+                <div className="space-y-0.5 pr-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-deep-teal">88% Match</p>
+                    <Badge variant="verified" size="sm">
+                      Verified Match
+                    </Badge>
+                  </div>
+                  <p className="text-[11px] text-secondary-text">Junior SDE • Bengaluru (₹8–12 LPA)</p>
                 </div>
               </div>
             </div>
