@@ -22,13 +22,13 @@ export function Chip({
 }: ChipProps) {
   const variantStyles = {
     default:
-      "bg-pale-blue text-primary-text border border-border hover:border-rock-blue hover:bg-light-blue",
+      "bg-pale-blue text-primary-text border border-border hover:border-rock-blue hover:bg-light-blue hover:text-deep-teal hover:-translate-y-0.5 hover:shadow-subtle",
     matched:
-      "bg-emerald-50 text-[#18856B] border border-[#18856B]/30 hover:border-[#18856B]/60",
+      "bg-emerald-50 text-[#18856B] border border-[#18856B]/30 hover:border-[#18856B]/60 hover:bg-emerald-100/60 hover:-translate-y-0.5 hover:shadow-subtle",
     missing:
-      "bg-rose-50 text-[#B54747] border border-[#B54747]/30 hover:border-[#B54747]/60",
+      "bg-rose-50 text-[#B54747] border border-[#B54747]/30 hover:border-[#B54747]/60 hover:bg-rose-100/60 hover:-translate-y-0.5 hover:shadow-subtle",
     highlight:
-      "bg-light-blue text-venice-blue border border-rock-blue/40 font-medium",
+      "bg-light-blue text-venice-blue border border-rock-blue/40 font-medium hover:bg-rock-blue/20 hover:-translate-y-0.5 hover:shadow-subtle",
   };
 
   const isClickable = Boolean(onClick || onAdd);
