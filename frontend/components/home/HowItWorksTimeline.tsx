@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { EditorialHeading } from "@/components/motion/ScrollReveal";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 import {
   FileText,
   Briefcase,
@@ -61,6 +62,7 @@ const WORKFLOW_STEPS = [
 export function HowItWorksTimeline() {
   const containerRef = useRef<HTMLDivElement>(null);
   const progressLineRef = useRef<HTMLDivElement>(null);
+  const timelineTrackRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -69,38 +71,21 @@ export function HowItWorksTimeline() {
       const container = containerRef.current;
       const progressLine = progressLineRef.current;
       const stepCards = container.querySelectorAll<HTMLElement>(".workflow-step-card");
-      const stepDots = container.querySelectorAll<HTMLElement>(".workflow-step-dot");
+      const desktopStepNodes = container.querySelectorAll<HTMLElement>(".desktop-step-node");
+      const mobileStepDots = container.querySelectorAll<HTMLElement>(".mobile-step-dot");
 
-      // Scroll-linked progress line advancing through the section
-      if (progressLine) {
-        gsap.fromTo(
-          progressLine,
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: container,
-              start: "top 75%",
-              end: "bottom 80%",
-              scrub: 0.5,
-            },
-          }
-        );
-      }
-
-      // Step cards staggered entrance with early trigger so content is never blank
+      // 1. Initial entrance animation for step cards when section enters viewport
       gsap.fromTo(
         stepCards,
         {
           opacity: 0,
-          y: 22,
+          y: 20,
         },
         {
           opacity: 1,
           y: 0,
           duration: 0.6,
-          stagger: 0.1,
+          stagger: 0.08,
           ease: "power3.out",
           scrollTrigger: {
             trigger: container,
@@ -110,32 +95,99 @@ export function HowItWorksTimeline() {
         }
       );
 
-      // Active state illumination as progress reaches each step
-      stepDots.forEach((dot, idx) => {
+      // 2. Desktop sequential progress scrubber connecting Steps 01 -> 02 -> 03 -> 04 -> 05
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 1024px)", () => {
         ScrollTrigger.create({
-          trigger: dot,
-          start: "top 75%",
-          onEnter: () => {
-            gsap.to(dot, {
-              backgroundColor: "#16587B",
-              color: "#FFFFFF",
-              scale: 1.05,
-              duration: 0.35,
-              ease: "back.out(1.5)",
-            });
-          },
-          onLeaveBack: () => {
-            if (idx > 0) {
-              gsap.to(dot, {
-                backgroundColor: "#E6F0F5",
-                color: "#16587B",
-                scale: 1,
-                duration: 0.25,
+          trigger: container,
+          start: "top 65%",
+          end: "bottom 65%",
+          scrub: 0.35,
+          onUpdate: (self) => {
+            const p = self.progress;
+
+            // Fill horizontal connecting bar
+            if (progressLine) {
+              gsap.to(progressLine, {
+                scaleX: p,
+                duration: 0.1,
+                ease: "none",
+                overwrite: "auto",
               });
             }
+
+            // Determine active step index: 0 (01), 1 (02), 2 (03), 3 (04), 4 (05)
+            let activeIndex = 0;
+            if (p >= 0.92) {
+              activeIndex = 4;
+            } else if (p >= 0.68) {
+              activeIndex = 3;
+            } else if (p >= 0.44) {
+              activeIndex = 2;
+            } else if (p >= 0.18) {
+              activeIndex = 1;
+            } else {
+              activeIndex = 0;
+            }
+
+            // Update desktop timeline milestone nodes
+            desktopStepNodes.forEach((node, i) => {
+              if (i <= activeIndex) {
+                node.classList.add("bg-venice-blue", "text-white", "border-venice-blue", "scale-110", "shadow-card");
+                node.classList.remove("bg-pure-white", "text-secondary-text", "border-border");
+              } else {
+                node.classList.remove("bg-venice-blue", "text-white", "border-venice-blue", "scale-110", "shadow-card");
+                node.classList.add("bg-pure-white", "text-secondary-text", "border-border");
+              }
+            });
+
+            // Update cards active border & elevation
+            stepCards.forEach((card, i) => {
+              if (i === activeIndex) {
+                card.classList.add("border-venice-blue/60", "shadow-card", "bg-pure-white", "ring-1", "ring-venice-blue/20");
+                card.classList.remove("border-border", "bg-pure-white/80");
+              } else {
+                card.classList.remove("border-venice-blue/60", "shadow-card", "ring-1", "ring-venice-blue/20");
+                card.classList.add("border-border", "bg-pure-white/80");
+              }
+            });
           },
         });
       });
+
+      // 3. Mobile (< 1024px) sequential reveals as each card scrolls past
+      mm.add("(max-width: 1023px)", () => {
+        mobileStepDots.forEach((dot, idx) => {
+          ScrollTrigger.create({
+            trigger: dot,
+            start: "top 78%",
+            onEnter: () => {
+              gsap.to(dot, {
+                backgroundColor: "#16587B",
+                color: "#FFFFFF",
+                scale: 1.05,
+                duration: 0.3,
+                ease: "back.out(1.4)",
+              });
+            },
+            onLeaveBack: () => {
+              if (idx > 0) {
+                gsap.to(dot, {
+                  backgroundColor: "#E6F0F5",
+                  color: "#16587B",
+                  scale: 1,
+                  duration: 0.2,
+                });
+              }
+            },
+          });
+        });
+      });
+
+      return () => {
+        mm.revert();
+      };
     },
     { scope: containerRef }
   );
@@ -167,30 +219,65 @@ export function HowItWorksTimeline() {
           </p>
         </div>
 
-        {/* Desktop Progress Tracker Track */}
-        <div className="hidden lg:block relative mb-10 px-8">
-          <div className="h-1 w-full bg-border rounded-full overflow-hidden">
-            <div
-              ref={progressLineRef}
-              className="h-full w-full bg-venice-blue origin-left scale-x-0 will-change-transform"
-            />
-          </div>
+        {/* Desktop Milestone Timeline Track (Integrated connecting line with precisely aligned nodes) */}
+        <div ref={timelineTrackRef} className="hidden lg:block relative mb-10 h-10">
+          {/* Base Background Track spanning from Column 1 center (10%) to Column 5 center (90%) */}
+          <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-1 bg-border rounded-full" />
+
+          {/* Active Filling Progress Line */}
+          <div
+            ref={progressLineRef}
+            className="absolute left-[10%] top-1/2 -translate-y-1/2 h-1 w-[80%] bg-venice-blue origin-left scale-x-0 rounded-full will-change-transform"
+          />
+
+          {/* 5 Milestone Step Nodes aligned with the center of each of the 5 cards below */}
+          {WORKFLOW_STEPS.map((s, idx) => {
+            const leftPercent = 10 + idx * 20;
+            const isInitialActive = idx === 0;
+
+            return (
+              <div
+                key={s.step}
+                style={{ left: `${leftPercent}%` }}
+                className={cn(
+                  "desktop-step-node absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-2 font-serif font-bold text-xs flex items-center justify-center transition-all duration-300 z-10",
+                  isInitialActive
+                    ? "bg-venice-blue text-white border-venice-blue scale-110 shadow-card"
+                    : "bg-pure-white text-secondary-text border-border"
+                )}
+              >
+                {s.step}
+              </div>
+            );
+          })}
         </div>
 
         {/* 5-Step Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-          {WORKFLOW_STEPS.map((s) => {
+          {WORKFLOW_STEPS.map((s, idx) => {
             const Icon = s.icon;
+            const isInitialActive = idx === 0;
+
             return (
               <div
                 key={s.step}
-                className="workflow-step-card bg-pure-white border border-border rounded-xl p-5 shadow-subtle hover:border-rock-blue hover:shadow-card transition-all flex flex-col justify-between space-y-4 group will-change-transform"
+                className={cn(
+                  "workflow-step-card rounded-xl p-5 transition-all duration-300 flex flex-col justify-between space-y-4 group will-change-transform",
+                  isInitialActive
+                    ? "border border-venice-blue/60 shadow-card bg-pure-white ring-1 ring-venice-blue/20"
+                    : "border border-border bg-pure-white/80 hover:border-rock-blue hover:shadow-card"
+                )}
               >
                 <div className="space-y-3">
-                  {/* Step Header with Step Dot */}
+                  {/* Step Header with Category Icon & Mobile Step Dot */}
                   <div className="flex items-center justify-between">
                     <span
-                      className="workflow-step-dot w-8 h-8 rounded-full bg-pale-blue text-venice-blue font-serif font-bold text-xs flex items-center justify-center transition-all duration-300 shadow-subtle"
+                      className={cn(
+                        "mobile-step-dot w-7 h-7 rounded-full font-serif font-bold text-xs flex items-center justify-center transition-all duration-300",
+                        isInitialActive
+                          ? "bg-venice-blue text-white"
+                          : "bg-pale-blue text-venice-blue"
+                      )}
                     >
                       {s.step}
                     </span>
