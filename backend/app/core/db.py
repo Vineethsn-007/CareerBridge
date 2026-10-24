@@ -169,6 +169,19 @@ class PersonaProfile(Base):
     resume_profile: Mapped[ResumeProfile | None] = relationship(back_populates="personas")
 
 
+class TailoredResumeRow(Base):
+    """Persisted tailored resume; content rendered on demand (no stored files)."""
+
+    __tablename__ = "tailored_resumes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(String(100), index=True)
+    job_id: Mapped[str] = mapped_column(String(100), index=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    content: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime, default=_utcnow)
+
+
 class CachedResource(Base):
     """Cached preparation resource, verified per Task 6 before it is ever shown."""
 

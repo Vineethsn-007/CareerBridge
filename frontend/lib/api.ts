@@ -21,12 +21,46 @@ import type {
   PrepPlanRequest,
   SkillGap,
   SkillGapRequest,
+  TailoredResume,
+  TailorRequest,
+  TailoredResumeRecord,
+  TailoredResumeListItem,
 } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const USER_ID_STORAGE_KEY = "careerbridge_user_id";
+
+export function getBrowserUserId(): string {
+  if (typeof window === "undefined") {
+    return "00000000-0000-0000-0000-000000000000";
+  }
+  let id = localStorage.getItem(USER_ID_STORAGE_KEY);
+  if (!id) {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      id = crypto.randomUUID();
+    } else {
+      id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+    localStorage.setItem(USER_ID_STORAGE_KEY, id);
+  }
+  return id;
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}/api${path}`, init);
+  const headers = new Headers(init?.headers);
+  if (!headers.has("X-User-ID")) {
+    headers.set("X-User-ID", getBrowserUserId());
+  }
+
+  const res = await fetch(`${BASE_URL}/api${path}`, {
+    ...init,
+    headers,
+  });
+
   if (!res.ok) {
     let detail = res.statusText;
     try {
@@ -43,6 +77,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 function post<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+function put<T>(path: string, body: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -105,5 +147,37 @@ export const api = {
       `/interview/sessions/${encodeURIComponent(sessionId)}/data`,
       { method: "DELETE" }
     );
+  },
+
+  // ---------- Resume Tailoring API ----------
+  tailorResume(body: TailorRequest): Promise<TailoredResumeRecord> {
+    return post<TailoredResumeRecord>("/resume/tailor", body);
+  },
+  getTailoredResume(id: number): Promise<TailoredResumeRecord> {
+    return request<TailoredResumeRecord>(`/resume/tailored/${id}`);
+  },
+  updateTailoredResume(id: number, content: TailoredResume): Promise<TailoredResumeRecord> {
+    return put<TailoredResumeRecord>(`/resume/tailored/${id}`, content);
+  },
+  listTailoredResumes(jobId?: string): Promise<TailoredResumeListItem[]> {
+    const qs = jobId ? `?job_id=${encodeURIComponent(jobId)}` : "";
+    return request<TailoredResumeListItem[]>(`/resume/tailored${qs}`);
+  },
+  async downloadTailoredResume(id: number, format: "pdf" | "docx", filename?: string): Promise<void> {
+    const res = await fetch(`${BASE_URL}/api/resume/tailored/${id}/download?format=${format}`, {
+      headers: { "X-User-ID": getBrowserUserId() },
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to download ${format.toUpperCase()} resume.`);
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename || `tailored_resume_${id}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
   },
 };

@@ -13,11 +13,13 @@ import { api } from "@/lib/api";
 import type { Job, SkillGap, PrepPlan, ParsedResume } from "@/lib/types";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { TailorResumeModal } from "@/components/tailoring/TailorResumeModal";
 import {
   ExternalLink,
   MessageSquare,
   Target,
   Calendar,
+  Sparkles,
 } from "lucide-react";
 
 // Preloaded sample resume for demo fallback
@@ -69,6 +71,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isTailorOpen, setIsTailorOpen] = useState(false);
 
   const activeResume = resume || DEMO_RESUME;
 
@@ -162,16 +165,27 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           }
           action={
             job && (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  size="sm"
+                  variant="highlight"
+                  onClick={() => setIsTailorOpen(true)}
+                  leftIcon={<Sparkles className="w-4 h-4 text-venice-blue" />}
+                  className="font-semibold shadow-sm"
+                >
+                  Tailor my resume
+                </Button>
+
                 <Link href={`/interview?job_id=${encodeURIComponent(job.id)}`}>
                   <Button
                     size="sm"
-                    variant="highlight"
+                    variant="secondary"
                     leftIcon={<MessageSquare className="w-4 h-4" />}
                   >
                     Mock Interview
                   </Button>
                 </Link>
+
                 <a
                   href={job.source_url}
                   target="_blank"
@@ -180,7 +194,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                 >
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="outline"
                     rightIcon={<ExternalLink className="w-3.5 h-3.5" />}
                   >
                     Official Portal
@@ -277,6 +291,16 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           </div>
         )}
       </Container>
+
+      {/* Tailor Resume Modal */}
+      {job && (
+        <TailorResumeModal
+          job={job}
+          resume={activeResume}
+          isOpen={isTailorOpen}
+          onClose={() => setIsTailorOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -401,3 +401,62 @@ export interface InterviewReport {
   created_at: string;
 }
 
+
+
+// ---------- Resume Tailoring (Task: resume-tailoring-agent) ----------
+
+export interface TailoredExperience {
+  title: string;
+  company?: string | null;
+  duration?: string | null;
+  bullets: string[];
+}
+
+export interface TailoredProject {
+  name: string;
+  description?: string | null;
+  highlights: string[];
+}
+
+export interface ChangeEntry {
+  section: string;
+  what: string;
+  why: string;
+}
+
+export interface TailoredResume {
+  headline: string;
+  summary: string;
+  skills_grouped: Record<string, string[]>;
+  experience: TailoredExperience[];
+  projects: TailoredProject[];
+  education: Education[];
+  certifications: Certification[];
+  change_log: ChangeEntry[];
+  ats_keywords_matched: string[];
+  gaps_not_added: string[];
+  ats_score_before: number;
+  ats_score_after: number;
+}
+
+export interface TailorRequest {
+  job_id: string;
+  resume?: ParsedResume | null;
+}
+
+export interface TailoredResumeRecord {
+  id: number;
+  user_id: string;
+  job_id: string;
+  version: number;
+  content: TailoredResume;
+  created_at: string;
+}
+
+export interface TailoredResumeListItem {
+  id: number;
+  version: number;
+  job_id: string;
+  ats_score_after: number;
+  created_at: string;
+}
