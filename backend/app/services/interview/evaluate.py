@@ -109,6 +109,24 @@ _SKIP_PHRASES = [
 ]
 
 
+def is_system_content(text: str) -> bool:
+    """Detect whether a transcript turn contains system prompts or perception instructions."""
+    if not text:
+        return False
+    t = text.lower()
+    if "you are robin" in t and "interviewer" in t:
+        return True
+    if "strict behavioral rules" in t:
+        return True
+    if "for reference, the current date and time" in t:
+        return True
+    if "<user_visual_analysis>" in t or "<emotion_call>" in t:
+        return True
+    if "perception metadata" in t or "webcam and screen labels" in t:
+        return True
+    return False
+
+
 def compute_communication_metrics(
     transcript: list[dict[str, Any]] | None,
 ) -> CommunicationMetrics:
@@ -131,9 +149,15 @@ def compute_communication_metrics(
 
     for turn in transcript:
         role = str(turn.get("role") or turn.get("speaker") or "").lower()
-        if role in ("user", "candidate"):
+        content = str(turn.get("content") or turn.get("text") or turn.get("message") or "").strip()
+        if not content or is_system_content(content):
+            continue
+        if role in ("system", "environment", "metadata", "perception"):
+            continue
+
+        if role in ("user", "candidate", "you", "human"):
             user_turns.append(turn)
-        elif role in ("assistant", "interviewer", "system"):
+        elif role in ("assistant", "interviewer", "robin", "bot", "ai"):
             assistant_turns.append(turn)
         else:
             # Fallback if roles aren't explicitly labeled
@@ -249,35 +273,57 @@ def compute_communication_metrics(
         if len(words_in_turn) < 4 or any(phrase in lower_txt for phrase in _SKIP_PHRASES):
             skipped_count += 1
 
+    if total_words == 0:
+        return CommunicationMetrics(
+            words_per_minute=0.0,
+            filler_word_count=0,
+            filler_percentage=0.0,
+            filler_breakdown={},
+            average_answer_duration_seconds=0.0,
+            average_answer_words=0.0,
+            long_pauses_count=long_pauses,
+            skipped_questions_count=skipped_count,
+            clarity_score=0.0,
+            conciseness_score=0.0,
+            confidence_score=0.0,
+            star_structure_score=0.0,
+        )
+
     # 5. Dimension scores (0 - 10)
-    # Clarity: penalized by fillers and unnatural pace
-    pace_penalty = 1.5 if (wpm > 185 or (wpm < 95 and total_words > 0)) else 0.0
-    filler_penalty = min(4.0, filler_percentage * 0.4)
-    clarity_score = round(max(2.0, min(10.0, 10.0 - filler_penalty - pace_penalty)), 1)
+    if total_words < 15:
+        clarity_score = round(max(1.0, min(5.0, 2.5 + (total_words * 0.15))), 1)
+        conciseness_score = 3.5
+        confidence_score = round(max(1.0, 4.0 - (1.5 * skipped_count)), 1)
+        star_structure_score = 2.0
+    else:
+        # Clarity: penalized by fillers and unnatural pace
+        pace_penalty = 1.5 if (wpm > 185 or (wpm < 95 and total_words > 0)) else 0.0
+        filler_penalty = min(4.0, filler_percentage * 0.4)
+        clarity_score = round(max(2.0, min(10.0, 10.0 - filler_penalty - pace_penalty)), 1)
 
-    # Conciseness: ideal average answer is 40-180 words
-    conciseness_deduction = 0.0
-    if avg_words > 250:
-        conciseness_deduction = min(3.5, (avg_words - 250) * 0.02)
-    elif avg_words < 20 and total_words > 0:
-        conciseness_deduction = 2.5
-    conciseness_score = round(max(2.0, min(10.0, 9.5 - conciseness_deduction)), 1)
+        # Conciseness: ideal average answer is 40-180 words
+        conciseness_deduction = 0.0
+        if avg_words > 250:
+            conciseness_deduction = min(3.5, (avg_words - 250) * 0.02)
+        elif avg_words < 20 and total_words > 0:
+            conciseness_deduction = 2.5
+        conciseness_score = round(max(2.0, min(10.0, 9.5 - conciseness_deduction)), 1)
 
-    # Confidence: penalized by fillers, excessive pauses, and skips
-    confidence_penalty = (
-        min(3.0, filler_percentage * 0.3) + (0.5 * min(long_pauses, 4)) + (1.5 * skipped_count)
-    )
-    confidence_score = round(max(2.0, min(10.0, 9.5 - confidence_penalty)), 1)
+        # Confidence: penalized by fillers, excessive pauses, and skips
+        confidence_penalty = (
+            min(3.0, filler_percentage * 0.3) + (0.5 * min(long_pauses, 4)) + (1.5 * skipped_count)
+        )
+        confidence_score = round(max(1.0, min(10.0, 9.5 - confidence_penalty)), 1)
 
-    # STAR structure score: measure coverage of situation, task, action, result
-    star_hits = 0
-    lowered_comb = combined_text.lower()
-    for _, markers in STAR_INDICATORS.items():
-        if any(marker in lowered_comb for marker in markers):
-            star_hits += 1
+        # STAR structure score: measure coverage of situation, task, action, result
+        star_hits = 0
+        lowered_comb = combined_text.lower()
+        for _, markers in STAR_INDICATORS.items():
+            if any(marker in lowered_comb for marker in markers):
+                star_hits += 1
 
-    star_score_map = {4: 9.2, 3: 8.2, 2: 7.0, 1: 5.8, 0: 4.5}
-    star_structure_score = star_score_map.get(star_hits, 7.5)
+        star_score_map = {4: 9.2, 3: 8.2, 2: 7.0, 1: 5.8, 0: 4.5}
+        star_structure_score = star_score_map.get(star_hits, 4.5)
 
     return CommunicationMetrics(
         words_per_minute=wpm,
@@ -316,7 +362,15 @@ def extract_candidate_answers(
         if not content:
             continue
 
-        if role in ("assistant", "interviewer"):
+        # CRITICAL: Exclude system prompts, metadata, environment, perception events!
+        if role in ("system", "environment", "metadata", "perception") or is_system_content(content):
+            continue
+
+        # Exclude UI status logs
+        if content in ("[Marked answer as complete]", "[Skipped question]"):
+            continue
+
+        if role in ("assistant", "interviewer", "robin", "ai", "bot"):
             # Check if this assistant turn corresponds to any question
             best_idx = None
             for idx, q in enumerate(questions):
@@ -335,22 +389,28 @@ def extract_candidate_answers(
                     questions
                 ):
                     current_q_idx += 1
-        else:
+        elif role in ("user", "candidate", "you", "human") or role == "":
             # Candidate turn
             if current_q_idx < len(candidate_turns_by_question):
                 candidate_turns_by_question[current_q_idx].append(content)
 
-    # Combine utterances per question
+    # Combine utterances per question and verify no system content leaked
     answers: list[str] = []
     for turn_list in candidate_turns_by_question:
-        answers.append(" ".join(turn_list).strip())
+        combined = " ".join(turn_list).strip()
+        if is_system_content(combined):
+            combined = ""
+        answers.append(combined)
 
     # Fallback: If no assistant roles were tagged and answers are all in index 0,
     # distribute sequential user turns across questions
     if len(answers) > 1 and not any(answers[1:]) and candidate_turns_by_question[0]:
         all_turns = candidate_turns_by_question[0]
         if len(all_turns) >= len(questions):
-            return [all_turns[i] for i in range(len(questions))]
+            return [
+                all_turns[i] if not is_system_content(all_turns[i]) else ""
+                for i in range(len(questions))
+            ]
 
     return answers
 
@@ -498,6 +558,9 @@ def evaluate_question_answer(
     focus = question.get("focus_skill_or_project") or question.get("focus_skill") or "General"
     difficulty = str(question.get("difficulty") or "medium")
     rubric_points = question.get("expected_key_points") or []
+
+    if is_system_content(candidate_answer):
+        candidate_answer = ""
 
     # If answer is empty or trivially short, bypass LLM
     if len(re.findall(r"\b\w+\b", candidate_answer.lower())) < 4:

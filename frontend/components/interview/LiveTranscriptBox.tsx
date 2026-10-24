@@ -56,6 +56,7 @@ export function LiveTranscriptBox({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [interimText, setInterimText] = useState<string>("");
   const [isCandidateSpeaking, setIsCandidateSpeaking] = useState<boolean>(false);
+  const [typedInput, setTypedInput] = useState<string>("");
 
   // Auto-scroll on new transcript entries or interim speech
   useEffect(() => {
@@ -240,6 +241,33 @@ export function LiveTranscriptBox({
           </div>
         )}
       </div>
+
+      {/* Candidate Input Option: Type or Speak */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (typedInput.trim()) {
+            onCandidateSpeechRecognized?.(typedInput.trim());
+            setTypedInput("");
+          }
+        }}
+        className="p-2 border-t border-border-subtle bg-surface-muted flex items-center gap-1.5"
+      >
+        <input
+          type="text"
+          value={typedInput}
+          onChange={(e) => setTypedInput(e.target.value)}
+          placeholder="Speak or type your answer..."
+          className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border border-border bg-white text-primary-text focus:outline-none focus:ring-1 focus:ring-venice-blue"
+        />
+        <button
+          type="submit"
+          disabled={!typedInput.trim()}
+          className="text-xs px-2.5 py-1.5 rounded-lg bg-venice-blue text-white font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-venice-blue/90 transition-colors"
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 }

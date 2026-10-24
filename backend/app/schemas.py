@@ -352,8 +352,16 @@ class TavusWebhookPayload(BaseModel):
     properties: dict[str, Any] = Field(default_factory=dict)
 
 
+class ClientTranscriptItem(BaseModel):
+    sender: str
+    text: str
+    timestamp: str | None = None
+    role: str | None = None
+
+
 class EndInterviewRequest(BaseModel):
     reason: str | None = None
+    transcript: list[ClientTranscriptItem] | None = None
 
 
 # ---------- Task 4: Interview Evaluation & Report ----------
@@ -383,10 +391,10 @@ class CommunicationMetrics(BaseModel):
     average_answer_words: float = 0.0
     long_pauses_count: int = 0
     skipped_questions_count: int = 0
-    clarity_score: float = Field(default=8.0, ge=0.0, le=10.0)
-    conciseness_score: float = Field(default=8.0, ge=0.0, le=10.0)
-    confidence_score: float = Field(default=8.0, ge=0.0, le=10.0)
-    star_structure_score: float = Field(default=8.0, ge=0.0, le=10.0)
+    clarity_score: float = Field(default=0.0, ge=0.0, le=10.0)
+    conciseness_score: float = Field(default=0.0, ge=0.0, le=10.0)
+    confidence_score: float = Field(default=0.0, ge=0.0, le=10.0)
+    star_structure_score: float = Field(default=0.0, ge=0.0, le=10.0)
 
 
 class IntegritySummary(BaseModel):

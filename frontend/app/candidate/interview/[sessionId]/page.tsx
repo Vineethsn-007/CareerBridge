@@ -263,7 +263,10 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
         candidateStream.getTracks().forEach((t) => t.stop());
       }
 
-      await api.endInterviewSession(sessionId, { reason: "Candidate concluded session" });
+      await api.endInterviewSession(sessionId, {
+        reason: "Candidate concluded session",
+        transcript: transcript,
+      });
       setIsEndModalOpen(false);
       setViewState("waiting");
     } catch (err) {
