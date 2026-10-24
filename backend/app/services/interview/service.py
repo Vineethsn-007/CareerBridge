@@ -25,6 +25,7 @@ from app.schemas import (
     ParsedResume,
     PersonaInput,
 )
+from app.services.interview.evaluate import is_system_content
 from app.services.interview.models import InterviewSessionModel
 from app.services.interview.prompts import (
     INTERVIEW_EVALUATION_PROMPT,
@@ -857,6 +858,7 @@ def get_interview_session(session_id: str) -> InterviewSessionResponse | None:
 async def end_interview_session(
     session_id: str,
     reason: str | None = None,
+    transcript: list[Any] | None = None,
     tavus_client: httpx.AsyncClient | None = None,
 ) -> InterviewSessionResponse:
     """End an ongoing interview session and signal Tavus to terminate the call."""
@@ -870,6 +872,44 @@ async def end_interview_session(
         if model.status not in ("ended", "processing", "report_ready", "failed"):
             model.status = "ended"
             model.ended_at = _utcnow()
+
+        if transcript:
+            client_turns = []
+            for item in transcript:
+                item_dict = item.model_dump() if hasattr(item, "model_dump") else dict(item)
+                s = str(item_dict.get("sender") or "").lower()
+                r = str(item_dict.get("role") or "").lower()
+                c = str(item_dict.get("text") or item_dict.get("content") or "").strip()
+                if not c or is_system_content(c):
+                    continue
+                if not r:
+                    r = "user" if s in ("you", "candidate", "me", "user") else "assistant"
+                client_turns.append(
+                    {
+                        "role": r,
+                        "speaker": "Candidate" if r == "user" else "Interviewer",
+                        "content": c,
+                        "timestamp": item_dict.get("timestamp"),
+                    }
+                )
+
+            if client_turns:
+                existing = list(model.transcript or [])
+                existing_clean = [
+                    t
+                    for t in existing
+                    if str(t.get("role") or "").lower() not in ("system", "environment", "metadata")
+                    and not is_system_content(str(t.get("content") or t.get("text") or ""))
+                ]
+                has_user_in_existing = any(
+                    str(t.get("role") or t.get("speaker") or "").lower()
+                    in ("user", "candidate", "you")
+                    for t in existing_clean
+                )
+                if not has_user_in_existing:
+                    model.transcript = client_turns
+                else:
+                    model.transcript = existing_clean
 
         tavus_conv_id = model.tavus_conversation_id
         db_session.commit()
@@ -939,11 +979,35 @@ async def handle_tavus_webhook(
 
         elif event_type == "application.transcription_ready":
             transcript = properties.get("transcript", [])
-            model.transcript = transcript
+            clean_tavus = [
+                t
+                for t in transcript
+                if str(t.get("role") or "").lower() not in ("system", "environment", "metadata")
+                and not is_system_content(str(t.get("content") or t.get("text") or ""))
+            ]
+            current_user_turns = [
+                t
+                for t in (model.transcript or [])
+                if str(t.get("role") or t.get("speaker") or "").lower()
+                in ("user", "candidate", "you")
+            ]
+            tavus_user_turns = [
+                t
+                for t in clean_tavus
+                if str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate")
+            ]
+            if current_user_turns and not tavus_user_turns:
+                pass
+            else:
+                model.transcript = clean_tavus
             if model.status != "report_ready":
                 model.status = "processing"
             db_session.commit()
-            return {"status": "processed", "event": event_type, "turns": len(transcript)}
+            return {
+                "status": "processed",
+                "event": event_type,
+                "turns": len(model.transcript or []),
+            }
 
         elif event_type == "application.recording_ready":
             rec_uri = properties.get("storage_uri") or properties.get("s3_key")
@@ -973,7 +1037,10 @@ async def poll_and_sync_transcript(
         if model is None or not model.tavus_conversation_id:
             return False
 
-        if model.transcript and len(model.transcript) > 0:
+        if model.transcript and any(
+            str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate", "you")
+            for t in model.transcript
+        ):
             return True
 
         verbose_data = await fetch_tavus_conversation_verbose(
@@ -988,8 +1055,27 @@ async def poll_and_sync_transcript(
             if ev.get("event_type") == "application.transcription_ready":
                 props = ev.get("properties", {})
                 transcript = props.get("transcript", [])
-                if transcript:
-                    model.transcript = transcript
+                clean_tavus = [
+                    t
+                    for t in transcript
+                    if str(t.get("role") or "").lower() not in ("system", "environment", "metadata")
+                    and not is_system_content(str(t.get("content") or t.get("text") or ""))
+                ]
+                if clean_tavus:
+                    current_user_turns = [
+                        t
+                        for t in (model.transcript or [])
+                        if str(t.get("role") or t.get("speaker") or "").lower()
+                        in ("user", "candidate", "you")
+                    ]
+                    tavus_user_turns = [
+                        t
+                        for t in clean_tavus
+                        if str(t.get("role") or t.get("speaker") or "").lower()
+                        in ("user", "candidate")
+                    ]
+                    if not (current_user_turns and not tavus_user_turns):
+                        model.transcript = clean_tavus
                     if model.status != "report_ready":
                         model.status = "processing"
                     updated = True

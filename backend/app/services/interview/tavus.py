@@ -233,8 +233,8 @@ async def create_tavus_conversation(
         "callback_url": callback_url,
         "properties": {
             "max_call_duration": max_duration_seconds,
-            "participant_left_timeout": 60,
-            "participant_absent_timeout": 300,
+            "participant_left_timeout": 180,
+            "participant_absent_timeout": 600,
             "enable_closed_captions": True,
             "enable_recording": bool(consent_recording),
         },

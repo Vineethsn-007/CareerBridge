@@ -2,7 +2,6 @@
 
 import React, { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { prefersReducedMotion } from "@/lib/motion";
 
 interface MagnetProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -20,7 +19,10 @@ export function Magnet({
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion() || !magnetRef.current) return;
+    const isReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isReduced || !magnetRef.current) return;
     const { left, top, width, height } = magnetRef.current.getBoundingClientRect();
     const centerX = left + width / 2;
     const centerY = top + height / 2;

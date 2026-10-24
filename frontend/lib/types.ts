@@ -317,8 +317,16 @@ export interface TavusWebhookPayload {
   properties?: Record<string, unknown>;
 }
 
+export interface ClientTranscriptTurn {
+  sender: string;
+  text: string;
+  timestamp?: string;
+  role?: string;
+}
+
 export interface EndInterviewRequest {
   reason?: string | null;
+  transcript?: ClientTranscriptTurn[];
 }
 export interface IntegrityEvent {
   event_type: "tab_switch" | "window_blur" | "fullscreen_exit" | "multiple_faces" | "no_face";

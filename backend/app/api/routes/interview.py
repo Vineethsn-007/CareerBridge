@@ -97,7 +97,11 @@ async def end_session(
     session_id: str, req: EndInterviewRequest | None = None
 ) -> InterviewSessionResponse:
     try:
-        return await end_interview_session(session_id, reason=req.reason if req else None)
+        return await end_interview_session(
+            session_id,
+            reason=req.reason if req else None,
+            transcript=req.transcript if req else None,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
