@@ -130,6 +130,18 @@ def _extract_completion_text(response: object) -> str:
     return str(content).strip()
 
 
+def _ensure_available() -> None:
+    if settings.llm_provider == "mock":
+        raise LLMUnavailable("LLM_PROVIDER is 'mock'; no LLM is configured.")
+    if not settings.llm_api_key:
+        raise LLMUnavailable("No LLM_API_KEY configured.")
+    if settings.llm_provider not in SUPPORTED_PROVIDERS:
+        raise LLMUnavailable(
+            f"Unsupported LLM_PROVIDER {settings.llm_provider!r}; "
+            f"supported providers: {', '.join(sorted(SUPPORTED_PROVIDERS))}."
+        )
+
+
 def complete(prompt: str, system: str | None = None, *, model: str | None = None) -> str:
     """Complete a prompt and return the raw text.
 
@@ -140,15 +152,7 @@ def complete(prompt: str, system: str | None = None, *, model: str | None = None
     configured. Retries transient provider failures exactly twice with exponential
     backoff; permanent errors (auth, config, validation) fail immediately.
     """
-    if settings.llm_provider == "mock":
-        raise LLMUnavailable("LLM_PROVIDER is 'mock'; no LLM is configured.")
-    if not settings.llm_api_key:
-        raise LLMUnavailable("No LLM_API_KEY configured.")
-    if settings.llm_provider not in SUPPORTED_PROVIDERS:
-        raise LLMUnavailable(
-            f"Unsupported LLM_PROVIDER {settings.llm_provider!r}; "
-            f"supported providers: {', '.join(sorted(SUPPORTED_PROVIDERS))}."
-        )
+    _ensure_available()
 
     return _extract_completion_text(_chat(_messages(prompt, system), model=model))
 
@@ -180,6 +184,8 @@ def complete_json(
     Without `schema_model`, behaviour is unchanged: the parsed dict is returned and the
     caller validates it.
     """
+    _ensure_available()
+
     if schema_model is None:
         raw = complete(prompt, system, model=model)
         candidate = _strip_code_fences(raw)
