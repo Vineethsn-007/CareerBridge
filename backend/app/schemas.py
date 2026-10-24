@@ -435,3 +435,82 @@ class InterviewReport(BaseModel):
     presentation_cues: list[str] | None = None
     integrity_summary: IntegritySummary | None = None
     created_at: str
+
+
+# ---------- Resume Tailoring (Task: resume-tailoring-agent) ----------
+
+
+class TailoredExperience(BaseModel):
+    """A rewritten experience entry; only facts from the source profile."""
+
+    title: str
+    company: str | None = None
+    duration: str | None = None
+    bullets: list[str] = Field(default_factory=list)
+
+
+class TailoredProject(BaseModel):
+    """A selected/reordered project entry from the source profile."""
+
+    name: str
+    description: str | None = None
+    highlights: list[str] = Field(default_factory=list)
+
+
+class ChangeEntry(BaseModel):
+    """One atomic change the agent made, with its rationale."""
+
+    section: str  # e.g. "headline", "summary", "experience[0]"
+    what: str  # short description of the change
+    why: str  # reason (job keyword matched, relevance, etc.)
+
+
+class TailoredResume(BaseModel):
+    """AI-tailored resume content derived strictly from the candidate's profile."""
+
+    # Core sections
+    headline: str
+    summary: str
+    skills_grouped: dict[str, list[str]] = Field(default_factory=dict)
+    experience: list[TailoredExperience] = Field(default_factory=list)
+    projects: list[TailoredProject] = Field(default_factory=list)
+    education: list[Education] = Field(default_factory=list)
+    certifications: list[Certification] = Field(default_factory=list)
+
+    # Metadata
+    change_log: list[ChangeEntry] = Field(default_factory=list)
+    ats_keywords_matched: list[str] = Field(default_factory=list)
+    gaps_not_added: list[str] = Field(default_factory=list)
+
+    # ATS scores (0-100) computed by the deterministic skill-score function
+    ats_score_before: float = Field(default=0.0, ge=0, le=100)
+    ats_score_after: float = Field(default=0.0, ge=0, le=100)
+
+
+class TailorRequest(BaseModel):
+    """Body for POST /api/resume/tailor."""
+
+    job_id: str
+    # The caller may pass the current parsed resume or rely on the stored one.
+    resume: ParsedResume | None = None
+
+
+class TailoredResumeRecord(BaseModel):
+    """Persisted tailored-resume record returned by the API."""
+
+    id: int
+    user_id: str
+    job_id: str
+    version: int
+    content: TailoredResume
+    created_at: str
+
+
+class TailoredResumeListItem(BaseModel):
+    """Slim version list entry (no full content)."""
+
+    id: int
+    version: int
+    job_id: str
+    ats_score_after: float
+    created_at: str
