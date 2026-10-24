@@ -18,6 +18,7 @@ export interface DailyAvatarCallHandle {
 interface DailyAvatarCallProps {
   conversationUrl?: string | null;
   sessionId: string;
+  isCandidateMuted?: boolean;
   onAvatarStartedSpeaking?: () => void;
   onAvatarStoppedSpeaking?: () => void;
   onUtterance?: (text: string, role: "interviewer" | "candidate") => void;
@@ -31,6 +32,7 @@ export const DailyAvatarCall = forwardRef<
   {
     conversationUrl,
     sessionId,
+    isCandidateMuted = false,
     onAvatarStartedSpeaking,
     onAvatarStoppedSpeaking,
     onUtterance,
@@ -277,20 +279,32 @@ export const DailyAvatarCall = forwardRef<
           } else if (data.event_type === "conversation.stopped_speaking") {
             setIsAvatarSpeaking(false);
             onAvatarStoppedSpeaking?.();
-          } else if (
-            data.event_type === "conversation.utterance" ||
-            data.event_type === "conversation.caption"
-          ) {
-            const text =
-              data.properties?.text ||
-              data.properties?.caption ||
-              data.properties?.speech ||
-              data.properties?.content ||
-              "";
-            const role =
-              data.properties?.role === "user" ? "candidate" : "interviewer";
-            if (text) {
-              onUtterance?.(text, role);
+          } else {
+            const evtType = typeof data.event_type === "string" ? data.event_type.toLowerCase() : "";
+            const isUtteranceEvent =
+              evtType.includes("utterance") ||
+              evtType.includes("caption") ||
+              evtType.includes("transcript") ||
+              evtType.includes("speech") ||
+              evtType === "conversation.message";
+
+            if (isUtteranceEvent) {
+              const text =
+                data.properties?.text ||
+                data.properties?.caption ||
+                data.properties?.speech ||
+                data.properties?.content ||
+                data.text ||
+                data.content ||
+                "";
+              const rawRole = String(data.properties?.role || data.role || "").toLowerCase();
+              const role =
+                rawRole === "user" || rawRole === "candidate" || rawRole === "human"
+                  ? "candidate"
+                  : "interviewer";
+              if (text && typeof text === "string" && text.trim()) {
+                onUtterance?.(text.trim(), role);
+              }
             }
           }
         });
@@ -299,13 +313,20 @@ export const DailyAvatarCall = forwardRef<
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         frame.on("transcription-message", (evt: any) => {
           const text = evt?.text;
-          if (text) {
+          if (text && typeof text === "string" && text.trim()) {
             const isLocal = evt?.participantId === frame.participants()?.local?.session_id;
-            onUtterance?.(text, isLocal ? "candidate" : "interviewer");
+            onUtterance?.(text.trim(), isLocal ? "candidate" : "interviewer");
           }
         });
 
         await frame.join();
+
+        // Explicitly enable local audio track so candidate voice is streamed to Tavus
+        try {
+          await frame.setLocalAudio(!isCandidateMuted);
+        } catch (e) {
+          console.warn("Daily setLocalAudio notice:", e);
+        }
       } catch (err: unknown) {
         console.warn("Daily SDK init notice:", err);
         if (isMounted) {
@@ -342,7 +363,18 @@ export const DailyAvatarCall = forwardRef<
         callFrameRef.current = null;
       }
     };
-  }, [conversationUrl, useIframeFallback, isMockUrl, onAvatarStartedSpeaking, onAvatarStoppedSpeaking, onUtterance, onCallEnded, sessionId]);
+  }, [conversationUrl, useIframeFallback, isMockUrl, onAvatarStartedSpeaking, onAvatarStoppedSpeaking, onUtterance, onCallEnded, sessionId, isCandidateMuted]);
+
+  // Synchronize Daily local audio when candidate mutes/unmutes
+  useEffect(() => {
+    if (callFrameRef.current && status === "live") {
+      try {
+        callFrameRef.current.setLocalAudio(!isCandidateMuted);
+      } catch (err) {
+        console.warn("Notice: could not sync Daily local audio track:", err);
+      }
+    }
+  }, [isCandidateMuted, status]);
 
   return (
     <div className="relative w-full h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[580px] bg-dark-navy rounded-xl overflow-hidden border border-border shadow-md flex items-center justify-center">

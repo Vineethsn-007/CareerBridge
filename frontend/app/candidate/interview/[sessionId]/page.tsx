@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, use } from "react";
+import React, { useState, useEffect, useRef, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
@@ -231,28 +231,60 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
     );
   };
 
+  // Recent sentences cache to prevent duplicate transcript bubbles
+  const recentSentencesRef = useRef<Map<string, number>>(new Map());
+
   // Handle incoming utterance from Daily avatar or candidate speech recognition
-  const handleAvatarUtterance = (text: string, role: "interviewer" | "candidate") => {
+  const handleAvatarUtterance = useCallback((text: string, role: "interviewer" | "candidate") => {
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    if (role === "candidate") {
+      const now = Date.now();
+      const norm = cleanText.toLowerCase().replace(/[^a-z0-9]/g, "");
+      for (const [k, time] of recentSentencesRef.current.entries()) {
+        if (now - time > 7000) recentSentencesRef.current.delete(k);
+      }
+      if (recentSentencesRef.current.has(norm)) return;
+      recentSentencesRef.current.set(norm, now);
+    }
+
     setTranscript((prev) => [
       ...prev,
       {
         sender: role === "interviewer" ? "Robin" : "You",
-        text,
+        text: cleanText,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       },
     ]);
-  };
+  }, []);
 
-  const handleCandidateSpeechRecognized = (text: string) => {
+  const handleCandidateSpeechRecognized = useCallback((text: string) => {
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    const now = Date.now();
+    const norm = cleanText.toLowerCase().replace(/[^a-z0-9]/g, "");
+    for (const [k, time] of recentSentencesRef.current.entries()) {
+      if (now - time > 7000) recentSentencesRef.current.delete(k);
+    }
+    if (recentSentencesRef.current.has(norm)) return;
+    recentSentencesRef.current.set(norm, now);
+
     setTranscript((prev) => [
       ...prev,
       {
         sender: "You",
-        text,
+        text: cleanText,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       },
     ]);
-  };
+  }, []);
+
+  // When candidate types an answer into transcript input
+  const handleCandidateTypedAnswer = useCallback((text: string) => {
+    avatarCallRef.current?.sendRespond(text);
+  }, []);
 
   // Poll session status periodically while live so if Tavus webhook ends session or report is ready,
   // the candidate is immediately transitioned without getting trapped on a dead call
@@ -400,6 +432,7 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
                 ref={avatarCallRef}
                 conversationUrl={session.conversation_url}
                 sessionId={session.session_id}
+                isCandidateMuted={isMuted}
                 onAvatarStartedSpeaking={() => setIsAvatarSpeaking(true)}
                 onAvatarStoppedSpeaking={() => setIsAvatarSpeaking(false)}
                 onUtterance={handleAvatarUtterance}
@@ -437,7 +470,9 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
               <LiveTranscriptBox
                 transcript={transcript}
                 isAvatarSpeaking={isAvatarSpeaking}
+                isMuted={isMuted}
                 onCandidateSpeechRecognized={handleCandidateSpeechRecognized}
+                onCandidateTypedAnswer={handleCandidateTypedAnswer}
               />
             </div>
           </main>
