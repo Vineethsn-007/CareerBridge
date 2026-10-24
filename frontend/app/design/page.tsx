@@ -119,7 +119,7 @@ export default function DesignSystemPage() {
               <div className="space-y-1 pt-2 border-t border-border">
                 <span className="text-xs text-muted-text uppercase tracking-wider">Body Copy (Sans-Serif)</span>
                 <p className="text-sm text-secondary-text leading-relaxed max-w-2xl">
-                  Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI — designed for students, fresh graduates, and aspiring professionals.
+                  Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI, designed for students, fresh graduates, and aspiring professionals.
                 </p>
               </div>
             </Card>
