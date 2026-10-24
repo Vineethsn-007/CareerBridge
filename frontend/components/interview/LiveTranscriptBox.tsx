@@ -209,7 +209,7 @@ export function LiveTranscriptBox({
         await navigator.mediaDevices.getUserMedia({ audio: true });
       }
       createAndStartRecognition();
-    } catch (err) {
+    } catch {
       setMicError("Microphone access was denied. Please allow mic permissions in browser settings.");
     }
   };

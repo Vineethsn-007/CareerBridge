@@ -362,8 +362,9 @@ def extract_candidate_answers(
         if not content:
             continue
 
-        # CRITICAL: Exclude system prompts, metadata, environment, perception events!
-        if role in ("system", "environment", "metadata", "perception") or is_system_content(content):
+        if role in ("system", "environment", "metadata", "perception") or is_system_content(
+            content
+        ):
             continue
 
         # Exclude UI status logs

@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Video,
-  Sparkles,
   ArrowRight,
   UserCheck,
   ShieldCheck,
@@ -13,9 +12,7 @@ import {
   Brain,
   CheckCircle2,
   Building2,
-  Briefcase,
   SlidersHorizontal,
-  ChevronRight,
 } from "lucide-react";
 
 import { Container } from "@/components/ui/Container";
@@ -440,7 +437,7 @@ function InterviewPracticeContent() {
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-venice-blue" />
-                    Use the <strong>"Done Speaking"</strong> button or say <em>"I have finished my answer"</em> to advance questions seamlessly.
+                    Use the <strong>&ldquo;Done Speaking&rdquo;</strong> button or say <em>&ldquo;I have finished my answer&rdquo;</em> to advance questions seamlessly.
                   </li>
                 </ul>
               </div>

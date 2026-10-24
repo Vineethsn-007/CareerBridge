@@ -308,7 +308,7 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
           }
           setViewState("waiting");
         }
-      } catch (err) {
+      } catch {
         // Silent poll error catch
       }
     }, 4000);

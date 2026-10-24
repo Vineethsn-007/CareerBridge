@@ -25,6 +25,7 @@ from app.schemas import (
     ParsedResume,
     PersonaInput,
 )
+from app.services.interview.evaluate import is_system_content
 from app.services.interview.models import InterviewSessionModel
 from app.services.interview.prompts import (
     INTERVIEW_EVALUATION_PROMPT,
@@ -39,7 +40,6 @@ from app.services.interview.tavus import (
     end_tavus_conversation,
     fetch_tavus_conversation_verbose,
 )
-from app.services.interview.evaluate import is_system_content
 
 logger = logging.getLogger(__name__)
 
@@ -884,22 +884,26 @@ async def end_interview_session(
                     continue
                 if not r:
                     r = "user" if s in ("you", "candidate", "me", "user") else "assistant"
-                client_turns.append({
-                    "role": r,
-                    "speaker": "Candidate" if r == "user" else "Interviewer",
-                    "content": c,
-                    "timestamp": item_dict.get("timestamp"),
-                })
+                client_turns.append(
+                    {
+                        "role": r,
+                        "speaker": "Candidate" if r == "user" else "Interviewer",
+                        "content": c,
+                        "timestamp": item_dict.get("timestamp"),
+                    }
+                )
 
             if client_turns:
                 existing = list(model.transcript or [])
                 existing_clean = [
-                    t for t in existing
+                    t
+                    for t in existing
                     if str(t.get("role") or "").lower() not in ("system", "environment", "metadata")
                     and not is_system_content(str(t.get("content") or t.get("text") or ""))
                 ]
                 has_user_in_existing = any(
-                    str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate", "you")
+                    str(t.get("role") or t.get("speaker") or "").lower()
+                    in ("user", "candidate", "you")
                     for t in existing_clean
                 )
                 if not has_user_in_existing:
@@ -976,16 +980,20 @@ async def handle_tavus_webhook(
         elif event_type == "application.transcription_ready":
             transcript = properties.get("transcript", [])
             clean_tavus = [
-                t for t in transcript
+                t
+                for t in transcript
                 if str(t.get("role") or "").lower() not in ("system", "environment", "metadata")
                 and not is_system_content(str(t.get("content") or t.get("text") or ""))
             ]
             current_user_turns = [
-                t for t in (model.transcript or [])
-                if str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate", "you")
+                t
+                for t in (model.transcript or [])
+                if str(t.get("role") or t.get("speaker") or "").lower()
+                in ("user", "candidate", "you")
             ]
             tavus_user_turns = [
-                t for t in clean_tavus
+                t
+                for t in clean_tavus
                 if str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate")
             ]
             if current_user_turns and not tavus_user_turns:
@@ -995,7 +1003,11 @@ async def handle_tavus_webhook(
             if model.status != "report_ready":
                 model.status = "processing"
             db_session.commit()
-            return {"status": "processed", "event": event_type, "turns": len(model.transcript or [])}
+            return {
+                "status": "processed",
+                "event": event_type,
+                "turns": len(model.transcript or []),
+            }
 
         elif event_type == "application.recording_ready":
             rec_uri = properties.get("storage_uri") or properties.get("s3_key")
@@ -1044,18 +1056,23 @@ async def poll_and_sync_transcript(
                 props = ev.get("properties", {})
                 transcript = props.get("transcript", [])
                 clean_tavus = [
-                    t for t in transcript
+                    t
+                    for t in transcript
                     if str(t.get("role") or "").lower() not in ("system", "environment", "metadata")
                     and not is_system_content(str(t.get("content") or t.get("text") or ""))
                 ]
                 if clean_tavus:
                     current_user_turns = [
-                        t for t in (model.transcript or [])
-                        if str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate", "you")
+                        t
+                        for t in (model.transcript or [])
+                        if str(t.get("role") or t.get("speaker") or "").lower()
+                        in ("user", "candidate", "you")
                     ]
                     tavus_user_turns = [
-                        t for t in clean_tavus
-                        if str(t.get("role") or t.get("speaker") or "").lower() in ("user", "candidate")
+                        t
+                        for t in clean_tavus
+                        if str(t.get("role") or t.get("speaker") or "").lower()
+                        in ("user", "candidate")
                     ]
                     if not (current_user_turns and not tavus_user_turns):
                         model.transcript = clean_tavus
