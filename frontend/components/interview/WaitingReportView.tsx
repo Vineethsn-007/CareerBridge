@@ -23,28 +23,52 @@ export function WaitingReportView({ session, onReportReady }: WaitingReportViewP
   const [currentSession, setCurrentSession] = useState<InterviewSessionResponse>(session);
   const [pollCount, setPollCount] = useState(0);
 
-  // Poll backend session status
+  // Poll and trigger report generation
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     let isMounted = true;
+    let isFetching = false;
 
     async function checkStatus() {
+      if (isFetching) return;
+      isFetching = true;
       try {
+        setPollCount((p) => p + 1);
+
+        // 1. Actively request the report:
+        // /report endpoint syncs any pending transcript and runs LLM evaluation on-demand
+        try {
+          const report = await api.getInterviewReport(session.session_id);
+          if (report && isMounted) {
+            setCurrentSession((prev) => ({
+              ...prev,
+              status: "report_ready",
+              has_report: true,
+            }));
+            onReportReady();
+            return;
+          }
+        } catch {
+          // If transcript is still synchronizing, fallback to session polling
+        }
+
+        // 2. Also check session metadata status
         const updated = await api.getInterviewSession(session.session_id);
         if (!isMounted) return;
         setCurrentSession(updated);
-        setPollCount((p) => p + 1);
 
         if (updated.status === "report_ready" || updated.has_report) {
           onReportReady();
         }
       } catch (err) {
-        console.warn("Polling error:", err);
+        console.warn("Report polling notice:", err);
+      } finally {
+        isFetching = false;
       }
     }
 
     if (currentSession.status !== "report_ready" && !currentSession.has_report) {
-      timer = setInterval(checkStatus, 3500);
+      timer = setInterval(checkStatus, 3000);
       // Run immediate initial check
       checkStatus();
     }
@@ -160,10 +184,23 @@ export function WaitingReportView({ session, onReportReady }: WaitingReportViewP
           View Full Performance Report
         </Button>
       ) : (
-        <p className="text-xs text-secondary-text flex items-center justify-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 text-venice-blue" />
-          This typically takes 5–15 seconds. You will be automatically redirected.
-        </p>
+        <div className="flex flex-col items-center gap-3">
+          {pollCount >= 2 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onReportReady}
+              className="text-xs px-5 py-2 font-medium"
+              rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+            >
+              Open Report
+            </Button>
+          )}
+          <p className="text-xs text-secondary-text flex items-center justify-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-venice-blue" />
+            This typically takes 5–15 seconds. You will be automatically redirected.
+          </p>
+        </div>
       )}
     </div>
   );

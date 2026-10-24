@@ -15,6 +15,39 @@ interface LiveTranscriptBoxProps {
   onCandidateSpeechRecognized?: (text: string) => void;
 }
 
+interface SpeechRecognitionResultItem {
+  transcript: string;
+}
+
+interface SpeechRecognitionResultEntry {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionResultItem;
+}
+
+interface SpeechRecognitionEventLike {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: SpeechRecognitionResultEntry;
+  };
+}
+
+interface SpeechRecognitionErrorEventLike {
+  error?: string;
+}
+
+interface BrowserSpeechRecognition {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onspeechend: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
 export function LiveTranscriptBox({
   transcript,
   isAvatarSpeaking,
@@ -33,13 +66,28 @@ export function LiveTranscriptBox({
 
   // Client-side Web Speech Recognition for live captions
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const win = typeof window !== "undefined" ? (window as unknown as Record<string, unknown>) : {};
+    const SpeechRecognitionClass = (win.SpeechRecognition || win.webkitSpeechRecognition) as
+      | (new () => BrowserSpeechRecognition)
+      | undefined;
     if (!SpeechRecognitionClass) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let recognition: any = null;
+    let recognition: BrowserSpeechRecognition | null = null;
     let isStopped = false;
+    let restartTimer: NodeJS.Timeout | null = null;
+
+    const safeStart = () => {
+      if (isStopped || !recognition) return;
+      if (restartTimer) clearTimeout(restartTimer);
+      restartTimer = setTimeout(() => {
+        if (isStopped) return;
+        try {
+          recognition?.start();
+        } catch {
+          // Ignore if already starting or active
+        }
+      }, 400);
+    };
 
     try {
       recognition = new SpeechRecognitionClass();
@@ -47,8 +95,7 @@ export function LiveTranscriptBox({
       recognition.interimResults = true;
       recognition.lang = "en-IN"; // English (Indian accent optimized)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEventLike) => {
         let currentInterim = "";
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
@@ -68,20 +115,17 @@ export function LiveTranscriptBox({
         setIsCandidateSpeaking(false);
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (e: SpeechRecognitionErrorEventLike) => {
         setIsCandidateSpeaking(false);
+        // Only ignore restart if user explicitly denied microphone
+        if (e?.error !== "not-allowed" && e?.error !== "service-not-allowed") {
+          safeStart();
+        }
       };
 
       recognition.onend = () => {
         setIsCandidateSpeaking(false);
-        // Restart if component is still mounted and not avatar speaking
-        if (!isStopped) {
-          try {
-            recognition.start();
-          } catch {
-            // ignore start error
-          }
-        }
+        safeStart();
       };
 
       recognition.start();
@@ -91,6 +135,7 @@ export function LiveTranscriptBox({
 
     return () => {
       isStopped = true;
+      if (restartTimer) clearTimeout(restartTimer);
       if (recognition) {
         try {
           recognition.stop();
