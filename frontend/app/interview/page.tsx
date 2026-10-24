@@ -56,7 +56,7 @@ function InterviewPracticeContent() {
   const searchParams = useSearchParams();
   const initialJobId = searchParams.get("job_id") || "job-web-001";
 
-  const { resume, isHydrated, saveResume } = useResumeStore();
+  const { resume, isHydrated, saveResume, getPersonaInput } = useResumeStore();
 
   const [jobId, setJobId] = useState(initialJobId);
   const [job, setJob] = useState<Job | null>(null);
@@ -214,6 +214,7 @@ function InterviewPracticeContent() {
                   const s = await api.createInterviewSession({
                     resume: activeResume,
                     job_id: jobId,
+                    persona: getPersonaInput(),
                     num_questions: 5,
                     duration_minutes: 15,
                     consent_recording: false,
