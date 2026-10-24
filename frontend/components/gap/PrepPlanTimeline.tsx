@@ -191,25 +191,35 @@ export function PrepPlanTimeline({
                   return (
                     <div
                       key={taskId}
+                      role="checkbox"
+                      aria-checked={isChecked}
+                      tabIndex={0}
                       onClick={() => toggleTask(taskId)}
+                      onKeyDown={(e) => {
+                        if (e.key === " " || e.key === "Enter") {
+                          e.preventDefault();
+                          toggleTask(taskId);
+                        }
+                      }}
                       className={cn(
-                        "p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none",
+                        "p-3 rounded-lg border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none outline-none focus-visible:ring-2 focus-visible:ring-venice-blue/40",
                         isChecked
                           ? "bg-emerald-50 border-[#18856B]/30 text-[#18856B]"
-                          : "bg-pale-blue/30 border-border hover:border-rock-blue text-primary-text"
+                          : "bg-pale-blue/30 border-border hover:border-rock-blue hover:translate-x-0.5 hover:shadow-subtle text-primary-text"
                       )}
                     >
                       <button
                         type="button"
                         aria-label="Toggle task"
+                        tabIndex={-1}
                         className={cn(
-                          "w-4 h-4 rounded mt-0.5 flex items-center justify-center transition-colors shrink-0",
+                          "w-4 h-4 rounded mt-0.5 flex items-center justify-center transition-all duration-200 active:scale-90 shrink-0",
                           isChecked
-                            ? "bg-[#18856B] text-white"
+                            ? "bg-[#18856B] text-white scale-100"
                             : "border border-border bg-pure-white hover:border-venice-blue"
                         )}
                       >
-                        {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                        {isChecked && <Check className="w-3 h-3 stroke-[3] animate-in zoom-in-50 duration-150" />}
                       </button>
                       <span
                         className={cn(

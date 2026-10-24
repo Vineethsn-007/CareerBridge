@@ -161,16 +161,18 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
   const handleDoneSpeaking = () => {
     if (!session) return;
 
-    // Send Daily app message to Robin avatar
-    avatarCallRef.current?.sendRespond("I have completed my answer.");
-
     // Advance question index
     if (currentQuestionIndex + 1 < session.questions.length) {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
 
-      // Add conversational transition to transcript
       const nextQ = session.questions[nextIndex];
+      // Send explicit Tavus app message instructing Robin to ask the next question
+      avatarCallRef.current?.sendRespond(
+        `I have completed my answer for that question. Please acknowledge and ask me the next question: "${nextQ.text}"`
+      );
+
+      // Add conversational transition to transcript
       setTranscript((prev) => [
         ...prev,
         {
@@ -185,7 +187,10 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
         },
       ]);
     } else {
-      // Reached end of questions, open end modal
+      // Reached end of questions, signal Robin and open end modal
+      avatarCallRef.current?.sendRespond(
+        "I have completed my answer for the final question. Thank you!"
+      );
       setIsEndModalOpen(true);
     }
   };
@@ -196,9 +201,11 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
     if (currentQuestionIndex + 1 < session.questions.length) {
       const nextIndex = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIndex);
-      avatarCallRef.current?.sendRespond("Let's proceed to the next question.");
-
       const nextQ = session.questions[nextIndex];
+      avatarCallRef.current?.sendRespond(
+        `Please skip to the next question: "${nextQ.text}"`
+      );
+
       setTranscript((prev) => [
         ...prev,
         {
@@ -220,7 +227,7 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
     if (!session) return;
     const currentQ = session.questions[currentQuestionIndex];
     avatarCallRef.current?.sendRespond(
-      `Could you please repeat question ${currentQuestionIndex + 1}: ${currentQ.text}?`
+      `Could you please repeat question ${currentQuestionIndex + 1}: "${currentQ.text}"?`
     );
   };
 
