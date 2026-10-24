@@ -188,7 +188,7 @@ function SkillsContent() {
       <Container size="lg">
         <PageHeader
           title="Skill Gap Analysis"
-          subtitle={gap ? `${gap.job_title} — see exactly which skills stand between you and the offer.` : "Identify missing skills and get a week-by-week prep plan."}
+          subtitle={gap ? `${gap.job_title}: see exactly which skills stand between you and the offer.` : "Identify missing skills and get a week-by-week prep plan."}
           backHref="/jobs"
           backLabel="Jobs"
           badge={

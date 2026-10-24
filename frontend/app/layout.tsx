@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://careerbridge.in"),
   title: "CareerBridge | Your Skills. Your Future. Your CareerBridge.",
   description:
-    "Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI — tailored for students, fresh graduates, and aspiring professionals.",
+    "Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI, tailored for students, fresh graduates, and aspiring professionals.",
   keywords: [
     "CareerBridge",
     "fresher jobs India",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CareerBridge | Your Skills. Your Future. Your CareerBridge.",
     description:
-      "Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI — tailored for students, fresh graduates, and aspiring professionals.",
+      "Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI, tailored for students, fresh graduates, and aspiring professionals.",
     siteName: "CareerBridge",
     locale: "en_IN",
     type: "website",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CareerBridge | Your Skills. Your Future. Your CareerBridge.",
     description:
-      "Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI — tailored for students, fresh graduates, and aspiring professionals.",
+      "Discover relevant jobs, identify skill gaps, and build personalized preparation plans with AI, tailored for students, fresh graduates, and aspiring professionals.",
   },
 };
 
