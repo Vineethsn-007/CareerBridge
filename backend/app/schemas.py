@@ -4,6 +4,8 @@ Changing a model here means changing `frontend/lib/types.ts` in the same PR
 and telling the team in chat. Add fields freely; avoid renaming/removing them.
 """
 
+from __future__ import annotations
+
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -107,6 +109,7 @@ class MatchRequest(BaseModel):
     verified_only: bool = True
     location: str | None = None
     job_type: str | None = None
+    persona: PersonaInput | None = None
 
 
 class JobMatch(BaseModel):

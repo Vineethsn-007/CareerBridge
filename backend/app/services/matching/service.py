@@ -18,7 +18,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from app.core.taxonomy import canonical_skill, normalize_skill
-from app.schemas import Job, JobMatch, MatchRequest, ParsedResume, SkillEvidence
+from app.schemas import Job, JobMatch, MatchRequest, ParsedResume, PersonaInput, SkillEvidence
 from app.services.jobs.service import list_jobs, list_jobs_from_db
 from app.services.parser.service import EVIDENCE_WEIGHTS
 
@@ -107,8 +107,8 @@ def compute_skill_overlap(
     return max(0.0, min(1.0, score_ratio)), matched, missing
 
 
-def _build_resume_document(resume: ParsedResume) -> str:
-    """Concatenate relevant resume textual fields into a single search document."""
+def _build_resume_document(resume: ParsedResume, persona: PersonaInput | None = None) -> str:
+    """Concatenate relevant resume textual fields and persona data into a single search document."""
     parts: list[str] = []
     if resume.summary:
         parts.append(resume.summary)
@@ -124,6 +124,11 @@ def _build_resume_document(resume: ParsedResume) -> str:
     for edu in resume.education:
         if edu.degree:
             parts.append(edu.degree)
+    if persona:
+        if persona.summary:
+            parts.append(persona.summary)
+        if persona.strengths:
+            parts.append(" ".join(persona.strengths))
     if resume.raw_text:
         parts.append(resume.raw_text)
     return " ".join(parts).strip()
@@ -204,10 +209,11 @@ def score_job(
     resume: ParsedResume,
     job: Job,
     resume_doc: str | None = None,
+    persona: PersonaInput | None = None,
 ) -> JobMatch:
     """Score a single job against a parsed resume using hybrid signals."""
     if resume_doc is None:
-        resume_doc = _build_resume_document(resume)
+        resume_doc = _build_resume_document(resume, persona=persona)
     job_doc = _build_job_document(job)
 
     # Signal A: Weighted skill overlap (50%), scaled by per-skill evidence.
@@ -255,6 +261,10 @@ def score_job(
         )
         rationale += f" {evidenced} of {len(matched)} matched skills are backed by direct evidence."
 
+    if persona and persona.strengths:
+        top_str = ", ".join(persona.strengths[:2])
+        rationale += f" Enriched by candidate persona working-style ({top_str})."
+
     return JobMatch(
         job=job,
         score=total_score,
@@ -284,8 +294,10 @@ def match_jobs(req: MatchRequest, session=None) -> list[JobMatch]:
     if req.job_type:
         jobs = [j for j in jobs if j.job_type == req.job_type]
 
-    resume_doc = _build_resume_document(req.resume)
-    results = [score_job(req.resume, job, resume_doc=resume_doc) for job in jobs]
+    resume_doc = _build_resume_document(req.resume, persona=req.persona)
+    results = [
+        score_job(req.resume, job, resume_doc=resume_doc, persona=req.persona) for job in jobs
+    ]
 
     # Deterministic sorting: primary score descending, secondary job ID ascending
     results.sort(key=lambda m: (-m.score, m.job.id))

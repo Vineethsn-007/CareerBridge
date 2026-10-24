@@ -20,8 +20,8 @@ export function Navbar() {
     { href: "/#capabilities", label: "Product" },
     { href: "/#how-it-works", label: "How It Works" },
     { href: "/#career-paths", label: "Career Paths" },
+    { href: "/resume", label: "Resume & Persona" },
     { href: "/jobs", label: "Jobs" },
-    { href: "/persona", label: "Persona Q&A" },
     { href: "/pricing", label: "Pricing" },
     { href: "/interview", label: "Practice" },
   ];

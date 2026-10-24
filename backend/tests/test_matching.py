@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
-from app.schemas import Experience, Job, JobMatch, MatchRequest, ParsedResume, SkillEvidence
+from app.schemas import (
+    Experience,
+    Job,
+    JobMatch,
+    MatchRequest,
+    ParsedResume,
+    PersonaInput,
+    SkillEvidence,
+)
 from app.services.matching.service import (
     compute_experience_compatibility,
     compute_skill_overlap,
@@ -404,3 +412,32 @@ def test_match_jobs_prefers_database_listings_with_session():
 
     without_session = _match_jobs(req)
     assert all(m.job.id != "db-python-role" for m in without_session)
+
+
+def test_match_jobs_enriched_with_persona():
+    """Verify that match_jobs and score_job enrich candidate text document and rationale
+    with persona strengths.
+    """
+    persona = PersonaInput(
+        summary="Collaborative and proactive builder with fast learning agility.",
+        strengths=["Leadership", "Initiative"],
+        confidence="high",
+    )
+    resume = ParsedResume(
+        skills=["Python", "FastAPI"],
+        summary="Fullstack Python developer",
+    )
+    job = _make_job(skills=["Python", "SQL"])
+    single_match = score_job(resume, job, persona=persona)
+    assert "persona working-style" in single_match.rationale
+    assert "Leadership, Initiative" in single_match.rationale
+
+    req = MatchRequest(
+        resume=resume,
+        persona=persona,
+        verified_only=False,
+        top_k=3,
+    )
+    results = match_jobs(req)
+    assert len(results) > 0
+    assert any("persona working-style" in m.rationale for m in results)
