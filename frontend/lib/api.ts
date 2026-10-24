@@ -51,25 +51,23 @@ export function getBrowserUserId(): string {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = new Headers(init?.headers);
+  if (!headers.has("X-User-ID")) {
+    headers.set("X-User-ID", getBrowserUserId());
+  }
+
   let res: Response;
   try {
-    res = await fetch(`${BASE_URL}/api${path}`, init);
+    res = await fetch(`${BASE_URL}/api${path}`, {
+      ...init,
+      headers,
+    });
   } catch (err) {
     console.error(`Network error connecting to API at ${BASE_URL}/api${path}:`, err);
     throw new Error(
       "Unable to connect to the CareerBridge backend server. Please verify the backend is running on port 8000."
     );
   }
-
-  const headers = new Headers(init?.headers);
-  if (!headers.has("X-User-ID")) {
-    headers.set("X-User-ID", getBrowserUserId());
-  }
-
-  const res = await fetch(`${BASE_URL}/api${path}`, {
-    ...init,
-    headers,
-  });
 
   if (!res.ok) {
     let detail = res.statusText;
