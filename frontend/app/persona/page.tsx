@@ -129,7 +129,7 @@ export default function PersonaPage() {
                 </h2>
                 <ul className="text-sm text-secondary-text list-disc pl-5 space-y-1">
                   <li>Questions are grounded in your parsed resume skills and projects.</li>
-                  <li>Answer in your own words — direct quotes become your profile evidence.</li>
+                  <li>Answer in your own words; direct quotes become your profile evidence.</li>
                   <li>Skipping is allowed, but skipped topics carry no evidence.</li>
                 </ul>
               </div>
@@ -166,7 +166,7 @@ export default function PersonaPage() {
             <textarea
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Describe a specific situation — what you did, your role, and the outcome."
+              placeholder="Describe a specific situation: what you did, your role, and the outcome."
               rows={5}
               className="w-full rounded-md border border-border bg-pure-white px-3.5 py-3 text-sm text-primary-text placeholder:text-muted-text focus:outline-none focus:ring-2 focus:ring-venice-blue resize-y"
             />
