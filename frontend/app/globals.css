@@ -124,3 +124,32 @@ button:disabled,
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* 3D Motion & Perspective System */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-800 {
+  perspective: 800px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Cinematic Scroll Mask Utilities */
+.mask-clip-horizontal {
+  clip-path: inset(0% 100% 0% 0%);
+  will-change: clip-path;
+}
+
+.mask-clip-vertical {
+  clip-path: inset(100% 0% 0% 0%);
+  will-change: clip-path;
+}
+

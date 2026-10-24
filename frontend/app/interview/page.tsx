@@ -61,7 +61,7 @@ function InterviewPracticeContent() {
   const searchParams = useSearchParams();
   const initialJobId = searchParams.get("job_id") || searchParams.get("job") || "job-web-001";
 
-  const { resume, isHydrated, saveResume } = useResumeStore();
+  const { resume, isHydrated, saveResume, getPersonaInput } = useResumeStore();
 
   const [jobId, setJobId] = useState(initialJobId);
   const [job, setJob] = useState<Job | null>(null);
@@ -96,11 +96,11 @@ function InterviewPracticeContent() {
   const handleLaunchAvatarInterview = async () => {
     setIsLaunchingAvatar(true);
     setError(null);
-
     try {
       const session = await api.createInterviewSession({
         resume: activeResume,
         job_id: jobId,
+        persona: typeof getPersonaInput === "function" ? getPersonaInput() : undefined,
         num_questions: 5,
         duration_minutes: 15,
         consent_recording: false,
@@ -156,7 +156,23 @@ function InterviewPracticeContent() {
           }
         />
 
-        {/* Error notification if session creation fails */}
+        {/* Fallback notification if demo resume active */}
+        {isHydrated && !resume && (
+          <div className="mb-6 p-4 rounded-md border border-primary/30 bg-surface-2/60 flex items-center justify-between text-xs max-w-4xl mx-auto">
+            <span className="text-text-muted">
+              Running simulation with preloaded profile: <strong className="text-text">{DEMO_RESUME.name}</strong>
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                saveResume(DEMO_RESUME);
+              }}
+            >
+              Save as My Profile
+            </Button>
+          </div>
+        )}
         {error && (
           <div className="mb-8 max-w-4xl mx-auto">
             <ErrorMessage

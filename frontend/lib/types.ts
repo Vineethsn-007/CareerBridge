@@ -119,6 +119,7 @@ export interface MatchRequest {
   verified_only?: boolean;
   location?: string | null;
   job_type?: string | null;
+  persona?: PersonaInput | null;
 }
 
 export interface JobMatch {

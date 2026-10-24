@@ -66,7 +66,11 @@ export function ScoreRing({
 
   return (
     <div
-      className={cn("relative inline-flex flex-col items-center justify-center", className)}
+      className={cn(
+        "relative inline-flex flex-col items-center justify-center transition-transform duration-200 hover:scale-105 group select-none",
+        className
+      )}
+      title={`${score}% Match Score`}
       {...props}
     >
       <svg

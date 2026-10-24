@@ -1,15 +1,72 @@
-import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { ShieldCheck } from "lucide-react";
+import { useGSAP } from "@gsap/react";
+import { gsap, prefersReducedMotion } from "@/lib/motion";
 
 export function Footer() {
+  const footerRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      if (!footerRef.current || prefersReducedMotion()) return;
+
+      const footer = footerRef.current;
+      const brand = footer.querySelector(".footer-brand");
+      const cols = footer.querySelectorAll(".footer-col");
+      const bottom = footer.querySelector(".footer-bottom");
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: footer,
+          start: "top 92%",
+          once: true,
+        },
+      });
+
+      tl.from(brand, {
+        opacity: 0,
+        y: 18,
+        duration: 0.6,
+        ease: "power2.out",
+      })
+        .from(
+          cols,
+          {
+            opacity: 0,
+            y: 16,
+            duration: 0.5,
+            stagger: 0.1,
+            ease: "power2.out",
+          },
+          "-=0.4"
+        )
+        .from(
+          bottom,
+          {
+            opacity: 0,
+            y: 10,
+            duration: 0.5,
+            ease: "power2.out",
+          },
+          "-=0.3"
+        );
+    },
+    { scope: footerRef }
+  );
+
   return (
-    <footer className="w-full border-t border-border bg-merino pt-12 pb-10 text-xs text-secondary-text">
+    <footer
+      ref={footerRef}
+      className="w-full border-t border-border bg-merino pt-12 pb-10 text-xs text-secondary-text"
+    >
       <Container size="xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-border">
-          <div className="space-y-3 md:col-span-2">
+          <div className="footer-brand space-y-3 md:col-span-2">
             <Link
               href="/"
               className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-venice-blue rounded-DEFAULT"
@@ -32,7 +89,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="footer-col space-y-2.5">
             <h4 className="font-semibold text-deep-teal text-xs uppercase tracking-wider">Product</h4>
             <ul className="space-y-2">
               <li>
@@ -58,7 +115,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="footer-col space-y-2.5">
             <h4 className="font-semibold text-deep-teal text-xs uppercase tracking-wider">Resources</h4>
             <ul className="space-y-2">
               <li>
@@ -80,7 +137,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-muted-text">
+        <div className="footer-bottom pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-muted-text">
           <p>© {new Date().getFullYear()} CareerBridge. All rights reserved.</p>
           <p>
             Designed for students, fresh graduates, and aspiring professionals across India.

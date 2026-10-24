@@ -48,21 +48,24 @@ export function Meter({
       )}
       <div
         className={cn(
-          "w-full bg-pale-blue rounded-full overflow-hidden border border-border",
+          "group/meter relative w-full bg-pale-blue rounded-full overflow-hidden border border-border cursor-pointer transition-colors hover:border-rock-blue",
           sizeStyles[size]
         )}
         role="progressbar"
         aria-valuenow={clampedValue}
         aria-valuemin={0}
         aria-valuemax={100}
+        title={`${Math.round(clampedValue)}% coverage`}
       >
         <div
           className={cn(
-            "h-full rounded-full transition-all duration-700 ease-out",
+            "h-full rounded-full transition-all duration-700 ease-out group-hover/meter:brightness-110 group-hover/meter:shadow-subtle",
             variantStyles[variant]
           )}
           style={{ width: `${clampedValue}%` }}
         />
+        {/* Subtle highlight sheen on hover */}
+        <div className="absolute inset-0 bg-white/0 group-hover/meter:bg-white/10 transition-colors pointer-events-none" />
       </div>
     </div>
   );
