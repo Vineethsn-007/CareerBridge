@@ -26,7 +26,16 @@ import type {
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}/api${path}`, init);
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}/api${path}`, init);
+  } catch (err) {
+    console.error(`Network error connecting to API at ${BASE_URL}/api${path}:`, err);
+    throw new Error(
+      "Unable to connect to the CareerBridge backend server. Please verify the backend is running on port 8000."
+    );
+  }
+
   if (!res.ok) {
     let detail = res.statusText;
     try {

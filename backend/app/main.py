@@ -24,11 +24,28 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+import traceback
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    tb = traceback.format_exc()
+    print("GLOBAL ERROR in request:", request.url.path)
+    print(tb)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc), "traceback": tb},
+        headers={"Access-Control-Allow-Origin": "http://localhost:3000"},
+    )
+
 
 app.include_router(api_router, prefix="/api")
