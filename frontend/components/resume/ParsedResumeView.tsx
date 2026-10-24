@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import type { ParsedResume } from "@/lib/types";
+import type { ParsedResume, PersonaProfileResult } from "@/lib/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -19,20 +19,25 @@ import {
   ArrowRight,
   RotateCcw,
   Plus,
+  Brain,
 } from "lucide-react";
 
 interface ParsedResumeViewProps {
   resume: ParsedResume;
+  personaProfile?: PersonaProfileResult | null;
   onAddSkill: (skill: string) => void;
   onRemoveSkill: (skill: string) => void;
   onReset: () => void;
+  onScrollToPersona?: () => void;
 }
 
 export function ParsedResumeView({
   resume,
+  personaProfile,
   onAddSkill,
   onRemoveSkill,
   onReset,
+  onScrollToPersona,
 }: ParsedResumeViewProps) {
   const [newSkillInput, setNewSkillInput] = useState("");
 
@@ -87,15 +92,28 @@ export function ParsedResumeView({
           >
             Re-upload
           </Button>
-          <Link href="/jobs" className="inline-flex">
+          {personaProfile ? (
+            <Link href="/jobs" className="inline-flex">
+              <Button
+                size="sm"
+                variant="primary"
+                rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              >
+                Match Verified Jobs
+              </Button>
+            </Link>
+          ) : (
             <Button
               size="sm"
               variant="primary"
+              onClick={onScrollToPersona}
+              leftIcon={<Brain className="w-3.5 h-3.5" />}
               rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              className="shadow-sm"
             >
-              Match Verified Jobs
+              Start Persona Q&A (Required)
             </Button>
-          </Link>
+          )}
         </div>
       </div>
 
@@ -229,22 +247,51 @@ export function ParsedResumeView({
 
       {/* Bottom Floating CTA */}
       <div className="p-6 rounded-xl bg-pale-blue border border-border flex flex-col sm:flex-row items-center justify-between gap-4 shadow-subtle">
-        <div>
-          <h4 className="text-sm font-bold text-deep-teal">Ready to match with companies?</h4>
-          <p className="text-xs text-secondary-text">
-            Our matching engine evaluates your {resume.skills.length} skills against verified job descriptions.
-          </p>
-        </div>
-        <Link href="/jobs" className="w-full sm:w-auto">
-          <Button
-            size="lg"
-            variant="primary"
-            rightIcon={<ArrowRight className="w-4 h-4" />}
-            className="w-full sm:w-auto shadow-card"
-          >
-            Find Matching Jobs
-          </Button>
-        </Link>
+        {personaProfile ? (
+          <>
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge variant="verified" size="sm">Persona Verified ✓</Badge>
+                <h4 className="text-sm font-bold text-deep-teal">Candidate Profile 100% Ready</h4>
+              </div>
+              <p className="text-xs text-secondary-text mt-1">
+                Both your parsed resume ({resume.skills.length} skills) and persona working-style evidence are loaded.
+              </p>
+            </div>
+            <Link href="/jobs" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="primary"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="w-full sm:w-auto shadow-card"
+              >
+                Find Matching Jobs (Step 3)
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <>
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge variant="highlight" size="sm">Step 2 Required</Badge>
+                <h4 className="text-sm font-bold text-deep-teal">Next: Complete Persona Working-Style Q&A</h4>
+              </div>
+              <p className="text-xs text-secondary-text mt-1">
+                Before discovering jobs, complete your 5-minute Persona Q&A below. This gives our AI deep behavioral evidence on your working style.
+              </p>
+            </div>
+            <Button
+              size="lg"
+              variant="primary"
+              onClick={onScrollToPersona}
+              leftIcon={<Brain className="w-4 h-4" />}
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+              className="w-full sm:w-auto shadow-card"
+            >
+              Continue to Persona Q&A (Step 2)
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

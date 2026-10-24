@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -21,6 +21,9 @@ import {
   FileText,
   Sparkles,
   ArrowRight,
+  Brain,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 
 // Preloaded sample resume for instant demo without uploading
@@ -53,7 +56,7 @@ const DEMO_RESUME: ParsedResume = {
 };
 
 export default function JobsPage() {
-  const { resume, isHydrated, saveResume } = useResumeStore();
+  const { resume, personaProfile, getPersonaInput, isHydrated, saveResume } = useResumeStore();
 
   const [matches, setMatches] = useState<JobMatch[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,13 +71,15 @@ export default function JobsPage() {
   const listContainerRef = useRef<HTMLDivElement>(null);
 
   // Fetch job matches whenever active resume is present
-  const fetchMatches = async (activeResume: ParsedResume) => {
+  const fetchMatches = useCallback(async (activeResume: ParsedResume) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Call backend POST /api/match with real resume
+      const personaInput = getPersonaInput();
+      // Call backend POST /api/match with real resume + persona
       const results = await api.match({
         resume: activeResume,
+        persona: personaInput,
         top_k: 20,
         verified_only: false, // ensure all verified + verified-source listings are retrieved
       });
@@ -85,13 +90,13 @@ export default function JobsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getPersonaInput]);
 
   useEffect(() => {
     if (isHydrated && resume) {
       fetchMatches(resume);
     }
-  }, [isHydrated, resume]);
+  }, [isHydrated, resume, personaProfile, fetchMatches]);
 
   // Extract unique locations from matches
   const locations = useMemo(() => {
@@ -172,10 +177,12 @@ export default function JobsPage() {
           title="Verified Job Matches"
           subtitle="Ranked algorithmically based on your technical skills, education, and target career direction."
           badge={
-            resume ? (
+            resume && personaProfile ? (
               <Badge variant="verified">
-                Matched for {resume.name || "Candidate"}
+                AI Enriched Match for {resume.name || "Candidate"}
               </Badge>
+            ) : resume ? (
+              <Badge variant="highlight">Persona Q&A Needed</Badge>
             ) : (
               <Badge variant="neutral">Demo Mode</Badge>
             )
@@ -184,7 +191,7 @@ export default function JobsPage() {
             resume && (
               <Link href="/resume">
                 <Button size="sm" variant="secondary" leftIcon={<FileText className="w-3.5 h-3.5" />}>
-                  Edit Skills ({resume.skills.length})
+                  Profile & Persona ({resume.skills.length} skills)
                 </Button>
               </Link>
             )
@@ -200,7 +207,7 @@ export default function JobsPage() {
                 <span>No Resume Uploaded Yet</span>
               </h3>
               <p className="text-xs text-secondary-text">
-                Upload your resume for personalized match scores, or test with our sample fresher profile.
+                Upload your resume and complete Persona Q&A for personalized match scores, or test with our sample fresher profile.
               </p>
             </div>
             <div className="flex items-center gap-2.5 shrink-0">
@@ -216,10 +223,63 @@ export default function JobsPage() {
               </Button>
               <Link href="/resume" className="inline-flex">
                 <Button size="sm" variant="secondary" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
-                  Upload My Resume
+                  Start Candidate Flow
                 </Button>
               </Link>
             </div>
+          </div>
+        )}
+
+        {/* Missing Persona Alert Banner (Mandatory Step 2) */}
+        {isHydrated && resume && !personaProfile && (
+          <div className="mb-8 p-5 rounded-lg border border-amber-300 bg-amber-50 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-subtle">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-amber-900 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Step 2 Required: Persona Q&A Incomplete</span>
+              </h3>
+              <p className="text-xs text-amber-800">
+                You have parsed your resume, but Persona Q&A is mandatory so our AI has deep behavioral evidence on your working style for accurate matching.
+              </p>
+            </div>
+            <Link href="/resume" className="inline-flex shrink-0">
+              <Button
+                size="sm"
+                variant="primary"
+                leftIcon={<Brain className="w-3.5 h-3.5" />}
+                rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                className="shadow-sm"
+              >
+                Complete Persona Q&A Now
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        {/* Persona Enriched Success Banner */}
+        {isHydrated && resume && personaProfile && (
+          <div className="mb-8 p-4 rounded-lg border border-[#18856B]/30 bg-emerald-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-subtle">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-[#18856B] text-white flex items-center justify-center shrink-0 text-xs">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-deep-teal">
+                  AI Matching Enriched with 100% Candidate Profile Data
+                </p>
+                <p className="text-[11px] text-secondary-text">
+                  Scoring utilizes {resume.skills.length} technical skills + verified Persona strengths:{" "}
+                  <span className="font-semibold text-deep-teal">
+                    {personaProfile.strengths.map((s) => s.topic).join(", ")}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <Link href="/resume" className="inline-flex shrink-0">
+              <Button size="sm" variant="ghost" className="text-xs">
+                Review Profile & Persona
+              </Button>
+            </Link>
           </div>
         )}
 
