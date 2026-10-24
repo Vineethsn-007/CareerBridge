@@ -349,7 +349,7 @@ export default function Home() {
 
   return (
     <div ref={mainRef} className="relative min-h-screen bg-merino text-primary-text">
-      {/* SECTION 2 — HERO SECTION (CINEMATIC OPENING & SCROLL PARALLAX) */}
+      {/* SECTION 2: HERO SECTION (CINEMATIC OPENING & SCROLL PARALLAX) */}
       <section
         ref={heroRef}
         className="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden border-b border-border bg-cream-mesh"
@@ -387,7 +387,7 @@ export default function Home() {
               {/* Supporting Description */}
               <p className="hero-desc text-base sm:text-lg md:text-xl text-secondary-text max-w-xl leading-relaxed">
                 Discover relevant jobs, identify skill gaps, and build
-                personalized preparation plans with AI — all in one place.
+                personalized preparation plans with AI, all in one place.
               </p>
 
               {/* CTAs */}
@@ -472,7 +472,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* SECTION 3 — VALUE PROPOSITION STRIP */}
+      {/* SECTION 3: VALUE PROPOSITION STRIP */}
       <section ref={valPropRef} className="bg-pale-blue py-12 border-b border-border">
         <Container size="xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -527,7 +527,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* SECTION 4 — THE CHALLENGE (EDITORIAL REVEALS + MASKED PHOTOGRAPHY) */}
+      {/* SECTION 4: THE CHALLENGE (EDITORIAL REVEALS + MASKED PHOTOGRAPHY) */}
       <section ref={challengeRef} className="py-20 lg:py-24 border-b border-border bg-merino">
         <Container size="xl">
           {/* Top Two-Column Composition */}
@@ -633,7 +633,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* SECTION 5 — PRODUCT CAPABILITIES (STAGGERED FEATURE CARDS) */}
+      {/* SECTION 5: PRODUCT CAPABILITIES (STAGGERED FEATURE CARDS) */}
       <section id="capabilities" ref={capabilitiesRef} className="py-20 border-b border-border bg-muted-cream">
         <Container size="xl">
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
@@ -769,13 +769,13 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* SECTION 6 — PINNED STORYTELLING SECTION ("FROM YOUR RESUME TO YOUR NEXT OPPORTUNITY") */}
+      {/* SECTION 6: PINNED STORYTELLING SECTION ("FROM YOUR RESUME TO YOUR NEXT OPPORTUNITY") */}
       <PinnedStorytelling />
 
-      {/* SECTION 7 — HOW IT WORKS (PROGRESSIVE WORKFLOW STORYTELLING) */}
+      {/* SECTION 7: HOW IT WORKS (PROGRESSIVE WORKFLOW STORYTELLING) */}
       <HowItWorksTimeline />
 
-      {/* SECTION 8 — CAREER PATHS (SCROLL-REVEALED PATHWAYS) */}
+      {/* SECTION 8: CAREER PATHS (SCROLL-REVEALED PATHWAYS) */}
       <section id="career-paths" ref={careerPathsRef} className="py-20 border-b border-border bg-pale-blue/40">
         <Container size="xl">
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
@@ -865,7 +865,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* SECTION 9 — FINAL CTA (SCROLL REVEAL) */}
+      {/* SECTION 9: FINAL CTA (SCROLL REVEAL) */}
       <section ref={finalCtaRef} className="py-20 bg-pale-blue border-b border-border relative overflow-hidden">
         <Container size="xl">
           <div className="final-cta-card bg-pure-white border border-border rounded-2xl p-8 sm:p-12 shadow-float max-w-4xl mx-auto text-center space-y-6">

@@ -161,7 +161,7 @@ export default function PricingPage() {
             {[
               {
                 q: "Is CareerBridge completely free right now?",
-                a: "Yes! All features — resume parsing, verified job matching, skill gap priorities, weekly prep plans, and AI mock interviews — are completely free and unlocked for testing.",
+                a: "Yes! All features, including resume parsing, verified job matching, skill gap priorities, weekly prep plans, and AI mock interviews, are completely free and unlocked for testing.",
               },
               {
                 q: "Where do the job listings come from?",
