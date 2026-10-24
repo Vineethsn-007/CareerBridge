@@ -307,7 +307,7 @@ export function PersonaQnASection({
             <textarea
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Describe a real situation — what you did, your role, and the outcome. (Direct quotes will back up your verified profile strengths)"
+              placeholder="Describe a real situation: what you did, your role, and the outcome. (Direct quotes will back up your verified profile strengths)"
               rows={4}
               className="w-full rounded-md border border-border bg-pure-white px-3.5 py-3 text-sm text-primary-text placeholder:text-muted-text focus:outline-none focus:ring-2 focus:ring-venice-blue resize-y transition-all"
             />
