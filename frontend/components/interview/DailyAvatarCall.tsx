@@ -55,6 +55,18 @@ export const DailyAvatarCall = forwardRef<
       conversationUrl.startsWith("c_mock")
   );
 
+  // Helper to extract Tavus CVI conversation ID from URL (e.g. https://tavus.daily.co/c75d88fe82944449 -> c75d88fe82944449)
+  const getTavusConvId = (): string => {
+    if (conversationUrl) {
+      const parts = conversationUrl.split("/").filter(Boolean);
+      const lastPart = parts[parts.length - 1];
+      if (lastPart && !lastPart.includes(".")) {
+        return lastPart;
+      }
+    }
+    return sessionId;
+  };
+
   // Expose imperative methods to parent (e.g. candidate "Done Speaking" button sends message)
   useImperativeHandle(ref, () => ({
     sendRespond: (text: string) => {
@@ -76,12 +88,13 @@ export const DailyAvatarCall = forwardRef<
       }
 
       if (callFrameRef.current) {
+        const tavusId = getTavusConvId();
         try {
           callFrameRef.current.sendAppMessage(
             {
               message_type: "conversation",
               event_type: "conversation.respond",
-              conversation_id: sessionId,
+              conversation_id: tavusId,
               properties: { text },
             },
             "*"
@@ -99,12 +112,13 @@ export const DailyAvatarCall = forwardRef<
       }
 
       if (callFrameRef.current) {
+        const tavusId = getTavusConvId();
         try {
           callFrameRef.current.sendAppMessage(
             {
               message_type: "conversation",
               event_type: "conversation.interrupt",
-              conversation_id: sessionId,
+              conversation_id: tavusId,
             },
             "*"
           );
@@ -171,6 +185,9 @@ export const DailyAvatarCall = forwardRef<
           url: conversationUrl || undefined,
           showLeaveButton: false,
           showFullscreenButton: true,
+          showLocalVideo: false,
+          showParticipantsBar: false,
+          showUserNameChangeUI: false,
           iframeStyle: {
             width: "100%",
             height: "100%",
@@ -206,6 +223,7 @@ export const DailyAvatarCall = forwardRef<
           }
         });
 
+        // Listen for Tavus CVI app messages & events
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         frame.on("app-message", (evt: any) => {
           const data = evt?.data;
@@ -217,12 +235,31 @@ export const DailyAvatarCall = forwardRef<
           } else if (data.event_type === "conversation.stopped_speaking") {
             setIsAvatarSpeaking(false);
             onAvatarStoppedSpeaking?.();
-          } else if (data.event_type === "conversation.utterance") {
-            const text = data.properties?.text || data.properties?.speech || "";
-            const role = data.properties?.role === "user" ? "candidate" : "interviewer";
+          } else if (
+            data.event_type === "conversation.utterance" ||
+            data.event_type === "conversation.caption"
+          ) {
+            const text =
+              data.properties?.text ||
+              data.properties?.caption ||
+              data.properties?.speech ||
+              data.properties?.content ||
+              "";
+            const role =
+              data.properties?.role === "user" ? "candidate" : "interviewer";
             if (text) {
               onUtterance?.(text, role);
             }
+          }
+        });
+
+        // Also capture native Daily live transcription messages if emitted
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        frame.on("transcription-message", (evt: any) => {
+          const text = evt?.text;
+          if (text) {
+            const isLocal = evt?.participantId === frame.participants()?.local?.session_id;
+            onUtterance?.(text, isLocal ? "candidate" : "interviewer");
           }
         });
 
