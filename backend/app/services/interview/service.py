@@ -1023,3 +1023,31 @@ def record_integrity_events(session_id: str, events: list[dict[str, Any]]) -> di
         model.integrity_log = current_log
         db_session.commit()
         return {"recorded": len(events), "total": len(current_log)}
+
+
+def get_or_generate_report(session_id: str) -> Any:
+    """Retrieves an existing InterviewReport, or generates it on-demand if not yet produced."""
+    from app.schemas import InterviewReport
+    from app.services.interview.evaluate import generate_interview_report
+
+    init_db()
+    with SessionLocal() as db_session:
+        model = db_session.get(InterviewSessionModel, session_id)
+        if model is None:
+            raise ValueError(f"Session '{session_id}' not found.")
+
+        if model.report:
+            return InterviewReport.model_validate(model.report)
+
+        report = generate_interview_report(model)
+        model.report = report.model_dump()
+        model.status = "report_ready"
+        db_session.commit()
+        return report
+
+
+def delete_session_data(session_id: str) -> dict[str, Any]:
+    """Permanently deletes candidate interview data for GDPR/privacy compliance."""
+    from app.services.interview.evaluate import delete_interview_session_data
+
+    return delete_interview_session_data(session_id)
