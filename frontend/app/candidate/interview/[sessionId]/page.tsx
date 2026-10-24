@@ -254,6 +254,70 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
     ]);
   };
 
+  // Poll session status periodically while live so if Tavus webhook ends session or report is ready,
+  // the candidate is immediately transitioned without getting trapped on a dead call
+  useEffect(() => {
+    if (viewState !== "live") return;
+
+    let isMounted = true;
+    const interval = setInterval(async () => {
+      try {
+        const data = await api.getInterviewSession(sessionId);
+        if (!isMounted) return;
+
+        if (data.status === "report_ready" || data.has_report) {
+          if (candidateStream) {
+            candidateStream.getTracks().forEach((t) => t.stop());
+          }
+          router.replace(`/candidate/interview/${sessionId}/report`);
+        } else if (data.status === "ended" || data.status === "processing") {
+          if (candidateStream) {
+            candidateStream.getTracks().forEach((t) => t.stop());
+          }
+          setViewState("waiting");
+        }
+      } catch (err) {
+        // Silent poll error catch
+      }
+    }, 4000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [viewState, sessionId, router, candidateStream]);
+
+  // Handle when live call concludes or interviewer disconnects
+  const handleCallEnded = async (reason?: string) => {
+    if (candidateStream) {
+      candidateStream.getTracks().forEach((t) => t.stop());
+    }
+
+    try {
+      const data = await api.getInterviewSession(sessionId);
+      if (data.status === "report_ready" || data.has_report) {
+        router.replace(`/candidate/interview/${sessionId}/report`);
+        return;
+      }
+      if (data.status === "ended" || data.status === "processing") {
+        setViewState("waiting");
+        return;
+      }
+    } catch (err) {
+      console.warn("Could not fetch session status on call ended:", err);
+    }
+
+    try {
+      await api.endInterviewSession(sessionId, {
+        reason: reason || "Live call concluded",
+        transcript: transcript,
+      });
+    } catch (err) {
+      console.warn("Notice: could not end session on call concluded:", err);
+    }
+    setViewState("waiting");
+  };
+
   // End interview flow
   const handleConfirmEndInterview = async () => {
     try {
@@ -339,6 +403,7 @@ export default function InterviewRoomPage({ params }: InterviewRoomPageProps) {
                 onAvatarStartedSpeaking={() => setIsAvatarSpeaking(true)}
                 onAvatarStoppedSpeaking={() => setIsAvatarSpeaking(false)}
                 onUtterance={handleAvatarUtterance}
+                onCallEnded={handleCallEnded}
               />
             </div>
 

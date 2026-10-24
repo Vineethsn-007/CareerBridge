@@ -21,6 +21,7 @@ interface DailyAvatarCallProps {
   onAvatarStartedSpeaking?: () => void;
   onAvatarStoppedSpeaking?: () => void;
   onUtterance?: (text: string, role: "interviewer" | "candidate") => void;
+  onCallEnded?: (reason?: string) => void;
 }
 
 export const DailyAvatarCall = forwardRef<
@@ -33,6 +34,7 @@ export const DailyAvatarCall = forwardRef<
     onAvatarStartedSpeaking,
     onAvatarStoppedSpeaking,
     onUtterance,
+    onCallEnded,
   },
   ref
 ) {
@@ -46,6 +48,7 @@ export const DailyAvatarCall = forwardRef<
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isAvatarSpeaking, setIsAvatarSpeaking] = useState<boolean>(false);
   const [useIframeFallback, setUseIframeFallback] = useState<boolean>(false);
+  const [isCallConcluded, setIsCallConcluded] = useState<boolean>(false);
 
   // Detect whether this is an offline mock room URL (e.g. from tests or offline dev mode)
   const isMockUrl = Boolean(
@@ -209,17 +212,43 @@ export const DailyAvatarCall = forwardRef<
         });
 
         frame.on("left-meeting", () => {
-          if (isMounted) setStatus("connecting");
+          if (isMounted) {
+            setIsCallConcluded(true);
+            onCallEnded?.("Call ended");
+          }
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        frame.on("participant-left", (evt: any) => {
+          if (!evt?.participant?.local) {
+            console.info("Interviewer has left the session:", evt);
+            if (isMounted) {
+              setIsCallConcluded(true);
+              onCallEnded?.("Interviewer has left the session");
+            }
+          }
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         frame.on("error", (e: any) => {
-          // Log as info/warning rather than breaking console error
           console.warn("Daily stream notice:", e);
           if (isMounted) {
-            // Gracefully switch to direct iframe fallback if Daily WebRTC encounters an issue
-            setUseIframeFallback(true);
-            setStatus("live");
+            const errStr = (typeof e === "string" ? e : JSON.stringify(e || "")).toLowerCase();
+            const isMeetingGone =
+              errStr.includes("not exist") ||
+              errStr.includes("not-found") ||
+              errStr.includes("not found") ||
+              errStr.includes("ended") ||
+              errStr.includes("closed") ||
+              errStr.includes("expire");
+
+            if (isMeetingGone) {
+              setIsCallConcluded(true);
+              onCallEnded?.("Meeting room closed or does not exist");
+            } else {
+              setUseIframeFallback(true);
+              setStatus("live");
+            }
           }
         });
 
@@ -228,6 +257,19 @@ export const DailyAvatarCall = forwardRef<
         frame.on("app-message", (evt: any) => {
           const data = evt?.data;
           if (!data) return;
+
+          if (
+            data.event_type === "system.shutdown" ||
+            data.event_type === "conversation.ended" ||
+            data.event_type === "system.conversation_ended" ||
+            (typeof data.event_type === "string" && (data.event_type.includes("shutdown") || data.event_type.includes("ended")))
+          ) {
+            if (isMounted) {
+              setIsCallConcluded(true);
+              onCallEnded?.("Interviewer ended the conversation");
+            }
+            return;
+          }
 
           if (data.event_type === "conversation.started_speaking") {
             setIsAvatarSpeaking(true);
@@ -265,11 +307,24 @@ export const DailyAvatarCall = forwardRef<
 
         await frame.join();
       } catch (err: unknown) {
-        console.warn("Daily SDK init notice, falling back to direct embed:", err);
+        console.warn("Daily SDK init notice:", err);
         if (isMounted) {
-          // If Daily SDK errors, offer clean fallback to standard responsive iframe
-          setUseIframeFallback(true);
-          setStatus("live");
+          const errStr = String(err).toLowerCase();
+          const isMeetingGone =
+            errStr.includes("not exist") ||
+            errStr.includes("not-found") ||
+            errStr.includes("not found") ||
+            errStr.includes("ended") ||
+            errStr.includes("closed") ||
+            errStr.includes("expired");
+
+          if (isMeetingGone) {
+            setIsCallConcluded(true);
+            onCallEnded?.("Meeting room closed or does not exist");
+          } else {
+            setUseIframeFallback(true);
+            setStatus("live");
+          }
         }
       }
     }
@@ -287,12 +342,34 @@ export const DailyAvatarCall = forwardRef<
         callFrameRef.current = null;
       }
     };
-  }, [conversationUrl, useIframeFallback, isMockUrl, onAvatarStartedSpeaking, onAvatarStoppedSpeaking, onUtterance, sessionId]);
+  }, [conversationUrl, useIframeFallback, isMockUrl, onAvatarStartedSpeaking, onAvatarStoppedSpeaking, onUtterance, onCallEnded, sessionId]);
 
   return (
     <div className="relative w-full h-full min-h-[420px] sm:min-h-[500px] lg:min-h-[580px] bg-dark-navy rounded-xl overflow-hidden border border-border shadow-md flex items-center justify-center">
-      {/* Mock Avatar Simulation Mode */}
-      {isMockUrl ? (
+      {/* Concluded Call View */}
+      {isCallConcluded ? (
+        <div className="w-full h-full absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-dark-navy via-[#1B445D] to-dark-navy text-center select-none z-30">
+          <div className="relative mb-6">
+            <div className="w-20 h-20 rounded-full border-2 border-emerald-400 bg-emerald-950/40 flex items-center justify-center shadow-xl">
+              <UserCheck className="w-10 h-10 text-emerald-400" />
+            </div>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-serif font-semibold text-white mb-2">
+            Interview Session Concluded
+          </h3>
+          <p className="text-xs sm:text-sm text-rock-blue max-w-sm mb-6">
+            Robin has concluded this live interview session. Your responses and integrity analysis are being processed into your evaluation report.
+          </p>
+          <Button
+            variant="highlight"
+            size="md"
+            onClick={() => onCallEnded?.("Session concluded")}
+            leftIcon={<Sparkles className="w-4 h-4" />}
+          >
+            View Evaluation Report
+          </Button>
+        </div>
+      ) : isMockUrl ? (
         <div className="w-full h-full absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-b from-dark-navy via-[#1B445D] to-dark-navy text-center select-none">
           {/* Animated Avatar Circle with Aura */}
           <div className="relative mb-6">
@@ -362,7 +439,7 @@ export const DailyAvatarCall = forwardRef<
       ) : null}
 
       {/* Connecting Overlay (for live room only) */}
-      {!isMockUrl && status === "connecting" && (
+      {!isCallConcluded && !isMockUrl && status === "connecting" && (
         <div className="absolute inset-0 bg-dark-navy/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center text-white">
           <div className="w-16 h-16 rounded-full bg-venice-blue/40 border border-venice-blue flex items-center justify-center mb-4">
             <Loader2 className="w-8 h-8 text-rock-blue animate-spin" />
@@ -377,7 +454,7 @@ export const DailyAvatarCall = forwardRef<
       )}
 
       {/* Error Overlay (for live room only if fallback fails) */}
-      {!isMockUrl && status === "error" && (
+      {!isCallConcluded && !isMockUrl && status === "error" && (
         <div className="absolute inset-0 bg-dark-navy/95 z-20 flex flex-col items-center justify-center p-6 text-center text-white">
           <AlertCircle className="w-12 h-12 text-danger mb-3" />
           <h3 className="text-base font-semibold text-white mb-1">Connection Issue</h3>
@@ -401,28 +478,30 @@ export const DailyAvatarCall = forwardRef<
       )}
 
       {/* Name Tag & Status Overlay (Bottom Left) */}
-      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
-        <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
-          <UserCheck className="w-3.5 h-3.5 text-rock-blue" />
-          <span className="text-xs font-semibold text-white">Robin</span>
-          <span className="text-[10px] text-white/60">AI Interviewer</span>
+      {!isCallConcluded && (
+        <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+          <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2">
+            <UserCheck className="w-3.5 h-3.5 text-rock-blue" />
+            <span className="text-xs font-semibold text-white">Robin</span>
+            <span className="text-[10px] text-white/60">AI Interviewer</span>
 
-          <div className="h-3 w-px bg-white/20 mx-0.5" />
+            <div className="h-3 w-px bg-white/20 mx-0.5" />
 
-          {/* Speaking Indicator */}
-          {isAvatarSpeaking ? (
-            <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
-              <Volume2 className="w-3.5 h-3.5 animate-pulse" />
-              <span>Speaking...</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5 text-[11px] text-rock-blue">
-              <span className="w-1.5 h-1.5 rounded-full bg-rock-blue animate-pulse" />
-              <span>Listening</span>
-            </div>
-          )}
+            {/* Speaking Indicator */}
+            {isAvatarSpeaking ? (
+              <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
+                <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+                <span>Speaking...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-[11px] text-rock-blue">
+                <span className="w-1.5 h-1.5 rounded-full bg-rock-blue animate-pulse" />
+                <span>Listening</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 });
